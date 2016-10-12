@@ -1,3 +1,6 @@
+-- Tell which database to use.
+USE cs419;
+
 -- Drop all tables to reset database.
 DROP TABLE IF EXISTS admins;
 DROP TABLE IF EXISTS awards;
