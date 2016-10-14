@@ -23,7 +23,7 @@ var login = require('./lib/login');
 /**************************************
 **    START OF WEBSITE HANDLERS      **
 **************************************/
-// ---------  DEFAULT  -------------
+// ---------  Default  -------------
 // Redirects to login page
 app.get('/',function(req, res, next){
   res.redirect(303, '/login');
@@ -34,33 +34,14 @@ app.post('/', function(req, res, next){
 
 // ---------  Additional -----------
 // Please consider adding as seperate modules
+login.runHandlers(app);
 
-// Takes the user to the login page
-app.get('/login',function(req, res, next){
-  res.render('login/main');
+// --------- Catch All GET ---------
+app.get('/*', function(req, res, next){
+  console.log(req);
 });
 
-// Handles Submitted Logins
-app.post('/login', function(req, res, next){
-  login.mainPostHandler(req, res, next);
-});
-
-// Reset Password Page
-app.get('/reset-password', function(req, res, next){
-  res.render('login/get-reset-code');
-});
-
-// Handles reset password attemps
-app.post('/login/reset-password', function(req, res, next){
-  login.mainResetPassword(req, res, next);
-});
-
-// Change password website
-app.post('/login/change-password', function(req, res, next){
-  res.render('change-password');
-});
-
-// ------------
+// ------------ Error ---------------
 
 // Error page not found
 app.use(function(req, res, next){
@@ -75,6 +56,8 @@ app.use(function(err, req, res, next){
   res.status(500);
   res.render('500');
 });
+
+/*********** END HANDLERS ***********/
 
 // Starts the web page
 app.listen(app.get('port'), function(){

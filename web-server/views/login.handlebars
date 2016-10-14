@@ -1,6 +1,6 @@
 <div class="container">
-  <section name="login" class="wrapper">
-    <form class="form-signin" method="post" action="/">       
+  <section name="login" class="wrapper-signin">
+    <form class="form-signin" method="post" action="/login">       
       <h2 class="form-signin-heading">Login</h2>
       <input type="text" class="form-control" name="username" placeholder="Username"  autofocus="" /><!--required=""-->
       <input type="password" class="form-control" name="password" placeholder="Password" /><!--required=""-->      
@@ -9,8 +9,6 @@
       </label>
       <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
     </form>
-    <a href="/reset-password">Forgot Password?</a>
+    <a href="/login/reset-password">Forgot Password?</a>
   </section>
 </div>
-
-<link href="public/login.css" rel="stylesheet">
