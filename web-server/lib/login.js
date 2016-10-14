@@ -1,4 +1,6 @@
 // Global Variable Decleration
+var express = require('express');
+var router = express.Router();
 
 /****************************************
 Func: mainPostHandler
@@ -11,7 +13,7 @@ function mainPostHandler(req, res, next) {
 
 	// Handles User Logins
 	} else {
-		res.redirect('/award');
+		res.redirect('/award/dummy');
 	}
 }
 
@@ -31,41 +33,31 @@ function mainResetPassword(req, res, next) {
 }
 
 /****************************************
-Func: runHandlers
-Desc: Handles get and post requests
+************ Login Routers **************
 ****************************************/
-function runHandlers(app) {
-	// Takes the user to the login page
-	app.get('/login',function(req, res, next){
-	  res.render('login');
-	});
+router.get('/login',function(req, res, next){
+  res.render('login');
+});
 
-	// Handles Submitted Logins
-	app.post('/login', function(req, res, next){
-	  login.mainPostHandler(req, res, next);
-	});
+// Handles Submitted Logins
+router.post('/login', function(req, res, next){
+  mainPostHandler(req, res, next);
+});
 
-	// Reset Password Page
-	app.get('/login/reset-password', function(req, res, next){
-	  res.render('login/get-reset-code');
-	});
+// Reset Password Page
+router.get('/login/reset-password', function(req, res, next){
+  res.render('login/get-reset-code');
+});
 
-	// Handles reset password attemps
-	app.post('/login/reset-password', function(req, res, next){
-	  login.mainResetPassword(req, res, next);
-	});
+// Handles reset password attemps
+router.post('/login/reset-password', function(req, res, next){
+  mainResetPassword(req, res, next);
+});
 
-	// Change password website
-	app.post('/login/change-password', function(req, res, next){
-	  res.render('login/change-password');
-	});
-}
+// Change password website
+router.post('/login/change-password', function(req, res, next){
+  res.render('login/change-password');
+});
 
-/****************************************
-EXPORTS: Exports the function listed below
-****************************************/
-module.exports = {
-	runHandlers : runHandlers,
-	mainPostHandler : mainPostHandler,
-	mainResetPassword : mainResetPassword,
-};
+// Allows the router to be exported
+module.exports = router;

@@ -1,4 +1,4 @@
-// Loads the express, handlebars engine
+// Loads the https, express, handlebars engine
 var express = require('express');
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
@@ -17,8 +17,8 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Requires additional custom modules
-var login = require('./lib/login');
+// Required Modules (Miscellaneous)
+var fs = require('fs');
 
 /**************************************
 **    START OF WEBSITE HANDLERS      **
@@ -32,17 +32,31 @@ app.post('/', function(req, res, next){
   res.redirect(303, '/login');
 });
 
-// ---------  Additional -----------
-// Please consider adding as seperate modules
-login.runHandlers(app);
+// --------- Additional Routers --------
+var loginRouter = require('./lib/login.js')
+app.use(loginRouter);
 
-// --------- Catch All GET ---------
-app.get('/*', function(req, res, next){
-  console.log(req);
+// ------- Automatic GET Router --------
+app.get('/*', function(req, res, next) {
+  // Gets the file name of the handlebars template
+  var url = req.originalUrl;
+  if (url[url.length - 1] == '/') // Removes trialing '/'
+    url = url.substring(0, url.length - 1); 
+  var filename = "views" + url + ".handlebars";  
+
+  // Checks if the file exists
+  fs.stat(filename, function(err, stats){
+    // Skips the handler if no file was found
+    if (err)
+      next();
+
+    // Renders the page
+    else
+      res.render(url.substring(1));
+  });
 });
 
 // ------------ Error ---------------
-
 // Error page not found
 app.use(function(req, res, next){
   res.status(404);
