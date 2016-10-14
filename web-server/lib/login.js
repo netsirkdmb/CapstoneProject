@@ -16,8 +16,24 @@ function mainPostHandler(req, res, next) {
 }
 
 /****************************************
+Func: mainResetPassword
+Desc: Handles submitted forms for password resets
+****************************************/
+function mainResetPassword(req, res, next) {
+	// Handles the reset (code provided)
+	if (req.body.hasOwnProperty('code')) {
+		res.redirect('/change-password');
+	
+	// Generates a code for the user
+	} else {
+		res.render('login');
+	}
+}
+
+/****************************************
 EXPORTS: Exports the function listed below
 ****************************************/
 module.exports = {
 	mainPostHandler : mainPostHandler,
+	mainResetPassword : mainResetPassword,
 };

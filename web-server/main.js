@@ -30,6 +30,16 @@ app.post('/', function(req, res, next){
   login.mainPostHandler(req, res, next);
 });
 
+// Reset Password Page
+app.get('/reset-password', function(req, res, next){
+  res.render('get-reset-code');
+});
+
+// Handles reset password attemps
+app.post('/reset-password', function(req, res, next){
+  login.mainResetPassword(req, res, next);
+});
+
 // Error page not found
 app.use(function(req, res, next){
   res.status(404);

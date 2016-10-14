@@ -1,13 +1,16 @@
-<section name="login" class="wrapper">
-  <form class="form-signin" method="post" action="/">       
-    <h2 class="form-signin-heading">Login</h2>
-    <input type="text" class="form-control" name="username" placeholder="Username"  autofocus="" /><!--required=""-->
-    <input type="password" class="form-control" name="password" placeholder="Password" /><!--required=""-->      
-    <label class="checkbox">
-      <input type="checkbox" value="admin" id="rememberMe" name="admin-login"> Login As Administrator
-    </label>
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>   
-  </form>
-</section>
+<div class="container">
+  <section name="login" class="wrapper">
+    <form class="form-signin" method="post" action="/">       
+      <h2 class="form-signin-heading">Login</h2>
+      <input type="text" class="form-control" name="username" placeholder="Username"  autofocus="" /><!--required=""-->
+      <input type="password" class="form-control" name="password" placeholder="Password" /><!--required=""-->      
+      <label class="checkbox">
+        <input type="checkbox" value="admin" id="admin" name="admin-login"> Login As Administrator
+      </label>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+    </form>
+    <a href="/reset-password">Forgot Password?</a>
+  </section>
+</div>
 
 <link href="public/login.css" rel="stylesheet">
