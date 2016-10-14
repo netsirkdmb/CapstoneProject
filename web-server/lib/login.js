@@ -22,11 +22,11 @@ Desc: Handles submitted forms for password resets
 function mainResetPassword(req, res, next) {
 	// Handles the reset (code provided)
 	if (req.body.hasOwnProperty('code')) {
-		res.redirect('/change-password');
+		res.redirect(307, '/change-password');
 	
 	// Generates a code for the user
 	} else {
-		res.render('login');
+		res.redirect('/reset-password');
 	}
 }
 

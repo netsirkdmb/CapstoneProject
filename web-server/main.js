@@ -12,13 +12,13 @@ app.use("/bootstrap", express.static(__dirname + '/node_modules/bootstrap/dist')
 app.use("/jquery", express.static(__dirname + '/node_modules/jquery/dist'))
 app.use("/tether", express.static(__dirname + '/node_modules/tether/dist'))
 
-// Requires additional custom modules
-var login = require('./lib/login');
-
 // Sets up the body parser
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+// Requires additional custom modules
+var login = require('./lib/login');
 
 // Takes the user to the login page
 app.get('/',function(req, res, next){
@@ -38,6 +38,11 @@ app.get('/reset-password', function(req, res, next){
 // Handles reset password attemps
 app.post('/reset-password', function(req, res, next){
   login.mainResetPassword(req, res, next);
+});
+
+// Change password website
+app.post('/change-password', function(req, res, next){
+  res.render('change-password');
 });
 
 // Error page not found
