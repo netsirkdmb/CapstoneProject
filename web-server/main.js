@@ -9,27 +9,29 @@ app.set('port', 3500);
 // Sets up the static files
 app.use("/public", express.static(__dirname + '/static'));
 app.use("/bootstrap", express.static(__dirname + '/node_modules/bootstrap/dist'))
-app.use("/jquery", express.static(__dirname + '/node_modules/bootstrap/node_modules/jquery/dist'))
-app.use("/tether", express.static(__dirname + '/node_modules/bootstrap/node_modules/tether/dist'))
+app.use("/jquery", express.static(__dirname + '/node_modules/jquery/dist'))
+app.use("/tether", express.static(__dirname + '/node_modules/tether/dist'))
 
+// Requires additional custom modules
+var login = require('./lib/login');
 
 // Sets up the body parser
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Takes user to the add data page
-app.get('/',function(req,res){
-  //res.render('add-data');
+// Takes the user to the login page
+app.get('/',function(req, res, next){
+  res.render('login');
 });
 
-// Redirects user to add data after submitting the form
-app.post('/', function(req, res){
-	// NOTHING HERE
+// Handles Submitted Logins
+app.post('/', function(req, res, next){
+  login.mainPostHandler(req, res, next);
 });
 
 // Error page not found
-app.use(function(req,res){
+app.use(function(req, res, next){
   res.status(404);
   res.render('404');
 });
