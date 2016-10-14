@@ -20,30 +20,47 @@ app.use(bodyParser.json());
 // Requires additional custom modules
 var login = require('./lib/login');
 
-// Takes the user to the login page
+/**************************************
+**    START OF WEBSITE HANDLERS      **
+**************************************/
+// ---------  DEFAULT  -------------
+// Redirects to login page
 app.get('/',function(req, res, next){
-  res.render('login');
+  res.redirect(303, '/login');
+});
+app.post('/', function(req, res, next){
+  res.redirect(303, '/login');
+});
+
+// ---------  Additional -----------
+// Please consider adding as seperate modules
+
+// Takes the user to the login page
+app.get('/login',function(req, res, next){
+  res.render('login/main');
 });
 
 // Handles Submitted Logins
-app.post('/', function(req, res, next){
+app.post('/login', function(req, res, next){
   login.mainPostHandler(req, res, next);
 });
 
 // Reset Password Page
 app.get('/reset-password', function(req, res, next){
-  res.render('get-reset-code');
+  res.render('login/get-reset-code');
 });
 
 // Handles reset password attemps
-app.post('/reset-password', function(req, res, next){
+app.post('/login/reset-password', function(req, res, next){
   login.mainResetPassword(req, res, next);
 });
 
 // Change password website
-app.post('/change-password', function(req, res, next){
+app.post('/login/change-password', function(req, res, next){
   res.render('change-password');
 });
+
+// ------------
 
 // Error page not found
 app.use(function(req, res, next){

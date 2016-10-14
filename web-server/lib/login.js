@@ -31,9 +31,18 @@ function mainResetPassword(req, res, next) {
 }
 
 /****************************************
+Func: runHandlers
+Desc: Handles get and post requests
+****************************************/
+function runHandlers(app) {
+	
+}
+
+/****************************************
 EXPORTS: Exports the function listed below
 ****************************************/
 module.exports = {
-	mainPostHandler : mainPostHandler,
+	runHandlers : runHandlers,
+	mainPostHandler : mainPostHandler
 	mainResetPassword : mainResetPassword,
 };
