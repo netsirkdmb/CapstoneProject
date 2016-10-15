@@ -1,7 +1,7 @@
 #API Readme
 
-##API base endpoint:
-[http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600]
+**API base endpoint:**
+http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600
 
 **Admins Table:** [/admins](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins)
 - get: returns all admins in the database
