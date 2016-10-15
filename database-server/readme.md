@@ -10,8 +10,7 @@ http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600
 - delete: deletes all admins in the database
 
 **Admins Table by ID:** [/admins/1234](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins/1)
-_"1234" represents the specified id_
-- get: returns admin with specified id
+- get: returns admin with specified id _(specified id is represented by "1234")_
 - post: invalid
 - put: updates admin with specified id
 - delete: deletes admin with specified id
