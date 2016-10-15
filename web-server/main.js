@@ -4,7 +4,20 @@ var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
-app.set('port', 3500);
+app.set('port', 3500);6
+
+// Sets up express sessions
+var session = require('express-session');
+app.use(session({
+  secret: 'CatDog',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false, maxAge: 10*60*1000}
+}));
+
+// Sets up the affentication
+var passport = require('passport');
+var passportConfig = require('./lib/passportConfig').init(passport);
 
 // Sets up the static files
 app.use("/public", express.static(__dirname + '/static'));
@@ -36,7 +49,7 @@ app.post('/', function(req, res, next){
 var loginRouter = require('./lib/login.js')
 app.use(loginRouter);
 
-// ------- Automatic GET Router --------
+// ------- Catch-All GET Router --------
 app.get('/*', function(req, res, next) {
   // Gets the file name of the handlebars template
   var url = req.originalUrl;
@@ -70,7 +83,6 @@ app.use(function(err, req, res, next){
   res.status(500);
   res.render('500');
 });
-
 /*********** END HANDLERS ***********/
 
 // Starts the web page

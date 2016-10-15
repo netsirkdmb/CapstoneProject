@@ -36,6 +36,7 @@ function mainResetPassword(req, res, next) {
 ************ Login Routers **************
 ****************************************/
 router.get('/login',function(req, res, next){
+  console.log(req.session.id);
   res.render('login');
 });
 
