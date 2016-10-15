@@ -1,0 +1,107 @@
+<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">Angama: Admin Site</a>
+				</div>
+				<ul class="nav navbar-nav">
+					<li ><a href="users">Users</a></li>
+					<li class="active"><a href="#">Administrators</a></li>
+					<li><a href="bi">Business Intelligence Suite</a></li>
+				</ul>
+			</div>
+		</nav>
+		<div class ="row">
+			<div class = "col-md-1"> </div>
+				<div class = "col-md-10">
+					<div class="container">
+					<h2>Admins</h2>
+					<p>This table contains all the active admins. Click on a row to edit or delete the admins. To add a admins, use the bottom screen:</p>
+					<table class="table table-hover" id="admintable" >
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Email</th>
+								<th>Password</th>
+								<th>AccountCreationTime</th>
+							</tr>
+						</thead>
+						<tbody >
+						  {{#each data}}
+						  <tr>
+							<td>{{this.name}}</td>
+							<td>{{this.email}}</td>
+							<td>{{this.password}}</td>
+							<td>{{this.time}}</td>
+						  </tr>
+						{{/each}}
+						</tbody>
+						<tfoot>
+										
+						</tfoot>
+				  </table>
+				  <button type = "button" class="btn btn-info btn-lg" id="newadminbutton">Create new Admin</button>
+				  <div class = "modal fade" id= "newAdminModal" role ="dialog">
+						<div class="modal-dialog">
+							<div class = "modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">×</button>
+									<h4 class="modal-title"> Add Admin</h4>
+									</div>
+									<div class = modal-body>
+											<div class="form-group">
+												<label for="name">User Name:</label>
+												<input type="text" class="form-control" id="name">
+											</div>
+											<div class="form-group">
+												<label for="pwd">Password:</label>
+												<input type="password" class="form-control" id="pwd">
+											</div>
+											<div class="form-group">
+												<label for="email">Email:</label>
+												<input type="email" class="form-control" id="email">
+											</div>
+																					
+									</div>
+									<div class= "modal-footer">
+										<button type="button" class = "btn btn-info btn-md" data-dismiss="modal">Submit </button>
+									
+									</div>
+							</div>
+						</div>
+					</div>
+					<div class = "modal fade" id= "updateUser" role ="dialog">
+						<div class="modal-dialog">
+							<div class = "modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">×</button>
+									<h4 class="modal-title"> Edit User </h4>
+									</div>
+									<div class = modal-body>
+											<div class="form-group">
+												<label for="name">User Name:</label>
+												<input type="text" class="form-control" id="editadminname">
+											</div>
+											<div class="form-group">
+												<label for="pwd">Password:</label>
+												<input type="text" class="form-control" id="editadminpwd">
+											</div>
+											<div class="form-group">
+												<label for="email">Email:</label>
+												<input type="email" class="form-control" id="editadminemail">
+											</div>
+																					
+									</div>
+									<div class= "modal-footer">
+										<button type="button" class = "btn btn-info btn-md" data-dismiss="modal">Update </button>
+										<button type="button" class = "btn btn-info btn-md" data-dismiss="modal">Delete </button>
+									</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		<div class = "col-md-1"></div>
+	</div>
+	
+	<script src= "public/admins.js"></script>

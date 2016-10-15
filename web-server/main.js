@@ -8,8 +8,8 @@ app.set('port', 3500);
 
 // Sets up the static files
 app.use("/public", express.static(__dirname + '/static'));
-app.use("/bootstrap", express.static(__dirname + '/node_modules/bootstrap/dist'))
-app.use("/jquery", express.static(__dirname + '/node_modules/jquery/dist'))
+//app.use("/bootstrap", express.static(__dirname + '/node_modules/bootstrap/dist'))
+//app.use("/jquery", express.static(__dirname + '/node_modules/jquery/dist'))
 app.use("/tether", express.static(__dirname + '/node_modules/tether/dist'))
 
 // Sets up the body parser
@@ -33,8 +33,10 @@ app.post('/', function(req, res, next){
 });
 
 // --------- Additional Routers --------
-var loginRouter = require('./lib/login.js')
+var loginRouter = require('./lib/login.js');
 app.use(loginRouter);
+var adminRouter = require ('./lib/admin.js');
+app.use(adminRouter);
 
 // ------- Automatic GET Router --------
 app.get('/*', function(req, res, next) {

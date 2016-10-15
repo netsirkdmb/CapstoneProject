@@ -1,0 +1,93 @@
+
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">Angama: Admin Site</a>
+				</div>
+				<ul class="nav navbar-nav">
+					<li ><a href="users">Users</a></li>
+					<li ><a href= "admins">Administrators</a></li>
+					<li class="active"><a href="#">Business Intelligence Suite</a></li>
+				</ul>
+			</div>
+		</nav>
+		<div class ="row">
+			<div class = "col-md-1"> </div>
+			<div class = "col-md-10">
+				<h2>Top Performing Employees </h2>
+				   <div>
+						<!--Divs that will hold each control and chart-->
+						<table class="columns">
+							<tr>
+								<td><div id="topdogsbar"></div></td>
+								<td><div id="topdogs"></div></td>
+								
+							</tr>
+						</table>
+				<hr>
+				<h2>Most Generous Employees </h2>
+					<table>
+						<tr>
+							<td><div id="nicedogsgraph"></div></td>
+							<td><div id="nicedogs"></div></td>
+							<td><div id="awardtypepie"</div></td>
+						</tr>
+					</table>
+					
+				<hr>
+				<h2>Time Break Down Of Award</h2>
+					<table>
+						<tr>
+						    <td><div id="awardsfrequency"> </div></td>
+							<td><div id ="PieBreakdown"></div></td>
+						</tr>
+					
+					
+					</table>
+				
+					
+				<hr>
+				<h2>Look Up</h2>
+				<form>
+					<div class="form-group">
+						<label for ="ename">Name: </label>
+						<input type="text" id="ename" class="form-control"></label>
+					</div>
+					
+						
+				
+				</form>
+				<button type="submit" class= "btn btn-info btn-md" id="searchbutton">Look Up</button>
+				<div id="employeeinfo">
+					<h3 id="employeename"></h3>
+					<h3 id="Employee_rating"></h3>
+					<table id= "indirecieved">
+						<tr><h2 id="awards_title" hidden>Awards</h2></tr>
+						<tr>
+							
+							<td><div id ="indiLineRecieved" > </div> </td>
+							<td><div id ="indiPieRecieved" > </div> </td>
+							<td><div id ="indiTableRecieved"> </div> </td>
+						</tr>
+					</table>
+					<table>
+						<tr><h2 id="given_title" hidden>Awards Given</h2> </tr>
+						<tr>
+							
+							<td><div id ="indiBarGiven" > </div> </td>
+							<td><div id ="indiPieGiven" > </div> </td>
+							<td><div id ="indiTableGiven" > </div> </td>
+						</tr>
+					</table>
+				
+				</div>
+				
+				<hr>
+			</div>
+			<div class = "col-md-1"> </div>
+		<br>
+		<script src="public/TopPerformers.js"></script>
+		<script src="public/Generous.js"></script>
+		<script src= "public/AwardData.js"></script>
+		<script src="public/Search.js"></script>
