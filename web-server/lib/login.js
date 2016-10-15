@@ -1,7 +1,6 @@
 // Global Variable Decleration
-var express = require('express');
-var router = express.Router();
-var passport;
+var router = require('express').Router();
+var routerAuth = require('express').Router();
 
 /****************************************
 Func: mainPostHandler
@@ -38,15 +37,23 @@ function mainResetPassword(req, res, next) {
 }
 
 /****************************************
+Func: Init
+Desc: Initialises the router with authentication
+****************************************/
+function init(passport) {
+	console.log(passport);
+
+	// Handles Submitted Logins
+	router.post('/login', passport.authenticate('user-login'), function(req, res, next){
+		mainPostHandler(req, res, next);
+	});
+};
+
+/****************************************
 ************ Login Routers **************
 ****************************************/
 router.get('/login',function(req, res, next){
   res.render('login');
-});
-
-// Handles Submitted Logins
-router.post('/login', function(req, res, next){
-  mainPostHandler(req, res, next);
 });
 
 // Reset Password Page
@@ -64,14 +71,8 @@ router.post('/login/change-password', function(req, res, next){
   res.render('login/change-password');
 });
 
-
-/****************************************
-Func: module.export
-Desc: Initialises the router (inc authentication)
-****************************************/
-module.exports = function(pass){
-	passport = pass;
-
-	// returns the router
-	return router;
+// Exports the module
+module.exports = {
+	init : init,
+	router : router
 }

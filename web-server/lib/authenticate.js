@@ -1,5 +1,6 @@
 // Requires
-localStrategy = require('passport-local').Strategy;
+var passport = require('passport');
+var localStrategy = require('passport-local').Strategy;
 
 // Dummy users for testing
 const user = {
@@ -10,9 +11,9 @@ const user = {
 
 /******************************************
 ** Var: userLogin
-** Desc: Authentication strategy for users
+** Desc: Authentication strategy for users logins
 ******************************************/
-userLogin = function(username, password, done) {
+function userLogin(username, password, done) {
 User.findOne({ username: username }, function (err, user) {
 		if (err) { return done(err); }
 		if (!user) { return done(null, false); }
@@ -21,7 +22,16 @@ User.findOne({ username: username }, function (err, user) {
 	});
 }
 
-// Exports the functions
-module.exports = {
-	userLogin : userLogin
+/******************************************
+** Var: init
+** Desc: Initialises the authentication
+******************************************/
+function init(app, session) {
+	app.use(passport.initialize());
+	app.use(passport.session());
+	passport.use('user-login', userLogin);
+	return passport;
 }
+
+// Exports the functions
+module.exports = init;
