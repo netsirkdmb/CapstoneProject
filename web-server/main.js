@@ -19,12 +19,8 @@ app.use(session({
   cookie: { secure: false, maxAge: 10*60*1000}
 }));
 
-// Sets up the affentication
-var passport = require('passport');
-app.use(passport.initialize());
-app.use(passport.session());
-var auth = require('./lib/authenticate.js');
-app.use('user-login', auth.userLogin);
+// Loads the authentication module
+var passport = require('./lib/authenticate')(app, session);
 
 // Sets up the static files
 app.use("/public", express.static(__dirname + '/static'));
@@ -50,10 +46,13 @@ app.post('/', function(req, res, next){
 });
 
 // ------------ AUTHENTICATE -------------
+// Authenticates login post
 //next() --> additional routers
 
 // --------- Additional Routers --------
-app.use(require('./lib/login.js')(passport));
+var loginRouter = require('./lib/login.js');
+loginRouter.init(passport);
+app.use(loginRouter.router);
 
 // ------- Catch-All GET Router --------
 app.get('/*', function(req, res, next) {
