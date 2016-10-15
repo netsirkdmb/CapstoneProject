@@ -1,15 +1,20 @@
 // Global Variable Decleration
 var express = require('express');
 var router = express.Router();
+var passport;
 
 /****************************************
 Func: mainPostHandler
 Desc: Handles the submitted login form from '/'
 ****************************************/
 function mainPostHandler(req, res, next) {
+	// Records the user as logged in
+	// NOTE: Do not use for security purposes - only forces the save
+	req.session.login = true; // Do not use
+
 	// Handles Admin Logins
 	if (req.body.hasOwnProperty('admin-login')) {
-		res.redirect('/admin/dummyFile');
+		res.redirect('/admin/dummy');
 
 	// Handles User Logins
 	} else {
@@ -36,7 +41,6 @@ function mainResetPassword(req, res, next) {
 ************ Login Routers **************
 ****************************************/
 router.get('/login',function(req, res, next){
-  console.log(req.session.id);
   res.render('login');
 });
 
@@ -60,5 +64,14 @@ router.post('/login/change-password', function(req, res, next){
   res.render('login/change-password');
 });
 
-// Allows the router to be exported
-module.exports = router;
+
+/****************************************
+Func: module.export
+Desc: Initialises the router (inc authentication)
+****************************************/
+module.exports = function(pass){
+	passport = pass;
+
+	// returns the router
+	return router;
+}

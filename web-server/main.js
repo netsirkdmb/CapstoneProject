@@ -1,15 +1,19 @@
+// Required Modules (Miscellaneous)
+var fs = require('fs');
+var randomString = require('randomstring');
+
 // Loads the https, express, handlebars engine
 var express = require('express');
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
-app.set('port', 3500);6
+app.set('port', 3500);
 
 // Sets up express sessions
 var session = require('express-session');
 app.use(session({
-  secret: 'CatDog',
+  secret: randomString.generate(),
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false, maxAge: 10*60*1000}
@@ -17,7 +21,10 @@ app.use(session({
 
 // Sets up the affentication
 var passport = require('passport');
-var passportConfig = require('./lib/passportConfig').init(passport);
+app.use(passport.initialize());
+app.use(passport.session());
+var auth = require('./lib/authenticate.js');
+app.use('user-login', auth.userLogin);
 
 // Sets up the static files
 app.use("/public", express.static(__dirname + '/static'));
@@ -29,9 +36,6 @@ app.use("/tether", express.static(__dirname + '/node_modules/tether/dist'))
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-// Required Modules (Miscellaneous)
-var fs = require('fs');
 
 /**************************************
 **    START OF WEBSITE HANDLERS      **
@@ -45,9 +49,11 @@ app.post('/', function(req, res, next){
   res.redirect(303, '/login');
 });
 
+// ------------ AUTHENTICATE -------------
+//next() --> additional routers
+
 // --------- Additional Routers --------
-var loginRouter = require('./lib/login.js')
-app.use(loginRouter);
+app.use(require('./lib/login.js')(passport));
 
 // ------- Catch-All GET Router --------
 app.get('/*', function(req, res, next) {
