@@ -17,6 +17,7 @@ function mainPostHandler(req, res, next) {
 
 	// Handles User Logins
 	} else {
+		console.log(req);
 		res.redirect('/award/dummy');
 	}
 }
@@ -41,8 +42,6 @@ Func: Init
 Desc: Initialises the router with authentication
 ****************************************/
 function init(passport) {
-	console.log(passport);
-
 	// Handles Submitted Logins
 	router.post('/login', passport.authenticate('user-login'), function(req, res, next){
 		mainPostHandler(req, res, next);

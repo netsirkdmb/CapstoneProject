@@ -50,6 +50,7 @@ app.post('/', function(req, res, next){
 //next() --> additional routers
 
 // --------- Additional Routers --------
+// Loads the login routers
 var loginRouter = require('./lib/login.js');
 loginRouter.init(passport);
 app.use(loginRouter.router);
