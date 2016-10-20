@@ -8,14 +8,15 @@ app.set('port', 3500);
 
 // Sets up the static files
 app.use("/public", express.static(__dirname + '/static'));
-//app.use("/bootstrap", express.static(__dirname + '/node_modules/bootstrap/dist'))
-//app.use("/jquery", express.static(__dirname + '/node_modules/jquery/dist'))
 app.use("/tether", express.static(__dirname + '/node_modules/tether/dist'))
 
 // Sets up the body parser
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+//Sets up Request Library
+var request = require('request');
 
 // Required Modules (Miscellaneous)
 var fs = require('fs');
