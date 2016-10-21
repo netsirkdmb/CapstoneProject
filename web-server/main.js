@@ -19,6 +19,12 @@ app.use(session({
   cookie: { secure: false, maxAge: 10*60*1000}
 }));
 
+// Sets up the https server
+var https = require('https');
+var privateKey = fs.readFileSync('keys/key.pem', 'utf8');
+var certificate = fs.readFileSync('keys/cert.pem', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
+
 // Loads the authentication module
 var passport = require('./lib/authenticate')(app, session);
 
@@ -93,7 +99,8 @@ app.use(function(err, req, res, next){
 });
 /*********** END HANDLERS ***********/
 
-// Starts the web page
-app.listen(app.get('port'), function(){
+// Starts the web page (On https)
+var httpsServer = https.createServer(credentials, app);
+httpsServer.listen(app.get('port'), function(){
   console.log('Express started on http://localhost:' + app.get('port') + '; press Ctrl-C to terminate.');
 });
