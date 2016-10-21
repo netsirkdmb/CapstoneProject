@@ -65,6 +65,14 @@ pageParser.add_argument("limit", type=inputs.positive)
 
 mysql.init_app(app)
 
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    return response
+
 
 class AdminsList(Resource):
     # get a list of all of the admins in the database
@@ -681,7 +689,7 @@ class AddDummyData(Resource):
         else:
             app.cursor.close()
             app.conn.close()
-            
+
             return {"Status": "Fail", "Message": data}, 400
 
 
