@@ -1,3 +1,7 @@
+// Required Modules (Miscellaneous)
+var fs = require('fs');
+var randomString = require('randomstring');
+
 // Loads the https, express, handlebars engine
 var express = require('express');
 var app = express();
@@ -5,6 +9,18 @@ var handlebars = require('express-handlebars').create({defaultLayout:'main'});
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 app.set('port', 3500);
+
+// Sets up express sessions
+var session = require('express-session');
+app.use(session({
+  secret: randomString.generate(),
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false, maxAge: 10*60*1000}
+}));
+
+// Loads the authentication module
+var passport = require('./lib/authenticate')(app, session);
 
 // Sets up the static files
 app.use("/public", express.static(__dirname + '/static'));
@@ -16,9 +32,6 @@ app.use("/tether", express.static(__dirname + '/node_modules/tether/dist'))
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-// Required Modules (Miscellaneous)
-var fs = require('fs');
 
 /**************************************
 **    START OF WEBSITE HANDLERS      **
@@ -32,11 +45,17 @@ app.post('/', function(req, res, next){
   res.redirect(303, '/login');
 });
 
-// --------- Additional Routers --------
-var loginRouter = require('./lib/login.js')
-app.use(loginRouter);
+// ------------ AUTHENTICATE -------------
+// Authenticates login post
+//next() --> additional routers
 
-// ------- Automatic GET Router --------
+// --------- Additional Routers --------
+// Loads the login routers
+var loginRouter = require('./lib/login.js');
+loginRouter.init(passport);
+app.use(loginRouter.router);
+
+// ------- Catch-All GET Router --------
 app.get('/*', function(req, res, next) {
   // Gets the file name of the handlebars template
   var url = req.originalUrl;
@@ -70,7 +89,6 @@ app.use(function(err, req, res, next){
   res.status(500);
   res.render('500');
 });
-
 /*********** END HANDLERS ***********/
 
 // Starts the web page
