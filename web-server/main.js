@@ -24,8 +24,8 @@ var passport = require('./lib/authenticate')(app, session);
 
 // Sets up the static files
 app.use("/public", express.static(__dirname + '/static'));
-app.use("/bootstrap", express.static(__dirname + '/node_modules/bootstrap/dist'))
-app.use("/jquery", express.static(__dirname + '/node_modules/jquery/dist'))
+//app.use("/bootstrap", express.static(__dirname + '/node_modules/bootstrap/dist'))
+//app.use("/jquery", express.static(__dirname + '/node_modules/jquery/dist'))
 app.use("/tether", express.static(__dirname + '/node_modules/tether/dist'))
 
 // Sets up the body parser
@@ -54,6 +54,8 @@ app.post('/', function(req, res, next){
 var loginRouter = require('./lib/login.js');
 loginRouter.init(passport);
 app.use(loginRouter.router);
+var adminRouter = require ('./lib/admin.js');
+app.use(adminRouter);
 
 // ------- Catch-All GET Router --------
 app.get('/*', function(req, res, next) {
