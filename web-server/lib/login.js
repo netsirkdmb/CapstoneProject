@@ -18,7 +18,7 @@ function mainPostHandler(req, res, next) {
 	// Handles User Logins
 	} else {
 		console.log(req);
-		res.redirect('/award/dummy');
+		res.redirect('/award/give-award');
 	}
 }
 
@@ -51,6 +51,7 @@ function init(passport) {
 /****************************************
 ************ Login Routers **************
 ****************************************/
+// Main login page
 router.get('/login',function(req, res, next){
   res.render('login');
 });

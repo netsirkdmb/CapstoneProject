@@ -1,0 +1,32 @@
+{{> user-nav give-award='true'}}
+<section class='award-wrapper'>
+	<h1> Give An Award </h1>
+	<p>Noticed an outstanding acheivement from a fellow co-worker? Fill out the form below to give them a award!</p>
+	<form>
+		<div class="form-group">
+			<label for="name">Recipient Full Name:</label>
+			<input type="text" class="form-control" id="name">
+		</div>
+		<div class="form-group">
+			<label for="email">Recipient Email:</label>
+			<input type="email" class="form-control" id="email">
+		</div>
+		<div class="dropdown form-group">
+			<label for="cert-type">Select Certificate Type:</label>
+			<select class="form-control" id="cert-type">
+				<option>1</option>
+				<option>2</option>
+				<option>3</option>
+				<option>4</option>
+			</select>
+		</div>
+		<div class="form-group">
+			<label for="date">Time and Date Issued</label>
+			<input type="time" class="form-control" id="time">
+			<input type="date" class="form-control" id="date">
+		</div> 
+		<br>
+		<button type="submit" class="btn btn-primary">Submit</button>
+	</form>
+</section>
+<link rel="stylesheet" type="text/css" href="../public/awards.css">

@@ -2,7 +2,7 @@
 var fs = require('fs');
 var randomString = require('randomstring');
 
-// Loads the https, express, handlebars engine
+// Loads the express, handlebars engine
 var express = require('express');
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
@@ -39,6 +39,14 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// Removes trailing forward slash
+app.use(function(req, res, next) {
+   if(req.url.substr(-1) == '/' && req.url.length > 1)
+       res.redirect(301, req.url.slice(0, -1));
+   else
+       next();
+});
+
 /**************************************
 **    START OF WEBSITE HANDLERS      **
 **************************************/
@@ -56,12 +64,23 @@ app.post('/', function(req, res, next){
 //next() --> additional routers
 
 // --------- Additional Routers --------
-// Loads the login routers
 var loginRouter = require('./lib/login.js');
 loginRouter.init(passport);
 app.use(loginRouter.router);
-var adminRouter = require ('./lib/admin.js');
+var adminRouter = require('./lib/admin.js');
 app.use(adminRouter);
+var userRouter = require('./lib/user.js');
+app.use(userRouter.router);
+
+// ------- Prevents Auto-Routing -------
+app.get('/layouts*', function(req, res, next){
+  res.status(404);
+  res.render('404');
+});
+app.get('/partials*', function(req, res, next){
+  res.status(404);
+  res.render('404');
+});
 
 // ------- Catch-All GET Router --------
 app.get('/*', function(req, res, next) {

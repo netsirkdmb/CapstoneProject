@@ -1,0 +1,21 @@
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="give-award">Angama: Awards</a>
+		</div>
+		<ul class="nav navbar-nav">
+			<li {{#if give-award}}class="active"{{/if}}>
+				<a href="give-award">Give Award</a>
+			</li>
+			<li {{#if previous-award}}class="active"{{/if}}>
+				<a href="previous-award">Previous Awards</a>
+			</li>
+			<li {{#if profile}}class="active"{{/if}}>
+				<a href="profile">Profile</a>
+			</li>
+			<li>
+				<a href="logout">Logout</a>
+			</li>
+		</ul>
+	</div>
+</nav>
