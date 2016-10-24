@@ -68,8 +68,8 @@ http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600
 
 
 **Reset Tables:** [/resetTables](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/resetTables)
-- drops all tables in the database and creates them again
+- post: drops all tables in the database and creates them again
 
 
 **Reset Tables with Dummy Data:** [/resetTablesWithDummyData](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/resetTablesWithDummyData)
-- drops all tables in the database, creates them again, and adds dummy data
+- post: drops all tables in the database, creates them again, and adds dummy data
