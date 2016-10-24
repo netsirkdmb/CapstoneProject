@@ -775,4 +775,6 @@ api.add_resource(AddDummyData, '/resetTablesWithDummyData')
 
 
 if __name__ == "__main__":
-    app.run(debug=False, port=5600, host='0.0.0.0')
+    # context = ("cert.crt", "key.key")
+    # app.run(ssl_context=context, debug=False, port=5600, host="0.0.0.0")
+    app.run(debug=False, port=5600, host="0.0.0.0")
