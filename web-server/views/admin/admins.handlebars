@@ -10,6 +10,8 @@
 				</ul>
 			</div>
 		</nav>
+
+		<!-- Admin Table Data -->
 		<div class ="row">
 			<div class = "col-md-1"> </div>
 				<div class = "col-md-10">
@@ -19,6 +21,7 @@
 					<table class="table table-hover" id="admintable" >
 						<thead>
 							<tr>
+								<th>ID</th>
 								<th>Name</th>
 								<th>Email</th>
 								<th>Password</th>
@@ -28,6 +31,7 @@
 						<tbody >
 						  {{#each data}}
 						  <tr>
+							<td>{{this.uid}}</td>
 							<td>{{this.name}}</td>
 							<td>{{this.email}}</td>
 							<td>{{this.password}}</td>
@@ -39,7 +43,10 @@
 										
 						</tfoot>
 				  </table>
-				  <button type = "button" class="btn btn-info btn-lg" id="newadminbutton">Create new Admin</button>
+
+				 <!-- New ADMIN Section -->
+
+				  <button type = "button" class="btn btn-info btn-lg" id="newadminbutton">Create New Admin</button>
 				  <div class = "modal fade" id= "newAdminModal" role ="dialog">
 						<div class="modal-dialog">
 							<div class = "modal-content">
@@ -69,12 +76,14 @@
 							</div>
 						</div>
 					</div>
+
+					<!-- EDIT USER MODAL -->
 					<div class = "modal fade" id= "updateUser" role ="dialog">
 						<div class="modal-dialog">
 							<div class = "modal-content">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal">×</button>
-									<h4 class="modal-title"> Edit User </h4>
+									<h4 class="modal-title"> Edit User <h4 class ="modal-title" id="uuID">Testing  </h4> </h4>
 									</div>
 									<div class = modal-body>
 											<div class="form-group">
@@ -92,8 +101,8 @@
 																					
 									</div>
 									<div class= "modal-footer">
-										<button type="button" class = "btn btn-info btn-md" data-dismiss="modal">Update </button>
-										<button type="button" class = "btn btn-info btn-md" data-dismiss="modal">Delete </button>
+										<button type="button" class = "btn btn-info btn-md" data-dismiss="modal" id="updateadminbutton">Update </button>
+										<button type="button" class = "btn btn-info btn-md" data-dismiss="modal" id="deleteadminbutton">Delete </button>
 									</div>
 							</div>
 						</div>
@@ -104,4 +113,4 @@
 		<div class = "col-md-1"></div>
 	</div>
 	
-	<script src= "public/admins.js"></script>
+	<script src= "/public/admins.js"></script>
