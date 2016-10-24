@@ -30,8 +30,6 @@ var passport = require('./lib/authenticate')(app, session);
 
 // Sets up the static files
 app.use("/public", express.static(__dirname + '/static'));
-//app.use("/bootstrap", express.static(__dirname + '/node_modules/bootstrap/dist'))
-//app.use("/jquery", express.static(__dirname + '/node_modules/jquery/dist'))
 app.use("/tether", express.static(__dirname + '/node_modules/tether/dist'))
 
 // Sets up the body parser
@@ -46,6 +44,12 @@ app.use(function(req, res, next) {
    else
        next();
 });
+
+//Sets up Request Library
+var request = require('request');
+
+// Required Modules (Miscellaneous)
+var fs = require('fs');
 
 /**************************************
 **    START OF WEBSITE HANDLERS      **

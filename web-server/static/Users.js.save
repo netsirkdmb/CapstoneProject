@@ -15,9 +15,10 @@ $(document).ready(function(){
 		$(this).find("td").each(function(){
 			modalData.push($(this).html());
 	        });
-		
+
 		//Set the modal form with these properties
-		$('#uuID').text(modalData[0]);
+		
+		$('#uuID').val(modalData[0]);
 		$('#editname').val(modalData[1]);
 		$('#editemail').val(modalData[2]);
 		$('#editpwd').val(modalData[3]);
@@ -39,6 +40,7 @@ $(document).ready(function(){
 	//function to delete user
 	$('#deleteuserbutton').click(function(){
         	var userID = $('#uuID').text();
+		
 		//ajax call to backend web server which reroutes to database
                 $.ajax({
                         url: '/adminAPI/user/' + userID,
@@ -64,13 +66,13 @@ $(document).ready(function(){
                 //add code to check form values are filled out
                 if( $('#editname').val()=="" || $('#edituserpwd').val()=="" || $('#editemail').val()=="", $('#editimage').val()=="", $('#editregion').val()==""){
                         if($('#editname').val()==""){
-	                        alert('Please Fill Out User Name.');
+                                alert('Please Fill Out Admin Name.');
                         }
                         else if( $('#edituserpwd').val()==""){
-                                alert('Please Fill Out User Password.');
+                                alert('Please Fill Out Admin Password.');
                         }
                         else if ($('#editemail').val() ==""){
-                                alert('Please Fill Out User Email.');
+                                alert('Please Fill Out Admin Email.');
                         }
 			else if ($('#editimage').val() == ""){
 				alert('Please Upload Image');
@@ -107,17 +109,17 @@ $(document).ready(function(){
 	
 	//function to submit new user request
       //Create new Admin Button
-        $('#createuserbutton').click(function(){
+        $('#creatuserbutton').click(function(){
                 //add code to check form values are filled out
 		if( $('#name').val()=="" || $('#pwd').val()=="" || $('#email').val()=="", $('#image').val()=="", $('#region').val()==""){
                         if($('#name').val()==""){
-                                alert('Please Fill Out User Name.');
+                                alert('Please Fill Out Admin Name.');
                         }
                         else if( $('#pwd').val()==""){
-                                alert('Please Fill Out User Password.');
+                                alert('Please Fill Out Admin Password.');
                         }
                         else if ($('#email').val() ==""){
-                                alert('Please Fill Out User Email.');
+                                alert('Please Fill Out Admin Email.');
                         }
                         else if ($('#image').val() == ""){
                                 alert('Please Upload Image');
@@ -127,10 +129,9 @@ $(document).ready(function(){
                         }
                         return;
                 }
-		//serialize form data
-                var formData  = "password=" + $('#pwd').val() + "&uuID=" + $('#name').val() + "&email=" + $('#email').val() + "&signatureImage=" + "comingsoon"  +  "&region=" + $('#region').val() + "&name=" +  $('#name').val();
-                console.log(formData);
-		 $.ajax({
+
+                var formData  = "password=" + $('#pwd').val() + "&uuID=" + $('#uuID').val() + "&email="+ $('#email').val() ;
+                $.ajax({
                         url: '/adminAPI/user',
                         contentType: 'application/x-www-form-urlencoded',
                         type: "POST",
@@ -152,7 +153,5 @@ $(document).ready(function(){
                 .fail(function(result){
                         alert("Fail");
                 });
-
 	});
-
 });
