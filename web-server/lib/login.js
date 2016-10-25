@@ -13,7 +13,7 @@ function mainPostHandler(req, res, next) {
 
 	// Handles Admin Logins
 	if (req.body.hasOwnProperty('admin-login')) {
-		res.redirect('/admin/dummy');
+		res.redirect('/admin/users');
 
 	// Handles User Logins
 	} else {
