@@ -650,6 +650,63 @@ class Award(Resource):
             return {"Status": "Fail", "Error": str(e)}, 400
 
 
+class AwardUser(Resource):
+    # get all awards that userID has given
+    def get(self, userID):
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            query = ("SELECT a.awardID, "
+                    "a.receiverID, "
+                    "rec.name AS receiverName, "
+                    "a.giverID, giv.name AS giverName, "
+                    "a.typeID, atyp.name AS awardType FROM cs419.awards a INNER JOIN "
+                    "users rec ON a.receiverID = rec.userID INNER JOIN "
+                    "users giv ON a.giverID = giv.userID INNER JOIN "
+                    "awardTypes atyp ON a.typeID = atyp.awardTypeID WHERE giv.userID = %s")
+            app.cursor.execute(query, int(userID))
+
+            awards = list(app.cursor.fetchall())
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Data": awards}, 200
+        
+        except Exception as e:
+            return {"Status": "Fail", "Error": str(e)}, 400
+
+    # insert award with userID error
+    def post(self, userID):
+        return {"Status": "Fail", "Message": "To create an award that this user has given, please send a post request to /awards."}, 400
+
+    # update awards given by user with userID error
+    def put(self, userID):
+        return {"Status": "Fail", "Message": "You are not allowed to do a bulk update of all the awards that the user has given."}, 400
+
+    # delete a award from the database, errors if the award does not exist in the database
+    def delete(self, userID):
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            stmt = "DELETE FROM awards WHERE giverID = %s"
+            app.cursor.execute(stmt, userID)
+
+            app.conn.commit()
+
+            app.cursor.close()
+            app.conn.close()
+
+            message = "All awards given by " + str(userID) + " have now been deleted from awards table."
+
+            return {"Status": "Success", "Message": message}, 200
+        
+        except Exception as e:
+            return {"Status": "Fail", "Error": str(e)}, 400
+
+
 class ResetTables(Resource):
     def post(self):
         try:
@@ -712,9 +769,12 @@ api.add_resource(AwardTypesList, '/awardTypes')
 api.add_resource(AwardType, '/awardTypes/<int:awardTypeID>')
 api.add_resource(AwardsList, '/awards')
 api.add_resource(Award, '/awards/<int:awardID>')
+api.add_resource(AwardUser, '/userAwards/<int:userID>')
 api.add_resource(ResetTables, '/resetTables')
 api.add_resource(AddDummyData, '/resetTablesWithDummyData')
 
 
 if __name__ == "__main__":
-    app.run(debug=False, port=5600, host='0.0.0.0')
+    # context = ("cert.crt", "key.key")
+    # app.run(ssl_context=context, debug=False, port=5600, host="0.0.0.0")
+    app.run(debug=False, port=5600, host="0.0.0.0")
