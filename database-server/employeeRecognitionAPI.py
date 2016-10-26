@@ -86,10 +86,19 @@ class AdminsList(Resource):
 
             admins = list(app.cursor.fetchall())
 
+            adminList = []
+            for admin in admins:
+                adminInfo = {}
+                (adminInfo["adminID"], 
+                adminInfo["uuID"], 
+                adminInfo["email"], 
+                adminInfo["password"]) = admin
+                adminList.append(adminInfo)
+
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": admins}, 200
+            return {"Status": "Success", "Data": adminList}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -114,7 +123,7 @@ class AdminsList(Resource):
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [admin_uuID, adminEmail, adminPassword]}, 200
+            return {"Status": "Success", "Data": [{"uuID": admin_uuID, "email": adminEmail, "password": adminPassword}]}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -155,10 +164,19 @@ class Admin(Resource):
 
             admins = list(app.cursor.fetchall())
 
+            adminList = []
+            for admin in admins:
+                adminInfo = {}
+                (adminInfo["adminID"], 
+                adminInfo["uuID"], 
+                adminInfo["email"], 
+                adminInfo["password"]) = admin
+                adminList.append(adminInfo)
+
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": admins}, 200
+            return {"Status": "Success", "Data": adminList}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -186,7 +204,7 @@ class Admin(Resource):
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [adminEmail, adminPassword]}, 200
+            return {"Status": "Success", "Data": [{"email": adminEmail, "password": adminPassword}]}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -225,10 +243,22 @@ class UsersList(Resource):
 
             users = list(app.cursor.fetchall())
 
+            userData = []
+            for user in users:
+                userInfo = {}
+                (userInfo["userID"], 
+                userInfo["uuID"], 
+                userInfo["name"], 
+                userInfo["email"], 
+                userInfo["password"], 
+                userInfo["signatureImage"], 
+                userInfo["region"]) = user
+                userData.append(userInfo)
+
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": users}, 200
+            return {"Status": "Success", "Data": userData}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -256,7 +286,7 @@ class UsersList(Resource):
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [user_uuID, userName, userEmail, userPassword, userSignature, userRegion]}, 200
+            return {"Status": "Success", "Data": [{"uuID": user_uuID, "name": userName, "email": userEmail, "password": userPassword, "signatureImage": userSignature, "region": userRegion}]}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -297,10 +327,22 @@ class User(Resource):
 
             users = list(app.cursor.fetchall())
 
+            userData = []
+            for user in users:
+                userInfo = {}
+                (userInfo["userID"], 
+                userInfo["uuID"], 
+                userInfo["name"], 
+                userInfo["email"], 
+                userInfo["password"], 
+                userInfo["signatureImage"], 
+                userInfo["region"]) = user
+                userData.append(userInfo)
+
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": users}, 200
+            return {"Status": "Success", "Data": userData}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -331,7 +373,7 @@ class User(Resource):
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [userName, userEmail, userPassword, userSignature, userRegion]}, 200
+            return {"Status": "Success", "Data": [{"name": userName, "email": userEmail, "password": userPassword, "signatureImage": userSignature, "region": userRegion}]}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -370,10 +412,18 @@ class AwardTypesList(Resource):
 
             awardTypes = list(app.cursor.fetchall())
 
+            awardTypesData = []
+            for awardType in awardTypes:
+                awardTypeInfo = {}
+                (awardTypeInfo["awardTypeID"], 
+                awardTypeInfo["name"], 
+                awardTypeInfo["prestigeLevel"]) = awardType
+                awardTypesData.append(awardTypeInfo)
+
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": awardTypes}, 200
+            return {"Status": "Success", "Data": awardTypesData}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -397,7 +447,7 @@ class AwardTypesList(Resource):
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [awardTypeName, awardTypePrestige]}, 200
+            return {"Status": "Success", "Data": [{"name": awardTypeName, "prestigeLevel": awardTypePrestige}]}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -438,10 +488,18 @@ class AwardType(Resource):
 
             awardTypes = list(app.cursor.fetchall())
 
+            awardTypesData = []
+            for awardType in awardTypes:
+                awardTypeInfo = {}
+                (awardTypeInfo["awardTypeID"], 
+                awardTypeInfo["name"], 
+                awardTypeInfo["prestigeLevel"]) = awardType
+                awardTypesData.append(awardTypeInfo)
+
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": awardTypes}, 200
+            return {"Status": "Success", "Data": awardTypesData}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -469,7 +527,7 @@ class AwardType(Resource):
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [awardTypeName, awardTypePrestige]}, 200
+            return {"Status": "Success", "Data": [{"name": awardTypeName, "prestigeLevel": awardTypePrestige}]}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -515,10 +573,22 @@ class AwardsList(Resource):
 
             awards = list(app.cursor.fetchall())
 
+            awardData = []
+            for award in awards:
+                awardInfo = {}
+                (awardInfo["awardID"], 
+                awardInfo["receiverID"], 
+                awardInfo["receiverName"], 
+                awardInfo["giverID"], 
+                awardInfo["giverName"], 
+                awardInfo["awardTypeID"], 
+                awardInfo["awardType"]) = award
+                awardData.append(awardInfo)
+
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": awards}, 200
+            return {"Status": "Success", "Data": awardData}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -543,7 +613,7 @@ class AwardsList(Resource):
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [awardReceiverID, awardGiverID, awardTypeID]}, 200
+            return {"Status": "Success", "Data": [{"receiverID": awardReceiverID, "giverID": awardGiverID, "typeID": awardTypeID}]}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -591,10 +661,22 @@ class Award(Resource):
 
             awards = list(app.cursor.fetchall())
 
+            awardData = []
+            for award in awards:
+                awardInfo = {}
+                (awardInfo["awardID"], 
+                awardInfo["receiverID"], 
+                awardInfo["receiverName"], 
+                awardInfo["giverID"], 
+                awardInfo["giverName"], 
+                awardInfo["awardTypeID"], 
+                awardInfo["awardType"]) = award
+                awardData.append(awardInfo)
+
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": awards}, 200
+            return {"Status": "Success", "Data": awardData}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -623,7 +705,7 @@ class Award(Resource):
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [awardReceiverID, awardGiverID, awardTypeID]}, 200
+            return {"Status": "Success", "Data": [{"receiverID": awardReceiverID, "giverID": awardGiverID, "typeID": awardTypeID}]}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -669,10 +751,22 @@ class AwardUser(Resource):
 
             awards = list(app.cursor.fetchall())
 
+            awardData = []
+            for award in awards:
+                awardInfo = {}
+                (awardInfo["awardID"], 
+                awardInfo["receiverID"], 
+                awardInfo["receiverName"], 
+                awardInfo["giverID"], 
+                awardInfo["giverName"], 
+                awardInfo["awardTypeID"], 
+                awardInfo["awardType"]) = award
+                awardData.append(awardInfo)
+
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": awards}, 200
+            return {"Status": "Success", "Data": awardData}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -760,6 +854,50 @@ def clearTables():
         return {"Status": "Fail", "Message": data}, 400
 
 
+class CreateAward(Resource):
+    # get details of award in order to create PDF certificate
+    def get(self, awardID):
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            query = ("SELECT a.awardID, "
+                    "a.receiverID, "
+                    "rec.name AS receiverName, "
+                    "rec.email, "
+                    "a.giverID, giv.name AS giverName, "
+                    "giv.signatureImage, "
+                    "a.typeID, atyp.name AS awardType FROM cs419.awards a INNER JOIN "
+                    "users rec ON a.receiverID = rec.userID INNER JOIN "
+                    "users giv ON a.giverID = giv.userID INNER JOIN "
+                    "awardTypes atyp ON a.typeID = atyp.awardTypeID WHERE a.awardID = %s")
+            app.cursor.execute(query, int(awardID))
+
+            awards = list(app.cursor.fetchall())
+
+            awardData = []
+            for award in awards:
+                awardInfo = {}
+                (awardInfo["awardID"], 
+                awardInfo["receiverID"], 
+                awardInfo["receiverName"], 
+                awardInfo["receiverEmail"], 
+                awardInfo["giverID"], 
+                awardInfo["giverName"], 
+                awardInfo["giverSignatureImage"], 
+                awardInfo["awardTypeID"], 
+                awardInfo["awardType"]) = award
+                awardData.append(awardInfo)
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Data": awardData}, 200
+
+        except Exception as e:
+            return {"Status": "Fail", "Error": str(e)}, 400
+
+
 # create routes for API
 api.add_resource(AdminsList, '/admins')
 api.add_resource(Admin, '/admins/<int:adminID>')
@@ -772,6 +910,7 @@ api.add_resource(Award, '/awards/<int:awardID>')
 api.add_resource(AwardUser, '/userAwards/<int:userID>')
 api.add_resource(ResetTables, '/resetTables')
 api.add_resource(AddDummyData, '/resetTablesWithDummyData')
+api.add_resource(CreateAward, '/getAwardCreationInfo/<int:awardID>')
 
 
 if __name__ == "__main__":
