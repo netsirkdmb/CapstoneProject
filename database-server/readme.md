@@ -73,3 +73,6 @@ http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600
 
 **Reset Tables with Dummy Data:** [/resetTablesWithDummyData](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/resetTablesWithDummyData)
 - post: drops all tables in the database, creates them again, and adds dummy data
+
+**Get Award Creation Info:** [/getAwardCreationInfo/1234](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getAwardCreationInfo/1)
+- get: returns the info required to create the award with the awardID specified
