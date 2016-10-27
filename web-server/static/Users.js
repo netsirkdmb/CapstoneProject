@@ -17,13 +17,13 @@ $(document).ready(function(){
 	        });
 		
 		//Set the modal form with these properties
-		$('#uuID').text(modalData[0]);
+		$('#ID').text(modalData[0]);
 		$('#editname').val(modalData[1]);
 		$('#editemail').val(modalData[2]);
 		$('#editpwd').val(modalData[3]);
 		$('#editimage').val(modalData[5]);
 		$('#editregion').val(modalData[6]);
-	
+		$('#uuID').text(modalData[7]);
 		//Show the modal
 		$('#editusers').modal('show');
 	});
@@ -60,7 +60,7 @@ $(document).ready(function(){
 
 
 	//function to edit user
-	$('#updateuserbutton').click(function(){
+	$('#updateduserbutton').click(function(){
                 //add code to check form values are filled out
                 if( $('#editname').val()=="" || $('#edituserpwd').val()=="" || $('#editemail').val()=="", $('#editimage').val()=="", $('#editregion').val()==""){
                         if($('#editname').val()==""){
@@ -82,13 +82,17 @@ $(document).ready(function(){
 
                         return;
                 }
-                var userID = $('#uuID').text();
+                var userID = $('#ID').text();
                 var formData = {
-                        uuid:$('#editusername').val()   ,
-                        email: $('#edituserpwd').val()  ,
-                        password:  $('#edituseremail').val()
+                        uuid: $('#uuID').text(),
+			name:$('#editname').val()   ,
+                        email: $('#editpwd').val()  ,
+                        password:  $('#editemail').val(),
+			region: $('#editregion').val(),
+			image: $('#editimage').val()
 
                 };
+		console.log(formData);
                 $.ajax({
                         url: '/adminAPI/user/' + userID,
                         data: formData,
@@ -97,6 +101,7 @@ $(document).ready(function(){
                 })
                 .done(function(result){
                         alert(result);
+			location.reload();
                 })
 
                 .fail(function(result){

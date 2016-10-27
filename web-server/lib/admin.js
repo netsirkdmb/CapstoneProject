@@ -2,6 +2,7 @@
 var express = require('express'); 
 var myRouter = express.Router(); 
 var request = require('request');
+var uuid = require('node-uuid');
 
 /*****************************************************
 		Login Routers 
@@ -17,20 +18,26 @@ myRouter.get('/admin/users' , function (req,res){
 	request('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users', function(err, response,body){
 		//convert response to JSON and process it
 		var jsonResult = JSON.parse(body);
+		
+				
 		//go through every result in JSON data and append to a results array. 
 		for(var entry in jsonResult.Data){
+			console.log(jsonResult.Data[entry].uuID);
 			results.push({
-				uid: jsonResult.Data[entry][0],
-				uuID: jsonResult.Data[entry][1],
-				name: jsonResult.Data[entry][2],
-				email: jsonResult.Data[entry][3],
-				password: jsonResult.Data[entry][4],
-				time: jsonResult.Data[entry][5],
-				image: jsonResult.Data[entry][4],
-				region: jsonResult.Data[entry][6]		
-			}
+				
+				uid: jsonResult.Data[entry].userID,
+				uuid: jsonResult.Data[entry].uuID,
+				name: jsonResult.Data[entry].name,
+				email: jsonResult.Data[entry].email,
+				password: jsonResult.Data[entry].password,
+				time: jsonResult.Data[entry],
+				image: jsonResult.Data[entry].signatureImage,
+				region: jsonResult.Data[entry].region		
+						
+				}
 			);
 		}
+
 		console.log("JSON to render for user page: " + results);
 
 		//send data to be rendered
@@ -51,15 +58,14 @@ myRouter.get('/admin/admins', function(req,res){
         request('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins', function(err, response,body){
                 //convert response to JSON and process it
                 var jsonResult = JSON.parse(body);
-		console.log(body);
 
                 //go through every result in JSON data and append to a results array.
                 for(var entry in jsonResult.Data){
                         results.push({
-				uid: jsonResult.Data[entry][0],
-                                name: jsonResult.Data[entry][1],
-                                email: jsonResult.Data[entry][2],
-                                password: jsonResult.Data[entry][3],
+				uuid: jsonResult.Data[entry].uuID,
+                                id: jsonResult.Data[entry].adminID,
+                                email: jsonResult.Data[entry].email,
+                                password: jsonResult.Data[entry].password,
                                 time: "Coming Soon"
                         }
                         );
@@ -91,14 +97,14 @@ myRouter.route('/adminAPI/admin')
 	//create New Router
 	.post( function(req,res){
 		
-		var values =  {password: req.body.password, email:  req.body.email, uuID:  req.body.uuID };
+		var values =  {password: req.body.password, email:  req.body.email, uuID:  uuid.v4() };
 		console.log(values);
 		request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins', form: values }, function(err, response,body){
 		        if(!err && response.statusCode < 400){
-                                console.log(body);
                                 res.send("1");
                         }
                         else{
+				console.log("ERROR");
                                 if(response)
                                         console.log(err);
                                 console.log(response);
@@ -109,15 +115,16 @@ myRouter.route('/adminAPI/admin')
 myRouter.route('/adminAPI/admin/:uuID')
 	.put(function(req,res){
 		console.log("Update Request for UUID: " + req.params.uuID); 
-	        request.put('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins/' + req.params.uuID, function(err, response,body){
+		var values =  {password: req.body.password, email:  req.body.email, uuID:  req.body.uuid };
+
+	        request.put({url:'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins/' + req.params.uuID, form:values}, function(err, response,body){
                         if(!err && response.statusCode < 400){
-                                console.log(body);
                                 res.send("1");
                         }
                         else{
                                 if(response)
                                         console.log(err);
-                                console.log(response);
+                                console.log(response.body);
                                 res.send("0");
                         }
                 });
@@ -127,10 +134,10 @@ myRouter.route('/adminAPI/admin/:uuID')
 		console.log("Delete Request for UUID: " + req.params.uuID);
 		request.delete('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins/' + req.params.uuID, function(err, response,body){
 			if(!err && response.statusCode < 400){
-				console.log(body);
 				res.send("1");
 			}
 			else{
+				console.log("ERRROR!!!!");
 				if(response)
 					console.log(err);
 				console.log(response);
@@ -150,7 +157,7 @@ myRouter.route('/adminAPI/user')
         //create New Router
         .post( function(req,res){
 
-                var values =  {password: req.body.password, email:  req.body.email, uuID:  req.body.uuID, region: req.body.region, signatureImage: "comingsoon", name: req.body.name };
+                var values =  {password: req.body.password, email:  req.body.email, uuID: uuid.v4()  , region: req.body.region, signatureImage: "comingsoon", name: req.body.name };
                 console.log(values);
                 request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users', form: values }, function(err, response,body){
                         if(!err && response.statusCode < 400){
@@ -165,10 +172,12 @@ myRouter.route('/adminAPI/user')
                         }
                 });
         });
-myRouter.route('/adminAPI/user/:uuID')
+myRouter.route('/adminAPI/user/:ID')
         .put(function(req,res){
-                console.log("Update Request for UUID: " + req.params.uuID);
-                request.put('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users/' + req.params.uuID, function(err, response,body){
+                console.log("Update Request for UUID: " + req.params.ID);
+		var values =  {password: req.body.password, email:  req.body.email, uuID:  req.body.uuid, region: req.body.region, signatureImage: "comingsoon", name: req.body.name };
+                console.log(values);
+		request.put({url:'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users/' + req.params.ID, form: values}, function(err, response,body){
                         if(!err && response.statusCode < 400){
                                 console.log(body);
                                 res.send("1");
@@ -176,7 +185,7 @@ myRouter.route('/adminAPI/user/:uuID')
                         else{
                                 if(response)
                                         console.log(err);
-                                console.log(response);
+                                console.log(response.body);
                                 res.send("0");
                         }
                 });
