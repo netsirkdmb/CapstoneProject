@@ -1,7 +1,7 @@
 ###############################################################################################
 # Kristen Dhuse, Bryant Hall, William McCumstie                                               #
 # CS419 - API                                                                                 #
-# Description: This API is hosted on Amazon Web Services and allows the user and admin sites
+# Description: This API is hosted on Amazon Web Services and allows the user and admin sites  #
 #              to make queries to the MySQL database for our employee recognition system.     #
 # References:                                                                                 #
 # - for help with Flask                                                                       #
@@ -12,14 +12,16 @@
 #       http://docs.python-guide.org/en/latest/dev/virtualenvs/                               #
 # - for help with Flask-restful                                                               #
 #       http://flask-restful-cn.readthedocs.io/en/0.3.4/quickstart.html                       #
+# - for help with LaTeX in Python                                                             #
+#       http://akuederle.com/Automatization-with-Latex-and-Python-1                           #
 ###############################################################################################
 
 
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse, inputs
 from flaskext.mysql import MySQL
-import bson
-import json
+import os
+import shutil
 
 app = Flask(__name__)
 api = Api(app)
@@ -57,6 +59,7 @@ awardParser = reqparse.RequestParser(bundle_errors=True)
 awardParser.add_argument("receiverID", type=int, help="The user that is getting the award.", required=True)
 awardParser.add_argument("giverID", type=int, help="The user that is giving the award.", required=True)
 awardParser.add_argument("typeID", type=int, help="The type of award being given.", required=True)
+awardParser.add_argument("awardDate", type=str, help="The date award is being given.", required=True)
 
 # parser for get admins/users request
 pageParser = reqparse.RequestParser(bundle_errors=True)
@@ -81,7 +84,7 @@ class AdminsList(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT adminID, uuID, email, password FROM admins"
+            query = "SELECT adminID, uuID, email, password, accountCreationTime FROM admins"
             app.cursor.execute(query)
 
             admins = list(app.cursor.fetchall())
@@ -92,7 +95,9 @@ class AdminsList(Resource):
                 (adminInfo["adminID"], 
                 adminInfo["uuID"], 
                 adminInfo["email"], 
-                adminInfo["password"]) = admin
+                adminInfo["password"], 
+                adminInfo["accountCreationTime"]) = admin
+                adminInfo["accountCreationTime"] = str(adminInfo["accountCreationTime"])
                 adminList.append(adminInfo)
 
             app.cursor.close()
@@ -159,7 +164,7 @@ class Admin(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT adminID, uuID, email, password FROM admins WHERE adminID = %s"
+            query = "SELECT adminID, uuID, email, password, accountCreationTime FROM admins WHERE adminID = %s"
             app.cursor.execute(query, int(adminID))
 
             admins = list(app.cursor.fetchall())
@@ -170,7 +175,9 @@ class Admin(Resource):
                 (adminInfo["adminID"], 
                 adminInfo["uuID"], 
                 adminInfo["email"], 
-                adminInfo["password"]) = admin
+                adminInfo["password"], 
+                adminInfo["accountCreationTime"]) = admin
+                adminInfo["accountCreationTime"] = str(adminInfo["accountCreationTime"])
                 adminList.append(adminInfo)
 
             app.cursor.close()
@@ -238,7 +245,7 @@ class UsersList(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT userID, uuID, name, email, password, signatureImage, region FROM users"
+            query = "SELECT userID, uuID, name, email, password, signatureImage, region, accountCreationTime FROM users"
             app.cursor.execute(query)
 
             users = list(app.cursor.fetchall())
@@ -252,7 +259,9 @@ class UsersList(Resource):
                 userInfo["email"], 
                 userInfo["password"], 
                 userInfo["signatureImage"], 
-                userInfo["region"]) = user
+                userInfo["region"], 
+                userInfo["accountCreationTime"]) = user
+                userInfo["accountCreationTime"] = str(userInfo["accountCreationTime"])
                 userData.append(userInfo)
 
             app.cursor.close()
@@ -322,7 +331,7 @@ class User(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT userID, uuID, name, email, password, signatureImage, region FROM users WHERE userID = %s"
+            query = "SELECT userID, uuID, name, email, password, signatureImage, region, accountCreationTime FROM users WHERE userID = %s"
             app.cursor.execute(query, int(userID))
 
             users = list(app.cursor.fetchall())
@@ -336,7 +345,9 @@ class User(Resource):
                 userInfo["email"], 
                 userInfo["password"], 
                 userInfo["signatureImage"], 
-                userInfo["region"]) = user
+                userInfo["region"], 
+                userInfo["accountCreationTime"]) = user
+                userInfo["accountCreationTime"] = str(userInfo["accountCreationTime"])
                 userData.append(userInfo)
 
             app.cursor.close()
@@ -565,7 +576,8 @@ class AwardsList(Resource):
                     "a.receiverID, "
                     "rec.name AS receiverName, "
                     "a.giverID, giv.name AS giverName, "
-                    "a.typeID, atyp.name AS awardType FROM cs419.awards a INNER JOIN "
+                    "a.typeID, atyp.name AS awardType, "
+                    "a.awardDate FROM cs419.awards a INNER JOIN "
                     "users rec ON a.receiverID = rec.userID INNER JOIN "
                     "users giv ON a.giverID = giv.userID INNER JOIN "
                     "awardTypes atyp ON a.typeID = atyp.awardTypeID")
@@ -582,7 +594,9 @@ class AwardsList(Resource):
                 awardInfo["giverID"], 
                 awardInfo["giverName"], 
                 awardInfo["awardTypeID"], 
-                awardInfo["awardType"]) = award
+                awardInfo["awardType"],
+                awardInfo["awardDate"]) = award
+                awardInfo["awardDate"] = str(awardInfo["awardDate"])
                 awardData.append(awardInfo)
 
             app.cursor.close()
@@ -600,20 +614,21 @@ class AwardsList(Resource):
         awardReceiverID = award["receiverID"]
         awardGiverID = award["giverID"]
         awardTypeID = award["typeID"]
+        awardDate = award["awardDate"]
 
         try:
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            stmt = "INSERT INTO awards (receiverID, giverID, typeID) VALUES (%s, %s, %s)"
-            app.cursor.execute(stmt, (awardReceiverID, awardGiverID, awardTypeID))
+            stmt = "INSERT INTO awards (receiverID, giverID, typeID, awardDate) VALUES (%s, %s, %s, %s)"
+            app.cursor.execute(stmt, (awardReceiverID, awardGiverID, awardTypeID, awardDate))
 
             app.conn.commit()
 
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [{"receiverID": awardReceiverID, "giverID": awardGiverID, "typeID": awardTypeID}]}, 200
+            return {"Status": "Success", "Data": [{"receiverID": awardReceiverID, "giverID": awardGiverID, "typeID": awardTypeID, "awardDate": awardDate}]}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -653,7 +668,8 @@ class Award(Resource):
                     "a.receiverID, "
                     "rec.name AS receiverName, "
                     "a.giverID, giv.name AS giverName, "
-                    "a.typeID, atyp.name AS awardType FROM cs419.awards a INNER JOIN "
+                    "a.typeID, atyp.name AS awardType, "
+                    "a.awardDate FROM cs419.awards a INNER JOIN "
                     "users rec ON a.receiverID = rec.userID INNER JOIN "
                     "users giv ON a.giverID = giv.userID INNER JOIN "
                     "awardTypes atyp ON a.typeID = atyp.awardTypeID WHERE a.awardID = %s")
@@ -670,7 +686,9 @@ class Award(Resource):
                 awardInfo["giverID"], 
                 awardInfo["giverName"], 
                 awardInfo["awardTypeID"], 
-                awardInfo["awardType"]) = award
+                awardInfo["awardType"],
+                awardInfo["awardDate"]) = award
+                awardInfo["awardDate"] = str(awardInfo["awardDate"])
                 awardData.append(awardInfo)
 
             app.cursor.close()
@@ -692,20 +710,21 @@ class Award(Resource):
         awardReceiverID = award["receiverID"]
         awardGiverID = award["giverID"]
         awardTypeID = award["typeID"]
+        awardDate = award["awardDate"]
 
         try:
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            stmt = "UPDATE awards SET receiverID = %s, giverID = %s, typeID = %s WHERE awardID = %s"
-            app.cursor.execute(stmt, (awardReceiverID, awardGiverID, awardTypeID, awardID))
+            stmt = "UPDATE awards SET receiverID = %s, giverID = %s, typeID = %s, awardDate = %s WHERE awardID = %s"
+            app.cursor.execute(stmt, (awardReceiverID, awardGiverID, awardTypeID, awardDate, awardID))
 
             app.conn.commit()
 
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [{"receiverID": awardReceiverID, "giverID": awardGiverID, "typeID": awardTypeID}]}, 200
+            return {"Status": "Success", "Data": [{"receiverID": awardReceiverID, "giverID": awardGiverID, "typeID": awardTypeID, "awardDate": awardDate}]}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -743,7 +762,8 @@ class AwardUser(Resource):
                     "a.receiverID, "
                     "rec.name AS receiverName, "
                     "a.giverID, giv.name AS giverName, "
-                    "a.typeID, atyp.name AS awardType FROM cs419.awards a INNER JOIN "
+                    "a.typeID, atyp.name AS awardType, "
+                    "a.awardDate FROM cs419.awards a INNER JOIN "
                     "users rec ON a.receiverID = rec.userID INNER JOIN "
                     "users giv ON a.giverID = giv.userID INNER JOIN "
                     "awardTypes atyp ON a.typeID = atyp.awardTypeID WHERE giv.userID = %s")
@@ -760,7 +780,9 @@ class AwardUser(Resource):
                 awardInfo["giverID"], 
                 awardInfo["giverName"], 
                 awardInfo["awardTypeID"], 
-                awardInfo["awardType"]) = award
+                awardInfo["awardType"],
+                awardInfo["awardDate"]) = award
+                awardInfo["awardDate"] = str(awardInfo["awardDate"])
                 awardData.append(awardInfo)
 
             app.cursor.close()
@@ -867,7 +889,8 @@ class CreateAward(Resource):
                     "rec.email, "
                     "a.giverID, giv.name AS giverName, "
                     "giv.signatureImage, "
-                    "a.typeID, atyp.name AS awardType FROM cs419.awards a INNER JOIN "
+                    "a.typeID, atyp.name AS awardType, "
+                    "a.awardDate FROM cs419.awards a INNER JOIN "
                     "users rec ON a.receiverID = rec.userID INNER JOIN "
                     "users giv ON a.giverID = giv.userID INNER JOIN "
                     "awardTypes atyp ON a.typeID = atyp.awardTypeID WHERE a.awardID = %s")
@@ -876,6 +899,7 @@ class CreateAward(Resource):
             awards = list(app.cursor.fetchall())
 
             awardData = []
+            awardPDF = []
             for award in awards:
                 awardInfo = {}
                 (awardInfo["awardID"], 
@@ -886,13 +910,48 @@ class CreateAward(Resource):
                 awardInfo["giverName"], 
                 awardInfo["giverSignatureImage"], 
                 awardInfo["awardTypeID"], 
-                awardInfo["awardType"]) = award
+                awardInfo["awardType"],
+                awardInfo["awardDate"]) = award
+                awardInfo["awardDate"] = str(awardInfo["awardDate"])
                 awardData.append(awardInfo)
-
+                awardPDF.append(awardInfo.items())
+            
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": awardData}, 200
+            project = "./"
+            pdf_d = "{}pdf/".format(project)
+            latexCode = ""
+            for award in awardPDF:
+                for key, value in award:
+                    latexCode = latexCode + "\\newCommand{{\\{}}}{{{}}}\n".format(key, value)
+            
+            template = "test"
+            latexCode = (latexCode + """
+                        \\documentclass{{{}}} % din a4, 11 pt, one-sided, 
+                        \\begin{{document}}
+                        \\end{{document}}
+                        """.format(template))
+            
+            build_d = "{}build/".format(project)
+            out_file = "{}template".format(build_d)
+
+            # create the build directory if not existing
+            if not os.path.exists(build_d):
+                os.makedirs(build_d)
+            
+            # create the pdf directory if not existing
+            if not os.path.exists(pdf_d):
+                os.makedirs(pdf_d)
+            
+            # saves latexCode to output file
+            with open(out_file + ".tex", "w") as f:
+                f.write(latexCode)
+            
+            os.system("pdflatex -output-directory {} {}".format(os.path.realpath(build_d), os.path.realpath(out_file)))
+            shutil.copy2(out_file + ".pdf", os.path.realpath(pdf_d))
+
+            return {"Status": "Success", "Data": awardData, "PDF": awardPDF}, 200
 
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
