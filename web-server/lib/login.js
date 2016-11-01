@@ -1,6 +1,5 @@
 // Global Variable Decleration
 var router = require('express').Router();
-var routerAuth = require('express').Router();
 
 /****************************************
 Func: mainPostHandler

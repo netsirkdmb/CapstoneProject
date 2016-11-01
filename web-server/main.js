@@ -8,7 +8,7 @@ var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
-app.set('port', 3500);
+app.set('port', 443);
 
 // Sets up express sessions
 var session = require('express-session');
@@ -75,6 +75,8 @@ var adminRouter = require('./lib/admin.js');
 app.use(adminRouter);
 var userRouter = require('./lib/user.js');
 app.use(userRouter.router);
+var awardRouter = require('./lib/award.js');
+app.use(awardRouter);
 
 // ------- Prevents Auto-Routing -------
 app.get('/layouts*', function(req, res, next){
@@ -125,5 +127,22 @@ app.use(function(err, req, res, next){
 // Starts the web page (On https)
 var httpsServer = https.createServer(credentials, app);
 httpsServer.listen(app.get('port'), function(){
-  console.log('Express started on http://localhost:' + app.get('port') + '; press Ctrl-C to terminate.');
+  console.log('Express started on https://localhost:' + app.get('port') + '; press Ctrl-C to terminate.');
+});
+
+// Creates the http redirect server
+var appRedir = express();
+appRedir.set('port', 80);
+appRedir.use(function(req, res, next){
+  if (!req.secure)
+    res.status(301).redirect('https://' + req.hostname);
+  else
+    next();
+});
+appRedir.use(function(err, req, res, next){
+  console.error(err.stack);
+  res.status(400).send();
+});
+appRedir.listen(appRedir.get('port'), function(){
+  console.log('Express started on http://localhost:' + appRedir.get('port') + '; press Ctrl-C to terminate.');
 });
