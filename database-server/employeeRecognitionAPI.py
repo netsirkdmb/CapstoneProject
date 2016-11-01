@@ -49,6 +49,18 @@ userAccountParser.add_argument("password", type=str, help="Password for new user
 userAccountParser.add_argument("signatureImage", type=str, help="Signature for new user.", required=True)
 userAccountParser.add_argument("region", type=str, help="Region for new user.", required=True)
 
+# parser for updating user
+userAccountUpdateParser = reqparse.RequestParser(bundle_errors=True)
+userAccountUpdateParser.add_argument("name", type=str, help="Name for user.", required=True)
+userAccountUpdateParser.add_argument("email", type=str, help="Email address for user.", required=True)
+userAccountUpdateParser.add_argument("password", type=str, help="Password for user.", required=True)
+userAccountUpdateParser.add_argument("signatureImage", type=str, help="Signature for user.", required=False)
+userAccountUpdateParser.add_argument("region", type=str, help="Region for user.", required=True)
+
+# parser for email
+emailParser = reqparse.RequestParser(bundle_errors=True)
+emailParser.add_argument("email", type=str, help="Email address.", required=True)
+
 # parser for creating awardTypes
 awardTypeParser = reqparse.RequestParser(bundle_errors=True)
 awardTypeParser.add_argument("name", type=str, help="Name for new award type.", required=True)
@@ -245,7 +257,7 @@ class UsersList(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT userID, uuID, name, email, password, signatureImage, region, accountCreationTime FROM users"
+            query = "SELECT userID, uuID, name, email, password, region, accountCreationTime FROM users"
             app.cursor.execute(query)
 
             users = list(app.cursor.fetchall())
@@ -258,7 +270,6 @@ class UsersList(Resource):
                 userInfo["name"], 
                 userInfo["email"], 
                 userInfo["password"], 
-                userInfo["signatureImage"], 
                 userInfo["region"], 
                 userInfo["accountCreationTime"]) = user
                 userInfo["accountCreationTime"] = str(userInfo["accountCreationTime"])
@@ -364,21 +375,25 @@ class User(Resource):
 
     # update user in database, errors if the user does not exist in the database
     def put(self, userID):
-        user = userAccountParser.parse_args()
+        user = userAccountUpdateParser.parse_args()
 
         userName = user["name"]
         userEmail = user["email"]
         userPassword = user["password"]
-        userSignature = user["signatureImage"]
+        if user["signatureImage"]:
+            userSignature = user["signatureImage"]
         userRegion = user["region"]
 
         try:
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
-
-            stmt = "UPDATE users SET name = %s, email = %s, password = %s, signatureImage = %s, region = %s WHERE userID = %s"
-            app.cursor.execute(stmt, (userName, userEmail, userPassword, userSignature, userRegion, userID))
-
+            if userSignature:
+                stmt = "UPDATE users SET name = %s, email = %s, password = %s, signatureImage = %s, region = %s WHERE userID = %s"
+                app.cursor.execute(stmt, (userName, userEmail, userPassword, userSignature, userRegion, userID))
+            else:
+                stmt = "UPDATE users SET name = %s, email = %s, password = %s, region = %s WHERE userID = %s"
+                app.cursor.execute(stmt, (userName, userEmail, userPassword, userRegion, userID))
+            
             app.conn.commit()
 
             app.cursor.close()
@@ -935,6 +950,8 @@ class CreateAward(Resource):
             
             build_d = "{}build/".format(project)
             out_file = "{}template".format(build_d)
+            ## code to do test certificate
+            test_file = "{}certificate".format(build_d)
 
             # create the build directory if not existing
             if not os.path.exists(build_d):
@@ -948,11 +965,85 @@ class CreateAward(Resource):
             with open(out_file + ".tex", "w") as f:
                 f.write(latexCode)
             
-            os.system("pdflatex -output-directory {} {}".format(os.path.realpath(build_d), os.path.realpath(out_file)))
-            shutil.copy2(out_file + ".pdf", os.path.realpath(pdf_d))
+            os.system("pdflatex -output-directory {} {}".format(os.path.realpath(build_d), os.path.realpath(test_file)))
+            shutil.copy2(test_file + ".pdf", os.path.realpath(pdf_d))
 
             return {"Status": "Success", "Data": awardData, "PDF": awardPDF}, 200
 
+        except Exception as e:
+            return {"Status": "Fail", "Error": str(e)}, 400
+
+
+class UserEmail(Resource):
+    # get user with matching email if it exists
+    def post(self):
+        email = emailParser.parse_args()
+
+        email = email["email"]
+
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            query = "SELECT userID, uuID, name, email, password, region, accountCreationTime FROM users WHERE email = %s"
+            app.cursor.execute(query, email)
+
+            users = list(app.cursor.fetchall())
+
+            userData = []
+            for user in users:
+                userInfo = {}
+                (userInfo["userID"], 
+                userInfo["uuID"], 
+                userInfo["name"], 
+                userInfo["email"], 
+                userInfo["password"], 
+                userInfo["region"], 
+                userInfo["accountCreationTime"]) = user
+                userInfo["accountCreationTime"] = str(userInfo["accountCreationTime"])
+                userData.append(userInfo)
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Data": userData}, 200
+        
+        except Exception as e:
+            return {"Status": "Fail", "Error": str(e)}, 400
+
+
+class AdminEmail(Resource):
+    # get admin with matching email if it exists
+    def post(self):
+        email = emailParser.parse_args()
+
+        email = email["email"]
+
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            query = "SELECT adminID, uuID, email, password, accountCreationTime FROM admins WHERE email = %s"
+            app.cursor.execute(query, email)
+
+            admins = list(app.cursor.fetchall())
+
+            adminList = []
+            for admin in admins:
+                adminInfo = {}
+                (adminInfo["adminID"], 
+                adminInfo["uuID"], 
+                adminInfo["email"], 
+                adminInfo["password"], 
+                adminInfo["accountCreationTime"]) = admin
+                adminInfo["accountCreationTime"] = str(adminInfo["accountCreationTime"])
+                adminList.append(adminInfo)
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Data": adminList}, 200
+        
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
 
@@ -970,6 +1061,8 @@ api.add_resource(AwardUser, '/userAwards/<int:userID>')
 api.add_resource(ResetTables, '/resetTables')
 api.add_resource(AddDummyData, '/resetTablesWithDummyData')
 api.add_resource(CreateAward, '/getAwardCreationInfo/<int:awardID>')
+api.add_resource(UserEmail, '/getUserByEmail')
+api.add_resource(AdminEmail, '/getAdminByEmail')
 
 
 if __name__ == "__main__":

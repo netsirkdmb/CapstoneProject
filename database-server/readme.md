@@ -19,16 +19,16 @@ http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600
 
 
 **Users Table:** [/users](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users)
-- get: returns all users in the database
+- get: returns all users in the database (does not include signature image)
 - post: creates a new users in the database
 - put: invalid
 - delete: deletes all users in the database
 
 
 **Users Table by ID:** [/users/1234](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users/1)
-- get: returns user with specified id _(specified id is represented by "1234")_
+- get: returns user with specified id _(specified id is represented by "1234")_, includes signature image
 - post: invalid
-- put: updates user with specified id
+- put: updates user with specified id, signatureImage not required
 - delete: deletes user with specified id
 
 
@@ -75,4 +75,10 @@ http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600
 - post: drops all tables in the database, creates them again, and adds dummy data
 
 **Get Award Creation Info:** [/getAwardCreationInfo/1234](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getAwardCreationInfo/1)
-- get: returns the info required to create the award with the awardID specified
+- get: returns the info required to create the award with the awardID specified, also creates certificate.pdf (currently does test certificate)
+
+**Get User by Email:** [/getUserByEmail](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getUserByEmail)
+- post: returns user with specified email (does not include signature image)
+
+**Get Admin by Email:** [/getAdminByEmail](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getAdminByEmail)
+- post: returns admin with specified email

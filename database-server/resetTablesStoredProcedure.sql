@@ -72,14 +72,14 @@ BEGIN
 -- giverID - an integer which is a foreign key reference to the users table, cannot be null
 -- typeID - an integer which is a foreign key reference to the awardType table, cannot be null
 -- datetimeGranted - the datetime that this award was given, cannot be null
--- awardDate - the date that the award is for, cannot be null
+-- awardDate - the date and time that the award is for, cannot be null
 	CREATE TABLE awards (
 		awardID INT AUTO_INCREMENT,
 		receiverID INT NOT NULL,
 		giverID INT NOT NULL,
 		typeID INT NOT NULL,
 		datetimeGranted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		awardDate DATE NOT NULL,
+		awardDate DATETIME NOT NULL,
 		PRIMARY KEY(awardID),
 		CONSTRAINT receiverID
 			FOREIGN KEY(receiverID)
