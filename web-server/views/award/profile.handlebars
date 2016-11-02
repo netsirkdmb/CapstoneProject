@@ -1,8 +1,12 @@
 {{> user-nav profile='true'}}
 <section class='award-wrapper'>
 	<h1>Profile Information</h1>
-	<h4>Name:</h4> Bob Jones <button>Edit</button><br>
-	<h4>Email:</h4> bob.jones@replace.with.templates<br>
-	<h4>Date Created:</h4> 10:10am 01/01/2006
+	{{#if errorMssg}}
+		<b>{{errorMssg}}</b>
+	{{else}}
+		<h4>Name:</h4> {{data.name}} <button>Edit</button><br>
+		<h4>Email:</h4> {{data.email}}<br>
+		<h4>Date Created:</h4> {{data.accountCreationTime}}
+	{{/if}}
 </section>
 <link rel="stylesheet" type="text/css" href="../public/awards.css">
