@@ -1,11 +1,19 @@
 // Global Variable Decleration
 var router = require('express').Router();
 var request = require('request');
-var hostDB = "http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600";
 var internalError = "An internal error has occured";
+var hostDB = "http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600";
 
 // TEMPORARY GLOBAL VARIABLE
 var userID = 1;
+
+/*******************************************
+** Router: /award
+** Desc: Redirects to /award/previous-award
+*******************************************/
+router.get('/award', function(req, res, next){
+	res.redirect('/award/previous-award');
+});
 
 /*******************************************
 ** Router: /award/previous-award
