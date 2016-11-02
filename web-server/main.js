@@ -39,6 +39,7 @@ var passport = require('./lib/authenticate')(app, session);
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
 // ------ END MODULE SETUP -----------
 /**************************************
 **    START OF WEBSITE HANDLERS      **

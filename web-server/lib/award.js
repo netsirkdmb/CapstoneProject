@@ -4,9 +4,6 @@ var request = require('request');
 var internalError = "An internal error has occured";
 var hostDB = "http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600";
 
-// TEMPORARY GLOBAL VARIABLE
-var userID = 1;
-
 /*******************************************
 ** Router: /award
 ** Desc: Redirects to /award/previous-award
@@ -20,8 +17,8 @@ router.get('/award', function(req, res, next){
 ** Desc: Displayes all the previous awards given
 *******************************************/
 router.get('/award/previous-award', function(req, res, next){
-	// NEEDS TO BE REPLACED
-	console.log("/award/previous-award - USING TEMPORARY userID - NEEDS TO BE FIXED");
+	// Pulls the user ID from the session
+	var userID = req.session.passport.user.id;
 
 	// Pulls previously issued awards for a user
 	var path = "/userAwards/" + userID;
@@ -49,8 +46,8 @@ router.get('/award/previous-award', function(req, res, next){
 ** Desc: Displayes the profile information
 *******************************************/
 router.get('/award/profile', function(req, res, next){
-	// NEEDS TO BE REPLACED
-	console.log("/award/profile - USING TEMPORARY userID - NEEDS TO BE FIXED");
+	// Pulls the user ID from the session
+	var userID = req.session.passport.user.id;
 
 	// Pulls previously issued awards for a user
 	var path = "/users/" + userID;
