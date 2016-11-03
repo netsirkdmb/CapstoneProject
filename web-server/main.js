@@ -28,8 +28,8 @@ app.use(session({
 
 // Sets up the https server
 var https = require('https');
-var privateKey = fs.readFileSync('keys/key.pem', 'utf8');
-var certificate = fs.readFileSync('keys/cert.pem', 'utf8');
+var privateKey = fs.readFileSync('../../../.https/domain.key', 'utf8');
+var certificate = fs.readFileSync('../../../.https/cert.key', 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 
 // Loads the authentication module
