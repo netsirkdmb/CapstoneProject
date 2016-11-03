@@ -14,11 +14,10 @@ $(document).ready(function(){
 		$(this).find("td").each(function(){
 	            modalData.push($(this).html());
         	});
-		console.log(modalData);
-		$('#uuID').text(modalData[0]);
-		$('#editadminname').val(modalData[1]);
-		$('#editadminemail').val(modalData[2]);
-		$('#editadminpwd').val(modalData[3]);
+		$('#ID').text(modalData[0]);
+		$('#editadminemail').val(modalData[1]);
+		$('#editadminpwd').val(modalData[2]);
+		$('#uuID').text(modalData[4]);
 		$('#updateUser').modal('show');
 		
 	});
@@ -43,7 +42,8 @@ $(document).ready(function(){
 			return;
 		}
 
-		var formData  = "password=" + $('#pwd').val() + "&uuID=" + $('#name').val() + "&email="+ $('#email').val();
+		var formData  = "password=" + $('#pwd').val() + "&uuID=" + $('#uuID').val() + "&email="+ $('#email').val();
+		console.log(formData);
 		$.ajax({
 			url: '/adminAPI/admin',
 			contentType: 'application/x-www-form-urlencoded',
@@ -70,7 +70,7 @@ $(document).ready(function(){
 
 	//Delete Admin Button
 	$('#deleteadminbutton').click(function(){
-		var userID = $('#uuID').text();
+		var userID = $('#ID').text();
 		$.ajax({
 			url: '/adminAPI/admin/' + userID,
 			type:"DELETE"
@@ -106,13 +106,14 @@ $(document).ready(function(){
 
 			return;
 		}
-		var userID = $('#uuID').text();
+		var userID = $('#ID').text();
 		var formData = {
-			uuid:$('#editadminname').val()   ,
+			uuid:$('#uuID').text()   ,
 			email: $('#editadminpwd').val()  ,
 			password:  $('#editadminemail').val()
 
 		};
+		console.log(formData);
 		$.ajax({
 			url: '/adminAPI/admin/' + userID,
 			data: formData,
@@ -121,6 +122,7 @@ $(document).ready(function(){
 		})
 		.done(function(result){
 			alert(result);
+			location.reload();
 		})
 	
 		.fail(function(result){
