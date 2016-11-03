@@ -18,13 +18,11 @@ BEGIN
 
 -- Create a table called admins with the following properties:
 -- adminID - an auto incrementing integer which is the primary key
--- uuID - a varchar with a maximum length of 255 characters, cannot be null, must be unique
 -- email - a varchar with a maximum length of 255 characters, cannot be null, must be unique
 -- password - a varchar with a maximum length of 255 characters, cannot be null
 -- accountCreationTime - the datetime that this record was first created, cannot be null
 	CREATE TABLE admins (
 		adminID INT AUTO_INCREMENT,
-		uuID VARCHAR(255) NOT NULL UNIQUE,
 		email VARCHAR(255) NOT NULL UNIQUE,
 		password VARCHAR(255) NOT NULL,
 		accountCreationTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -34,7 +32,6 @@ BEGIN
 
 -- Create a table called users with the following properties:
 -- userID - an auto incrementing integer which is the primary key
--- uuID - a varchar with a maximum length of 255 characters, cannot be null, must be unique
 -- name - a varchar with a maximum length of 255 characters, cannot be null
 -- email - a varchar with a maximum length of 255 characters, cannot be null, must be unique
 -- password - a varchar with a maximum length of 255 characters, cannot be null
@@ -43,7 +40,6 @@ BEGIN
 -- accountCreationTime - the datetime that this record was first created, cannot be null
 	CREATE TABLE users (
 		userID INT AUTO_INCREMENT,
-		uuID VARCHAR(255) NOT NULL UNIQUE,
 		name VARCHAR(255) NOT NULL,
 		email VARCHAR(255) NOT NULL UNIQUE,
 		password VARCHAR(255) NOT NULL,

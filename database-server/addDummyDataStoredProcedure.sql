@@ -10,9 +10,9 @@ CREATE PROCEDURE spAddDummyData ()
 BEGIN
 
 -- insert administrators
-INSERT INTO admins (uuID, email, password) VALUES ('a', 'dhusek@oregonstate.edu', 'k');
-INSERT INTO admins (uuID, email, password) VALUES ('b', 'hallbry@oregonstate.edu', 'b');
-INSERT INTO admins (uuID, email, password) VALUES ('c', 'mccumstw@oregonstate.edu', 'w');
+INSERT INTO admins (email, password) VALUES ('dhusek@oregonstate.edu', 'k');
+INSERT INTO admins (email, password) VALUES ('hallbry@oregonstate.edu', 'b');
+INSERT INTO admins (email, password) VALUES ('mccumstw@oregonstate.edu', 'w');
 
 
 -- insert award types
@@ -23,9 +23,9 @@ INSERT INTO awardTypes (name, prestigeLevel) VALUES ('Gold Star Employee', 20);
 
 
 -- insert users
-INSERT INTO users (uuID, name, email, password, signatureImage, region) VALUES ('a', 'Kristen', 'dhusek@oregonstate.edu', 'kd', 'kristen d', 'Washington');
-INSERT INTO users (uuID, name, email, password, signatureImage, region) VALUES ('b', 'Bryant', 'hallbry@oregonstate.edu', 'bh', 'bryant h', 'Washington');
-INSERT INTO users (uuID, name, email, password, signatureImage, region) VALUES ('c', 'William', 'mccumstw@oregonstate.edu', 'wm', 'william m', 'Canada');
+INSERT INTO users (name, email, password, signatureImage, region) VALUES ('Kristen', 'dhusek@oregonstate.edu', 'kd', 'kristen d', 'Washington');
+INSERT INTO users (name, email, password, signatureImage, region) VALUES ('Bryant', 'hallbry@oregonstate.edu', 'bh', 'bryant h', 'Washington');
+INSERT INTO users (name, email, password, signatureImage, region) VALUES ('William', 'mccumstw@oregonstate.edu', 'wm', 'william m', 'Canada');
 
 
 -- insert awards

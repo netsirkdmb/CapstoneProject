@@ -36,13 +36,11 @@ app.config.update(configDict)
 # request parsers to validate input
 # parser for creating admins
 adminAccountParser = reqparse.RequestParser(bundle_errors=True)
-adminAccountParser.add_argument("uuID", type=str, help="uuID for new admin.", required=True)
 adminAccountParser.add_argument("email", type=str, help="Email address for new admin.", required=True)
 adminAccountParser.add_argument("password", type=str, help="Password for new admin.", required=True)
 
 # parser for creating users
 userAccountParser = reqparse.RequestParser(bundle_errors=True)
-userAccountParser.add_argument("uuID", type=str, help="uuID for new user.", required=True)
 userAccountParser.add_argument("name", type=str, help="Name for new user.", required=True)
 userAccountParser.add_argument("email", type=str, help="Email address for new user.", required=True)
 userAccountParser.add_argument("password", type=str, help="Password for new user.", required=True)
@@ -96,7 +94,7 @@ class AdminsList(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT adminID, uuID, email, password, accountCreationTime FROM admins"
+            query = "SELECT adminID, email, password, accountCreationTime FROM admins"
             app.cursor.execute(query)
 
             admins = list(app.cursor.fetchall())
@@ -105,7 +103,6 @@ class AdminsList(Resource):
             for admin in admins:
                 adminInfo = {}
                 (adminInfo["adminID"], 
-                adminInfo["uuID"], 
                 adminInfo["email"], 
                 adminInfo["password"], 
                 adminInfo["accountCreationTime"]) = admin
@@ -124,7 +121,6 @@ class AdminsList(Resource):
     def post(self):
         admin = adminAccountParser.parse_args()
 
-        admin_uuID = admin["uuID"]
         adminEmail = admin["email"]
         adminPassword = admin["password"]
 
@@ -132,15 +128,15 @@ class AdminsList(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            stmt = "INSERT INTO admins (uuID, email, password) VALUES (%s, %s, %s)"
-            app.cursor.execute(stmt, (admin_uuID, adminEmail, adminPassword))
+            stmt = "INSERT INTO admins (email, password) VALUES (%s, %s)"
+            app.cursor.execute(stmt, (adminEmail, adminPassword))
 
             app.conn.commit()
 
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [{"uuID": admin_uuID, "email": adminEmail, "password": adminPassword}]}, 200
+            return {"Status": "Success", "Data": [{"email": adminEmail, "password": adminPassword}]}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -176,7 +172,7 @@ class Admin(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT adminID, uuID, email, password, accountCreationTime FROM admins WHERE adminID = %s"
+            query = "SELECT adminID, email, password, accountCreationTime FROM admins WHERE adminID = %s"
             app.cursor.execute(query, int(adminID))
 
             admins = list(app.cursor.fetchall())
@@ -185,7 +181,6 @@ class Admin(Resource):
             for admin in admins:
                 adminInfo = {}
                 (adminInfo["adminID"], 
-                adminInfo["uuID"], 
                 adminInfo["email"], 
                 adminInfo["password"], 
                 adminInfo["accountCreationTime"]) = admin
@@ -257,7 +252,7 @@ class UsersList(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT userID, uuID, name, email, password, region, accountCreationTime FROM users"
+            query = "SELECT userID, name, email, password, region, accountCreationTime FROM users"
             app.cursor.execute(query)
 
             users = list(app.cursor.fetchall())
@@ -266,7 +261,6 @@ class UsersList(Resource):
             for user in users:
                 userInfo = {}
                 (userInfo["userID"], 
-                userInfo["uuID"], 
                 userInfo["name"], 
                 userInfo["email"], 
                 userInfo["password"], 
@@ -287,7 +281,6 @@ class UsersList(Resource):
     def post(self):
         user = userAccountParser.parse_args()
 
-        user_uuID = user["uuID"]
         userName = user["name"]
         userEmail = user["email"]
         userPassword = user["password"]
@@ -298,15 +291,15 @@ class UsersList(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            stmt = "INSERT INTO users (uuID, name, email, password, signatureImage, region) VALUES (%s, %s, %s, %s, %s, %s)"
-            app.cursor.execute(stmt, (user_uuID, userName, userEmail, userPassword, userSignature, userRegion))
+            stmt = "INSERT INTO users (name, email, password, signatureImage, region) VALUES (%s, %s, %s, %s, %s)"
+            app.cursor.execute(stmt, (userName, userEmail, userPassword, userSignature, userRegion))
 
             app.conn.commit()
 
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [{"uuID": user_uuID, "name": userName, "email": userEmail, "password": userPassword, "signatureImage": userSignature, "region": userRegion}]}, 200
+            return {"Status": "Success", "Data": [{"name": userName, "email": userEmail, "password": userPassword, "signatureImage": userSignature, "region": userRegion}]}, 200
         
         except Exception as e:
             return {"Status": "Fail", "Error": str(e)}, 400
@@ -342,7 +335,7 @@ class User(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT userID, uuID, name, email, password, signatureImage, region, accountCreationTime FROM users WHERE userID = %s"
+            query = "SELECT userID, name, email, password, signatureImage, region, accountCreationTime FROM users WHERE userID = %s"
             app.cursor.execute(query, int(userID))
 
             users = list(app.cursor.fetchall())
@@ -351,7 +344,6 @@ class User(Resource):
             for user in users:
                 userInfo = {}
                 (userInfo["userID"], 
-                userInfo["uuID"], 
                 userInfo["name"], 
                 userInfo["email"], 
                 userInfo["password"], 
@@ -985,7 +977,7 @@ class UserEmail(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT userID, uuID, name, email, password, region, accountCreationTime FROM users WHERE email = %s"
+            query = "SELECT userID, name, email, password, region, accountCreationTime FROM users WHERE email = %s"
             app.cursor.execute(query, email)
 
             users = list(app.cursor.fetchall())
@@ -994,7 +986,6 @@ class UserEmail(Resource):
             for user in users:
                 userInfo = {}
                 (userInfo["userID"], 
-                userInfo["uuID"], 
                 userInfo["name"], 
                 userInfo["email"], 
                 userInfo["password"], 
@@ -1023,7 +1014,7 @@ class AdminEmail(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT adminID, uuID, email, password, accountCreationTime FROM admins WHERE email = %s"
+            query = "SELECT adminID, email, password, accountCreationTime FROM admins WHERE email = %s"
             app.cursor.execute(query, email)
 
             admins = list(app.cursor.fetchall())
@@ -1032,7 +1023,6 @@ class AdminEmail(Resource):
             for admin in admins:
                 adminInfo = {}
                 (adminInfo["adminID"], 
-                adminInfo["uuID"], 
                 adminInfo["email"], 
                 adminInfo["password"], 
                 adminInfo["accountCreationTime"]) = admin
