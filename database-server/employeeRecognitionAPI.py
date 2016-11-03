@@ -22,16 +22,16 @@ from flask_restful import Resource, Api, reqparse, inputs
 from flaskext.mysql import MySQL
 import os
 import shutil
+import yaml
 
 app = Flask(__name__)
 api = Api(app)
 mysql = MySQL()
 
 # MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = "dhusek"
-app.config['MYSQL_DATABASE_PASSWORD'] = "oX^an26CROYrtfIcv!6LtVotx^GwRP"
-app.config['MYSQL_DATABASE_DB'] = "cs419"
-app.config['MYSQL_DATABASE_HOST'] = "cs419-employee-recognition.cquogdmskuf6.us-west-2.rds.amazonaws.com"
+f = open("MySQLPasswords.yaml")
+configDict = yaml.load(f)
+app.config.update(configDict)
 
 # request parsers to validate input
 # parser for creating admins
