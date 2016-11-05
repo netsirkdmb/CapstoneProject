@@ -23,13 +23,14 @@ from flaskext.mysql import MySQL
 import os
 import shutil
 import yaml
+import traceback
 
 app = Flask(__name__)
 api = Api(app)
 mysql = MySQL()
 
 # MySQL configurations
-f = open("MySQLPasswords.yaml")
+f = open("/api/src/MySQLPasswords.yaml")
 configDict = yaml.load(f)
 app.config.update(configDict)
 
@@ -87,6 +88,10 @@ def after_request(response):
     return response
 
 
+# return message when an exception occurs
+returnException = {"Status": "Fail", "Error": traceback.format_exc()}
+
+
 class AdminsList(Resource):
     # get a list of all of the admins in the database
     def get(self):
@@ -114,8 +119,8 @@ class AdminsList(Resource):
 
             return {"Status": "Success", "Data": adminList}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
     
     # create a new admin in the database
     def post(self):
@@ -138,8 +143,8 @@ class AdminsList(Resource):
 
             return {"Status": "Success", "Data": [{"email": adminEmail, "password": adminPassword}]}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
     
     # update admin without adminID error
     def put(self):
@@ -161,8 +166,8 @@ class AdminsList(Resource):
 
             return {"Status": "Success", "Message": "admins table is now empty."}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
 
 class Admin(Resource):
@@ -192,8 +197,8 @@ class Admin(Resource):
 
             return {"Status": "Success", "Data": adminList}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
     # insert admin with adminID error
     def post(self, adminID):
@@ -220,8 +225,8 @@ class Admin(Resource):
 
             return {"Status": "Success", "Data": [{"email": adminEmail, "password": adminPassword}]}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
     # delete an admin from the database, errors if the admin does not exist in the database
     def delete(self, adminID):
@@ -241,8 +246,8 @@ class Admin(Resource):
 
             return {"Status": "Success", "Message": message}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
 
 class UsersList(Resource):
@@ -274,8 +279,8 @@ class UsersList(Resource):
 
             return {"Status": "Success", "Data": userData}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
     
     # create a new user in the database
     def post(self):
@@ -301,8 +306,8 @@ class UsersList(Resource):
 
             return {"Status": "Success", "Data": [{"name": userName, "email": userEmail, "password": userPassword, "signatureImage": userSignature, "region": userRegion}]}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
     
     # update user without userID error
     def put(self):
@@ -324,8 +329,8 @@ class UsersList(Resource):
 
             return {"Status": "Success", "Message": "users table is now empty."}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
 
 class User(Resource):
@@ -358,8 +363,8 @@ class User(Resource):
 
             return {"Status": "Success", "Data": userData}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
     # insert user with userID error
     def post(self, userID):
@@ -393,8 +398,8 @@ class User(Resource):
 
             return {"Status": "Success", "Data": [{"name": userName, "email": userEmail, "password": userPassword, "signatureImage": userSignature, "region": userRegion}]}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
     # delete a user from the database, errors if the user does not exist in the database
     def delete(self, userID):
@@ -414,8 +419,8 @@ class User(Resource):
 
             return {"Status": "Success", "Message": message}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
 
 class AwardTypesList(Resource):
@@ -443,8 +448,8 @@ class AwardTypesList(Resource):
 
             return {"Status": "Success", "Data": awardTypesData}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
     
     # create a new award type in the database
     def post(self):
@@ -467,8 +472,8 @@ class AwardTypesList(Resource):
 
             return {"Status": "Success", "Data": [{"name": awardTypeName, "prestigeLevel": awardTypePrestige}]}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
     
     # update award type without awardTypeID error
     def put(self):
@@ -490,8 +495,8 @@ class AwardTypesList(Resource):
 
             return {"Status": "Success", "Message": "awardTypes table is now empty."}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
 
 class AwardType(Resource):
@@ -519,8 +524,8 @@ class AwardType(Resource):
 
             return {"Status": "Success", "Data": awardTypesData}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
     # insert award type with awardTypeID error
     def post(self, awardTypeID):
@@ -547,8 +552,8 @@ class AwardType(Resource):
 
             return {"Status": "Success", "Data": [{"name": awardTypeName, "prestigeLevel": awardTypePrestige}]}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
     # delete a award type from the database, errors if the award type does not exist in the database
     def delete(self, awardTypeID):
@@ -568,8 +573,8 @@ class AwardType(Resource):
 
             return {"Status": "Success", "Message": message}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
 
 class AwardsList(Resource):
@@ -579,15 +584,15 @@ class AwardsList(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = ("SELECT a.awardID, "
-                    "a.receiverID, "
-                    "rec.name AS receiverName, "
-                    "a.giverID, giv.name AS giverName, "
-                    "a.typeID, atyp.name AS awardType, "
-                    "a.awardDate FROM cs419.awards a INNER JOIN "
-                    "users rec ON a.receiverID = rec.userID INNER JOIN "
-                    "users giv ON a.giverID = giv.userID INNER JOIN "
-                    "awardTypes atyp ON a.typeID = atyp.awardTypeID")
+            query = """SELECT a.awardID, 
+                    a.receiverID, 
+                    rec.name AS receiverName, 
+                    a.giverID, giv.name AS giverName, 
+                    a.typeID, atyp.name AS awardType, 
+                    a.awardDate FROM cs419.awards a INNER JOIN 
+                    users rec ON a.receiverID = rec.userID INNER JOIN 
+                    users giv ON a.giverID = giv.userID INNER JOIN 
+                    awardTypes atyp ON a.typeID = atyp.awardTypeID"""
             app.cursor.execute(query)
 
             awards = list(app.cursor.fetchall())
@@ -611,8 +616,8 @@ class AwardsList(Resource):
 
             return {"Status": "Success", "Data": awardData}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
     
     # create a new award in the database
     def post(self):
@@ -637,8 +642,8 @@ class AwardsList(Resource):
 
             return {"Status": "Success", "Data": [{"receiverID": awardReceiverID, "giverID": awardGiverID, "typeID": awardTypeID, "awardDate": awardDate}]}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
     
     # update award without awardID error
     def put(self):
@@ -660,8 +665,8 @@ class AwardsList(Resource):
 
             return {"Status": "Success", "Message": "awards table is now empty."}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
 
 class Award(Resource):
@@ -671,15 +676,15 @@ class Award(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = ("SELECT a.awardID, "
-                    "a.receiverID, "
-                    "rec.name AS receiverName, "
-                    "a.giverID, giv.name AS giverName, "
-                    "a.typeID, atyp.name AS awardType, "
-                    "a.awardDate FROM cs419.awards a INNER JOIN "
-                    "users rec ON a.receiverID = rec.userID INNER JOIN "
-                    "users giv ON a.giverID = giv.userID INNER JOIN "
-                    "awardTypes atyp ON a.typeID = atyp.awardTypeID WHERE a.awardID = %s")
+            query = """SELECT a.awardID, 
+                    a.receiverID, 
+                    rec.name AS receiverName, 
+                    a.giverID, giv.name AS giverName, 
+                    a.typeID, atyp.name AS awardType, 
+                    a.awardDate FROM cs419.awards a INNER JOIN 
+                    users rec ON a.receiverID = rec.userID INNER JOIN 
+                    users giv ON a.giverID = giv.userID INNER JOIN 
+                    awardTypes atyp ON a.typeID = atyp.awardTypeID WHERE a.awardID = %s"""
             app.cursor.execute(query, int(awardID))
 
             awards = list(app.cursor.fetchall())
@@ -703,8 +708,8 @@ class Award(Resource):
 
             return {"Status": "Success", "Data": awardData}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
     # insert award with awardID error
     def post(self, awardID):
@@ -733,8 +738,8 @@ class Award(Resource):
 
             return {"Status": "Success", "Data": [{"receiverID": awardReceiverID, "giverID": awardGiverID, "typeID": awardTypeID, "awardDate": awardDate}]}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
     # delete a award from the database, errors if the award does not exist in the database
     def delete(self, awardID):
@@ -754,8 +759,8 @@ class Award(Resource):
 
             return {"Status": "Success", "Message": message}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
 
 class AwardUser(Resource):
@@ -765,15 +770,15 @@ class AwardUser(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = ("SELECT a.awardID, "
-                    "a.receiverID, "
-                    "rec.name AS receiverName, "
-                    "a.giverID, giv.name AS giverName, "
-                    "a.typeID, atyp.name AS awardType, "
-                    "a.awardDate FROM cs419.awards a INNER JOIN "
-                    "users rec ON a.receiverID = rec.userID INNER JOIN "
-                    "users giv ON a.giverID = giv.userID INNER JOIN "
-                    "awardTypes atyp ON a.typeID = atyp.awardTypeID WHERE giv.userID = %s")
+            query = """SELECT a.awardID, 
+                    a.receiverID, 
+                    rec.name AS receiverName, 
+                    a.giverID, giv.name AS giverName, 
+                    a.typeID, atyp.name AS awardType, 
+                    a.awardDate FROM cs419.awards a INNER JOIN 
+                    users rec ON a.receiverID = rec.userID INNER JOIN 
+                    users giv ON a.giverID = giv.userID INNER JOIN 
+                    awardTypes atyp ON a.typeID = atyp.awardTypeID WHERE giv.userID = %s"""
             app.cursor.execute(query, int(userID))
 
             awards = list(app.cursor.fetchall())
@@ -797,8 +802,8 @@ class AwardUser(Resource):
 
             return {"Status": "Success", "Data": awardData}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
     # insert award with userID error
     def post(self, userID):
@@ -826,8 +831,8 @@ class AwardUser(Resource):
 
             return {"Status": "Success", "Message": message}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
 
 class ResetTables(Resource):
@@ -842,8 +847,8 @@ class ResetTables(Resource):
             app.conn.close()
 
             return result
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
 
 class AddDummyData(Resource):
@@ -857,8 +862,9 @@ class AddDummyData(Resource):
             clearTables()
             app.cursor.callproc('spAddDummyData')
             data = app.cursor.fetchall()
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
+        
         if len(data) == 0:
             app.conn.commit()
 
@@ -890,17 +896,17 @@ class CreateAward(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = ("SELECT a.awardID, "
-                    "a.receiverID, "
-                    "rec.name AS receiverName, "
-                    "rec.email, "
-                    "a.giverID, giv.name AS giverName, "
-                    "giv.signatureImage, "
-                    "a.typeID, atyp.name AS awardType, "
-                    "a.awardDate FROM cs419.awards a INNER JOIN "
-                    "users rec ON a.receiverID = rec.userID INNER JOIN "
-                    "users giv ON a.giverID = giv.userID INNER JOIN "
-                    "awardTypes atyp ON a.typeID = atyp.awardTypeID WHERE a.awardID = %s")
+            query = """SELECT a.awardID, 
+                    a.receiverID, 
+                    rec.name AS receiverName, 
+                    rec.email, 
+                    a.giverID, giv.name AS giverName, 
+                    giv.signatureImage, 
+                    a.typeID, atyp.name AS awardType, 
+                    a.awardDate FROM cs419.awards a INNER JOIN 
+                    users rec ON a.receiverID = rec.userID INNER JOIN 
+                    users giv ON a.giverID = giv.userID INNER JOIN 
+                    awardTypes atyp ON a.typeID = atyp.awardTypeID WHERE a.awardID = %s"""
             app.cursor.execute(query, int(awardID))
 
             awards = list(app.cursor.fetchall())
@@ -926,24 +932,24 @@ class CreateAward(Resource):
             app.cursor.close()
             app.conn.close()
 
-            project = "./"
-            pdf_d = "{}pdf/".format(project)
+            project = "/api/src/"
+            pdf_d = "{0}pdf/".format(project)
             latexCode = ""
             for award in awardPDF:
                 for key, value in award:
-                    latexCode = latexCode + "\\newCommand{{\\{}}}{{{}}}\n".format(key, value)
+                    latexCode = latexCode + "\\newCommand{{\\{0}}}{{{1}}}\n".format(key, value)
             
             template = "test"
             latexCode = (latexCode + """
-                        \\documentclass{{{}}} % din a4, 11 pt, one-sided, 
+                        \\documentclass{{{0}}} % din a4, 11 pt, one-sided, 
                         \\begin{{document}}
                         \\end{{document}}
                         """.format(template))
             
-            build_d = "{}build/".format(project)
-            out_file = "{}template".format(build_d)
+            build_d = "{0}build/".format(project)
+            out_file = "{0}template".format(build_d)
             ## code to do test certificate
-            test_file = "{}certificate".format(build_d)
+            test_file = "{0}certificate".format(build_d)
 
             # create the build directory if not existing
             if not os.path.exists(build_d):
@@ -957,13 +963,13 @@ class CreateAward(Resource):
             with open(out_file + ".tex", "w") as f:
                 f.write(latexCode)
             
-            os.system("pdflatex -output-directory {} {}".format(os.path.realpath(build_d), os.path.realpath(test_file)))
+            os.system("pdflatex -output-directory {0} {1}".format(os.path.realpath(build_d), os.path.realpath(test_file)))
             shutil.copy2(test_file + ".pdf", os.path.realpath(pdf_d))
 
             return {"Status": "Success", "Data": awardData, "PDF": awardPDF}, 200
 
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
 
 class UserEmail(Resource):
@@ -999,8 +1005,8 @@ class UserEmail(Resource):
 
             return {"Status": "Success", "Data": userData}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
 
 
 class AdminEmail(Resource):
@@ -1034,8 +1040,330 @@ class AdminEmail(Resource):
 
             return {"Status": "Success", "Data": adminList}, 200
         
-        except Exception as e:
-            return {"Status": "Fail", "Error": str(e)}, 400
+        except Exception:
+            return returnException, 400
+    
+
+def convertMonth(mon):
+    if mon == 1:
+        return "January"
+    elif mon == 2:
+        return "February"
+    elif mon == 3:
+        return "March"
+    elif mon == 4:
+        return "April"
+    elif mon == 5:
+        return "May"
+    elif mon == 6:
+        return "June"
+    elif mon == 7:
+        return "July"
+    elif mon == 8:
+        return "August"
+    elif mon == 9:
+        return "September"
+    elif mon == 10:
+        return "October"
+    elif mon == 11:
+        return "November"
+    else:
+        return "December"
+
+    
+class FreqChart(Resource):
+    # get the count of awards being given in the previous 12 months
+    def get(self):
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            query = """SELECT y, m, Count(a.awardDate) AS count FROM
+                    (SELECT y, m FROM
+                    (SELECT YEAR(CURDATE()) y UNION ALL SELECT YEAR(CURDATE())-1) years,
+                    (SELECT 1 m UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+                    UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 
+                    UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12) months) ym
+                    LEFT JOIN cs419.awards a ON ym.y = YEAR(a.awardDate) AND ym.m = MONTH(a.awardDate)
+                    WHERE (y=YEAR(CURDATE()) AND m<=MONTH(CURDATE())) OR (y<YEAR(CURDATE()) AND m>MONTH(CURDATE()))
+                    GROUP BY y, m"""
+            app.cursor.execute(query)
+
+            rows = list(app.cursor.fetchall())
+
+            rowList = []
+            for row in rows:
+                rowInfo = {}
+                (rowInfo["year"], 
+                rowInfo["month"], 
+                rowInfo["frequency"]) = row
+                rowInfo["month"] = convertMonth(rowInfo["month"])
+                rowList.append(rowInfo)
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Results": rowList}, 200
+        
+        except Exception:
+            return returnException, 400
+
+
+class AnnualAwardTypes(Resource):
+    # get the award types being given in the previous 12 months
+    def get(self):
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            query = """SELECT a.typeID as typeID, aTyp.name as name, aTyp.prestigeLevel as prestigeLevel, Count(a.typeID) AS count FROM
+                    (SELECT y, m FROM
+                    (SELECT YEAR(CURDATE()) y UNION ALL SELECT YEAR(CURDATE())-1) years,
+                    (SELECT 1 m UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+                    UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 
+                    UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12) months) ym
+                    RIGHT JOIN cs419.awards a ON ym.y = YEAR(a.awardDate) AND ym.m = MONTH(a.awardDate)
+					INNER JOIN cs419.awardTypes aTyp ON a.typeID = aTyp.awardTypeID
+					WHERE (y=YEAR(CURDATE()) AND m<=MONTH(CURDATE())) OR (y<YEAR(CURDATE()) AND m>MONTH(CURDATE())) 
+                    GROUP BY typeID"""
+            app.cursor.execute(query)
+
+            rows = list(app.cursor.fetchall())
+
+            rowList = []
+            for row in rows:
+                rowInfo = {}
+                (rowInfo["tyepID"], 
+                rowInfo["name"], 
+                rowInfo["value"], 
+                rowInfo["frequency"]) = row
+                rowList.append(rowInfo)
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Results": rowList}, 200
+        
+        except Exception:
+            return returnException, 400
+
+class EmployeeRank(Resource):
+    # get the employee's all-time ranking based on awards received
+    def get(self, userID):
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            query = """SELECT z.userID, z.name, z.rank, z.points FROM 
+                    (SELECT x.userID, x.name, x.points, 
+                    @prev := @curr, @curr := x.points, @rank := IF(@prev = @curr, @rank, @rank + @i) AS rank,
+                    IF(@prev <> x.points, @i:=1, @i:=@i+1) AS counter FROM
+                    (SELECT u.userID, u.name AS name, COALESCE(SUM(atyp.prestigeLevel), 0) AS points 
+                    FROM users u LEFT JOIN awards a ON u.userID = a.receiverID 
+                    LEFT JOIN awardTypes atyp ON a.typeID = atyp.awardTypeID 
+                    GROUP BY u.userID) x,
+                    (SELECT @curr := null, @prev := null, @rank := 1, @i := 0) tmp_tbl
+                    ORDER BY x.points DESC, x.userID ASC) z WHERE z.userID = %s"""
+            app.cursor.execute(query, int(userID))
+
+            rows = list(app.cursor.fetchall())
+
+            rowList = []
+            for row in rows:
+                rowInfo = {}
+                (rowInfo["userID"],
+                rowInfo["name"], 
+                rowInfo["rank"], 
+                rowInfo["prestige"]) = row
+                rowInfo["rank"] = int(rowInfo["rank"])
+                rowInfo["prestige"] = int(rowInfo["prestige"])
+                rowList.append(rowInfo)
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Results": rowList}, 200
+        
+        except Exception:
+            return returnException, 400
+
+
+class AllEmployeeRank(Resource):
+    # get the all-time ranking based on awards received
+    def get(self):
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            query = """SELECT z.userID, z.name, z.rank, z.points FROM 
+                    (SELECT x.userID, x.name, x.points, 
+                    @prev := @curr, @curr := x.points, @rank := IF(@prev = @curr, @rank, @rank + @i) AS rank,
+                    IF(@prev <> x.points, @i:=1, @i:=@i+1) AS counter FROM
+                    (SELECT u.userID, u.name AS name, COALESCE(SUM(atyp.prestigeLevel), 0) AS points 
+                    FROM users u LEFT JOIN awards a ON u.userID = a.receiverID 
+                    LEFT JOIN awardTypes atyp ON a.typeID = atyp.awardTypeID 
+                    GROUP BY u.userID) x,
+                    (SELECT @curr := null, @prev := null, @rank := 1, @i := 0) tmp_tbl
+                    ORDER BY x.points DESC, x.userID ASC) z"""
+            app.cursor.execute(query)
+
+            rows = list(app.cursor.fetchall())
+
+            rowList = []
+            for row in rows:
+                rowInfo = {}
+                (rowInfo["userID"],
+                rowInfo["name"], 
+                rowInfo["rank"], 
+                rowInfo["prestige"]) = row
+                rowInfo["rank"] = int(rowInfo["rank"])
+                rowInfo["prestige"] = int(rowInfo["prestige"])
+                rowList.append(rowInfo)
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Results": rowList}, 200
+        
+        except Exception:
+            return returnException, 400
+
+
+class EmployeePrestigePoints(Resource):
+    # get the prestige points for the awards the employee has received each month over their career
+    def get(self, userID):
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            query = """SELECT YEAR(aDate) AS year, MONTH(aDate) AS month, COALESCE(h.points, 0) AS points FROM (
+                    SELECT @maxDate - INTERVAL (a.a+(10*b.a)+(100*c.a)+(1000*d.a) + (10000*e.a)) day aDate FROM
+                    (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+                    UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL
+                    SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a, /*10 day range*/
+                    (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+                    UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL
+                    SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b, /*100 day range*/
+                    (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+                    UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL
+                    SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) c, /*1000 day range*/
+                    (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+                    UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL
+                    SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) d, /*10000 day range*/
+                    (SELECT 0 AS a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+                    UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL
+                    SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) e, /*100000 day range*/
+                    (SELECT @minDate := (SELECT startDate FROM users WHERE userID = %s), @maxDate := CURDATE()) f
+                    ) g LEFT JOIN (SELECT YEAR(a.awardDate) AS ay, MONTH(a.awardDate) AS am, SUM(atyp.prestigeLevel) as points FROM users u 
+                        INNER JOIN awards a ON u.userID = a.receiverID 
+                        INNER JOIN awardTypes atyp ON a.typeID = atyp.awardTypeID
+                        WHERE u.userID = %s
+                        GROUP BY YEAR(a.awardDate) DESC, MONTH(a.awardDate) DESC) h ON h.ay = YEAR(aDate) and h.am = MONTH(aDate)
+                    WHERE aDate BETWEEN @minDate AND @maxDate
+                    GROUP BY year DESC, month DESC"""
+            app.cursor.execute(query, (int(userID), int(userID)))
+
+            rows = list(app.cursor.fetchall())
+
+            rowList = []
+            for row in rows:
+                rowInfo = {}
+                (rowInfo["year"], 
+                rowInfo["month"], 
+                rowInfo["points"]) = row
+                rowInfo["year"] = int(rowInfo["year"])
+                rowInfo["month"] = convertMonth(rowInfo["month"])
+                rowInfo["points"] = int(rowInfo["points"])
+                rowList.append(rowInfo)
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Results": rowList}, 200
+        
+        except Exception:
+            return returnException, 400
+
+
+class EmployeeAwardTypes(Resource):
+    # get the award types the employee has received over their career
+    def get(self, userID):
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            query = """SELECT atyp.awardTypeID AS typeID, 
+                    atyp.name as awardName, 
+                    atyp.prestigeLevel AS value, 
+                    COUNT(atyp.name) as frequency FROM users u 
+                    INNER JOIN awards a ON u.userID = a.receiverID 
+                    INNER JOIN awardTypes atyp ON a.typeID = atyp.awardTypeID
+                    WHERE u.userID = %s
+                    GROUP BY atyp.name ASC"""
+            app.cursor.execute(query, int(userID))
+
+            rows = list(app.cursor.fetchall())
+
+            rowList = []
+            for row in rows:
+                rowInfo = {}
+                (rowInfo["tyepID"], 
+                rowInfo["name"], 
+                rowInfo["value"], 
+                rowInfo["frequency"]) = row
+                rowList.append(rowInfo)
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Results": rowList}, 200
+        
+        except Exception:
+            return returnException, 400
+
+
+class AwardUserReceived(Resource):
+    # get all awards that userID has received
+    def get(self, userID):
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            query = """SELECT a.awardID, 
+                    a.receiverID, 
+                    rec.name AS receiverName, 
+                    a.giverID, giv.name AS giverName, 
+                    a.typeID, atyp.name AS awardType, 
+                    a.awardDate FROM cs419.awards a INNER JOIN 
+                    users rec ON a.receiverID = rec.userID INNER JOIN 
+                    users giv ON a.giverID = giv.userID INNER JOIN 
+                    awardTypes atyp ON a.typeID = atyp.awardTypeID WHERE rec.userID = %s
+					ORDER BY a.awardDate DESC"""
+            app.cursor.execute(query, int(userID))
+
+            awards = list(app.cursor.fetchall())
+
+            awardData = []
+            for award in awards:
+                awardInfo = {}
+                (awardInfo["awardID"], 
+                awardInfo["receiverID"], 
+                awardInfo["receiverName"], 
+                awardInfo["giverID"], 
+                awardInfo["giverName"], 
+                awardInfo["awardTypeID"], 
+                awardInfo["awardType"],
+                awardInfo["awardDate"]) = award
+                awardInfo["awardDate"] = str(awardInfo["awardDate"])
+                awardData.append(awardInfo)
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Data": awardData}, 200
+        
+        except Exception:
+            return returnException, 400
 
 
 # create routes for API
@@ -1053,6 +1381,13 @@ api.add_resource(AddDummyData, '/resetTablesWithDummyData')
 api.add_resource(CreateAward, '/getAwardCreationInfo/<int:awardID>')
 api.add_resource(UserEmail, '/getUserByEmail')
 api.add_resource(AdminEmail, '/getAdminByEmail')
+api.add_resource(FreqChart, '/getFrequencyChart')
+api.add_resource(AnnualAwardTypes, '/getAwardTypes')
+api.add_resource(AllEmployeeRank, '/getRanking')
+api.add_resource(EmployeeRank, '/getRanking/<int:userID>')
+api.add_resource(EmployeePrestigePoints, '/getPrestigePoints/<int:userID>')
+api.add_resource(EmployeeAwardTypes, '/getAwardTypes/<int:userID>')
+api.add_resource(AwardUserReceived, '/getAwardsReceived/<int:userID>')
 
 
 if __name__ == "__main__":

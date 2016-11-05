@@ -35,16 +35,20 @@ BEGIN
 -- name - a varchar with a maximum length of 255 characters, cannot be null
 -- email - a varchar with a maximum length of 255 characters, cannot be null, must be unique
 -- password - a varchar with a maximum length of 255 characters, cannot be null
+-- passwordCode - a varchar with a maximum length of 255 characters, default is null
 -- signatureImage - a varchar with a maximum length of 255 characters, cannot be null
 -- region - a varchar with a maximum length of 255 characters, cannot be null
+-- startDate - the date that this user started, cannot be null
 -- accountCreationTime - the datetime that this record was first created, cannot be null
 	CREATE TABLE users (
 		userID INT AUTO_INCREMENT,
 		name VARCHAR(255) NOT NULL,
 		email VARCHAR(255) NOT NULL UNIQUE,
 		password VARCHAR(255) NOT NULL,
+		passwordCode VARCHAR(255) DEFAULT NULL,
 		signatureImage VARCHAR(255) NOT NULL,
 		region VARCHAR(255) NOT NULL,
+		startDate DATE NOT NULL,
 		accountCreationTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		PRIMARY KEY(userID)
 	) ENGINE=InnoDB;
