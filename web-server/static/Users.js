@@ -38,10 +38,10 @@ $(document).ready(function(){
 
 	//function to delete user
 	$('#deleteuserbutton').click(function(){
-        	var userID = $('#uuID').text();
+        	var userID = $('#ID').text();
 		//ajax call to backend web server which reroutes to database
                 $.ajax({
-                        url: '/adminAPI/user/' + userID,
+                        url: '/admin/API/user/' + userID,
                         type:"DELETE"
                 })
                 .done(function(result){
@@ -94,7 +94,7 @@ $(document).ready(function(){
                 };
 		console.log(formData);
                 $.ajax({
-                        url: '/adminAPI/user/' + userID,
+                        url: '/admin/API/user/' + userID,
                         data: formData,
                         type:"PUT"
 
@@ -136,7 +136,7 @@ $(document).ready(function(){
                 var formData  = "password=" + $('#pwd').val() + "&uuID=" + $('#name').val() + "&email=" + $('#email').val() + "&signatureImage=" + "comingsoon"  +  "&region=" + $('#region').val() + "&name=" +  $('#name').val();
                 console.log(formData);
 		 $.ajax({
-                        url: '/adminAPI/user',
+                        url: '/admin/API/user',
                         contentType: 'application/x-www-form-urlencoded',
                         type: "POST",
                         data: formData

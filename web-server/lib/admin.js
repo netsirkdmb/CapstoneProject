@@ -22,7 +22,6 @@ myRouter.get('/admin/users' , function (req,res){
 				
 		//go through every result in JSON data and append to a results array. 
 		for(var entry in jsonResult.Data){
-			console.log(jsonResult.Data[entry].uuID);
 			results.push({
 				
 				uid: jsonResult.Data[entry].userID,
@@ -50,6 +49,7 @@ myRouter.get('/admin/users' , function (req,res){
 
 //renders admin page with dummy data 
 myRouter.get('/admin/admins', function(req,res){
+	
 	//get data from server here
 	var context = {};
 	 var results=[];  //used to store processed results from server
@@ -93,12 +93,11 @@ API LINKS
 
 //Handle Remove Create and Update Operations Here. Take data from site and redirect to Database server
 
-myRouter.route('/adminAPI/admin')
-	//create New Router
-	.post( function(req,res){
+myRouter.route('/admin/API/admin').post(
+		 function(req,res){
 		
 		var values =  {password: req.body.password, email:  req.body.email, uuID:  uuid.v4() };
-		console.log(values);
+		console.log("Post Values");
 		request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins', form: values }, function(err, response,body){
 		        if(!err && response.statusCode < 400){
                                 res.send("1");
@@ -112,9 +111,8 @@ myRouter.route('/adminAPI/admin')
                         }
 		});		
 	});
-myRouter.route('/adminAPI/admin/:uuID')
+myRouter.route('/admin/API/admin/:uuID')
 	.put(function(req,res){
-		console.log("Update Request for UUID: " + req.params.uuID); 
 		var values =  {password: req.body.password, email:  req.body.email, uuID:  req.body.uuid };
 
 	        request.put({url:'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins/' + req.params.uuID, form:values}, function(err, response,body){
@@ -131,8 +129,9 @@ myRouter.route('/adminAPI/admin/:uuID')
 
 	})
 	.delete(function(req,res){
-		console.log("Delete Request for UUID: " + req.params.uuID);
+		console.log("Delete Request for ID: " + req.params.ID);
 		request.delete('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins/' + req.params.uuID, function(err, response,body){
+			console.log(req.session);
 			if(!err && response.statusCode < 400){
 				res.send("1");
 			}
@@ -148,12 +147,15 @@ myRouter.route('/adminAPI/admin/:uuID')
 
 
 
-
+/****************************************************************************************************************************************
+**							USERS
+**
+*****************************************************************************************************************************************/
 
 
 //Handle Remove Create and Update Operations Here. Take data from site and redirect to Database server
 
-myRouter.route('/adminAPI/user')
+myRouter.route('/admin/API/user')
         //create New Router
         .post( function(req,res){
 
@@ -161,7 +163,7 @@ myRouter.route('/adminAPI/user')
                 console.log(values);
                 request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users', form: values }, function(err, response,body){
                         if(!err && response.statusCode < 400){
-                                console.log(body);
+                                console.log(JSON.stringify(body));
                                 res.send("1");
                         }
                         else{
@@ -172,10 +174,10 @@ myRouter.route('/adminAPI/user')
                         }
                 });
         });
-myRouter.route('/adminAPI/user/:ID')
+myRouter.route('/admin/API/user/:ID')
         .put(function(req,res){
-                console.log("Update Request for UUID: " + req.params.ID);
-		var values =  {password: req.body.password, email:  req.body.email, uuID:  req.body.uuid, region: req.body.region, signatureImage: "comingsoon", name: req.body.name };
+                console.log("Update Request for ID: " + req.params.ID);
+		var values =  {password: req.body.password, email:  req.body.email,  region: req.body.region, signatureImage: "comingsoon", name: req.body.name };
                 console.log(values);
 		request.put({url:'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users/' + req.params.ID, form: values}, function(err, response,body){
                         if(!err && response.statusCode < 400){
@@ -192,8 +194,8 @@ myRouter.route('/adminAPI/user/:ID')
 
         })
         .delete(function(req,res){
-                console.log("Delete Request for UUID: " + req.params.uuID);
-                request.delete('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users/' + req.params.uuID, function(err, response,body){
+                console.log("Delete Request for ID: " + req.params.ID);
+                request.delete('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users/' + req.params.ID, function(err, response,body){
                         if(!err && response.statusCode < 400){
                                 console.log(body);
                                 res.send("1");

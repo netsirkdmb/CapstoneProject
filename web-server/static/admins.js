@@ -45,7 +45,7 @@ $(document).ready(function(){
 		var formData  = "password=" + $('#pwd').val() + "&uuID=" + $('#uuID').val() + "&email="+ $('#email').val();
 		console.log(formData);
 		$.ajax({
-			url: '/adminAPI/admin',
+			url: '/admin/API/admin',
 			contentType: 'application/x-www-form-urlencoded',
 			type: "POST",
 			data: formData
@@ -72,7 +72,7 @@ $(document).ready(function(){
 	$('#deleteadminbutton').click(function(){
 		var userID = $('#ID').text();
 		$.ajax({
-			url: '/adminAPI/admin/' + userID,
+			url: '/admin/API/admin/' + userID,
 			type:"DELETE"
 		})
 		.done(function(result){
@@ -115,7 +115,7 @@ $(document).ready(function(){
 		};
 		console.log(formData);
 		$.ajax({
-			url: '/adminAPI/admin/' + userID,
+			url: '/admin/API/admin/' + userID,
 			data: formData,
                         type:"PUT"
 
