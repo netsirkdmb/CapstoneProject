@@ -82,3 +82,40 @@ http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600
 
 **Get Admin by Email:** [/getAdminByEmail](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getAdminByEmail)
 - post: returns admin with specified email
+
+##Business Intelligence Suite Calls
+**Top Performing Employees:** [/getTopEmployees](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getTopEmployees)
+- get: returns the top 5 performing employees for each month of the previous year as well as the top 5 employees overall for the past year
+
+**Ranking All-Time:** [/getRanking](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getRanking)
+- get: returns the overall employee ranking based on awards received all-Time
+
+**Most Generous Employees:** [/getGenerousEmployees](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getGenerousEmployees)
+- get: returns the top 5 most generous employees for each month of the previous year as well as the top 5 employees overall for the past year
+
+**Frequency Chart:** [/getFrequencyChart](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getFrequencyChart)
+- get: returns the number of awards given each month for the previous 12 months
+
+**Award Types:** [/getAwardTypes](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getAwardTypes)
+- get: returns the types of awards given over the previous 12 months
+
+**Employee Ranking:** [/getRanking/1234](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getRanking/1)
+- get: returns overall ranking of the employee with specified id _(specified id is represented by "1234")_
+
+**Employee Prestige Points:** [/getPrestigePoints/1234](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getPrestigePoints/1)
+- get: returns total points earned by the employee with specified id _(specified id is represented by "1234")_ in each month of their career
+
+**Employee Award Types:** [/getAwardTypes/1234](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getAwardTypes/1)
+- get: returns types of awards earned by the employee with specified id _(specified id is represented by "1234")_ over their career
+
+**Employee Awards Received:** [/getAwardsReceived/1234](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getAwardsReceived/1)
+- get: returns the awards that the employee with specified id _(specified id is represented by "1234")_ has received over their career
+
+**Employee Award Giving Frequency:** [/getAwardsGivenFrequency/1234](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getAwardsGivenFrequency/1)
+- get: returns the number of awards the employee with specified id _(specified id is represented by "1234")_ has given in each month of their career
+
+**Employee Types of Awards Given:** [/getAwardTypesGiven/1234](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/getAwardTypesGiven/1)
+- get: returns the types of awards that the employee with specified id _(specified id is represented by "1234")_ has given along with their Frequency
+
+**Employee Awards Given:** [/userAwards/1234](http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/userAwards/1)
+- get: returns all awards given by employee with specified id _(specified id is represented by "1234")_
