@@ -16,6 +16,8 @@
 #       http://akuederle.com/Automatization-with-Latex-and-Python-1                           #
 # - for help with MySQL queries between two dates                                             #
 #       http://stackoverflow.com/questions/9511409/creating-a-list-of-month-names-between-two-dates-in-mysql
+# - for help with MySQL queries and ranking                                                   #
+#       http://stackoverflow.com/questions/24118393/mysql-rank-with-ties                      #
 ###############################################################################################
 
 
@@ -26,6 +28,7 @@ import os
 import shutil
 import yaml
 import traceback
+import datetime
 
 app = Flask(__name__)
 api = Api(app)
@@ -1322,11 +1325,11 @@ class EmployeePrestigePoints(Resource):
                     UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL
                     SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) e, /*100000 day range*/
                     (SELECT @minDate := (SELECT startDate FROM users WHERE userID = %s), @maxDate := CURDATE()) f
-                    ) g LEFT JOIN (SELECT YEAR(a.awardDate) AS ay, MONTH(a.awardDate) AS am, SUM(atyp.prestigeLevel) as points FROM users u 
+                    ) g LEFT JOIN (SELECT YEAR(a.awardDate) AS ay, MONTH(a.awardDate) AS am, SUM(atyp.prestigeLevel) AS points FROM users u 
                         INNER JOIN awards a ON u.userID = a.receiverID 
                         INNER JOIN awardTypes atyp ON a.typeID = atyp.awardTypeID
                         WHERE u.userID = %s
-                        GROUP BY YEAR(a.awardDate) DESC, MONTH(a.awardDate) DESC) h ON h.ay = YEAR(aDate) and h.am = MONTH(aDate)
+                        GROUP BY YEAR(a.awardDate) DESC, MONTH(a.awardDate) DESC) h ON h.ay = YEAR(aDate) AND h.am = MONTH(aDate)
                     WHERE aDate BETWEEN @minDate AND @maxDate
                     GROUP BY year DESC, month DESC"""
             app.cursor.execute(query, (int(userID), int(userID)))
@@ -1519,6 +1522,199 @@ class AwardUserGivenTypes(Resource):
             return returnException, 400
 
 
+class TopEmployees(Resource):
+    def get(self):
+        # get current month
+        month = datetime.datetime.now().strftime("%m")
+        year = datetime.datetime.now().strftime("%Y")
+        year = int(year)
+        monthList = []
+        for i in range(12):
+            monthNum = (int(month) - i) % 12
+            if monthNum == 0:
+                monthNum = 12
+                year -= 1
+            monthList.append((monthNum, year))
+
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            resultsList = {}
+
+            for i in range(len(monthList)):
+                queryMonth, queryYear = monthList[i]
+
+                query = """SELECT z.userID, z.name, z.rank, z.points FROM 
+                        (SELECT x.userID, x.name, x.points, 
+                        @prev := @curr, @curr := x.points, @rank := IF(@prev = @curr, @rank, @rank + @i) AS rank,
+                        IF(@prev <> x.points, @i:=1, @i:=@i+1) AS counter FROM
+                        (SELECT u.userID, u.name AS name, COALESCE(SUM(atyp.prestigeLevel), 0) AS points 
+                        FROM users u LEFT JOIN awards a ON u.userID = a.receiverID 
+                        LEFT JOIN awardTypes atyp ON a.typeID = atyp.awardTypeID 
+                        WHERE MONTH(a.awardDate) = %s AND YEAR(a.awardDate) = %s GROUP BY u.userID) x,
+                        (SELECT @curr := null, @prev := null, @rank := 1, @i := 0) tmp_tbl
+                        ORDER BY x.points DESC, x.userID ASC) z LIMIT 5"""
+                app.cursor.execute(query, (queryMonth, queryYear))
+
+                rows = list(app.cursor.fetchall())
+                
+                if len(rows) != 0:
+                    rowList = []
+                    for row in rows:
+                        rowInfo = {}
+                        (rowInfo["userID"], 
+                        rowInfo["name"], 
+                        rowInfo["rank"], 
+                        rowInfo["points"]) = row
+                        rowInfo["rank"] = int(rowInfo["rank"])
+                        rowInfo["points"] = int(rowInfo["points"])
+                        rowList.append(rowInfo)
+                    
+                    monthYear = "{0}-{1}".format(queryMonth, queryYear)
+                    resultsList[monthYear] = rowList
+                else:
+                    monthYear = "{0}-{1}".format(queryMonth, queryYear)
+                    resultsList[monthYear] = [0]
+            
+            query = """SELECT z.userID, z.name, z.rank, z.points FROM 
+                    (SELECT x.userID, x.name, x.points, 
+                    @prev := @curr, @curr := x.points, @rank := IF(@prev = @curr, @rank, @rank + @i) AS rank,
+                    IF(@prev <> x.points, @i:=1, @i:=@i+1) AS counter FROM
+                    (SELECT z.receiverID AS userID, z.receiverName AS name, SUM(z.points) AS points FROM
+					(SELECT a.awardID, 
+                    a.receiverID, 
+                    rec.name AS receiverName, 
+                    a.typeID, atyp.name AS awardType, atyp.prestigeLevel AS points,
+                    a.awardDate FROM
+					(SELECT @minDate := DATE_SUB(CURDATE(),INTERVAL 1 YEAR), @maxDate := CURDATE()) f INNER JOIN
+					cs419.awards a ON a.awardDate > @minDate AND a.awardDate <= @maxDate INNER JOIN 
+                    users rec ON a.receiverID = rec.userID INNER JOIN 
+                    awardTypes atyp ON a.typeID = atyp.awardTypeID
+					ORDER BY a.awardDate DESC) z
+					GROUP BY z.receiverID) x,
+                    (SELECT @curr := null, @prev := null, @rank := 1, @i := 0) tmp_tbl
+                    ORDER BY x.points DESC, x.userID ASC) z LIMIT 5"""
+
+            app.cursor.execute(query)
+
+            rows = list(app.cursor.fetchall())
+
+            rowList = []
+            for row in rows:
+                rowInfo = {}
+                (rowInfo["userID"], 
+                rowInfo["name"], 
+                rowInfo["rank"], 
+                rowInfo["points"]) = row
+                rowInfo["rank"] = int(rowInfo["rank"])
+                rowInfo["points"] = int(rowInfo["points"])
+                rowList.append(rowInfo)
+            
+            resultsList["Year"] = rowList
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Results": resultsList}, 200
+        
+        except Exception:
+            return returnException, 400
+
+
+class MostGenerous(Resource):
+    def get(self):
+        # get current month
+        month = datetime.datetime.now().strftime("%m")
+        year = datetime.datetime.now().strftime("%Y")
+        year = int(year)
+        monthList = []
+        for i in range(12):
+            monthNum = (int(month) - i) % 12
+            if monthNum == 0:
+                monthNum = 12
+                year -= 1
+            monthList.append((monthNum, year))
+
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            resultsList = {}
+
+            for i in range(len(monthList)):
+                queryMonth, queryYear = monthList[i]
+
+                query = """SELECT z.userID, z.name, z.rank, z.frequency FROM 
+                    (SELECT x.userID, x.name, x.frequency, 
+                    @prev := @curr, @curr := x.frequency, @rank := IF(@prev = @curr, @rank, @rank + @i) AS rank,
+                    IF(@prev <> x.frequency, @i:=1, @i:=@i+1) AS counter FROM
+                    (SELECT u.userID AS userID, u.name AS name, COUNT(a.awardDate) AS frequency FROM
+					users u INNER JOIN awards a ON u.userID = a.giverID 
+                    WHERE MONTH(a.awardDate) = %s AND YEAR(a.awardDate) = %s GROUP BY u.userID) x,
+					(SELECT @curr := null, @prev := null, @rank := 1, @i := 0) tmp_tbl
+					ORDER BY x.frequency DESC, x.userID ASC) z LIMIT 5"""
+                app.cursor.execute(query, (queryMonth, queryYear))
+
+                rows = list(app.cursor.fetchall())
+                
+                if len(rows) != 0:
+                    rowList = []
+                    for row in rows:
+                        rowInfo = {}
+                        (rowInfo["userID"], 
+                        rowInfo["name"], 
+                        rowInfo["rank"], 
+                        rowInfo["frequency"]) = row
+                        rowInfo["rank"] = int(rowInfo["rank"])
+                        rowInfo["frequency"] = int(rowInfo["frequency"])
+                        rowList.append(rowInfo)
+                    
+                    monthYear = "{0}-{1}".format(queryMonth, queryYear)
+                    resultsList[monthYear] = rowList
+                else:
+                    monthYear = "{0}-{1}".format(queryMonth, queryYear)
+                    resultsList[monthYear] = [0]
+            
+            query = """SELECT z.userID, z.name, z.rank, z.frequency FROM 
+                    (SELECT x.userID, x.name, x.frequency, 
+                    @prev := @curr, @curr := x.frequency, @rank := IF(@prev = @curr, @rank, @rank + @i) AS rank,
+                    IF(@prev <> x.frequency, @i:=1, @i:=@i+1) AS counter FROM
+                    (SELECT z.giverID AS userID, z.giverName AS name, COUNT(z.awardDate) AS frequency FROM
+					(SELECT a.awardID, a.giverID, giv.name AS giverName, a.awardDate FROM
+					(SELECT @minDate := DATE_SUB(CURDATE(),INTERVAL 1 YEAR), @maxDate := CURDATE()) f INNER JOIN
+					cs419.awards a ON a.awardDate > @minDate AND a.awardDate <= @maxDate INNER JOIN 
+                    users giv ON a.giverID = giv.userID ORDER BY a.awardDate DESC) z
+					GROUP BY z.giverID) x,
+                    (SELECT @curr := null, @prev := null, @rank := 1, @i := 0) tmp_tbl
+                    ORDER BY x.frequency DESC, x.userID ASC) z LIMIT 5"""
+
+            app.cursor.execute(query)
+
+            rows = list(app.cursor.fetchall())
+
+            rowList = []
+            for row in rows:
+                rowInfo = {}
+                (rowInfo["userID"], 
+                rowInfo["name"], 
+                rowInfo["rank"], 
+                rowInfo["frequency"]) = row
+                rowInfo["rank"] = int(rowInfo["rank"])
+                rowInfo["frequency"] = int(rowInfo["frequency"])
+                rowList.append(rowInfo)
+            
+            resultsList["Year"] = rowList
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Results": resultsList}, 200
+        
+        except Exception:
+            return returnException, 400
+
+
 # create routes for API
 api.add_resource(AdminsList, '/admins')
 api.add_resource(Admin, '/admins/<int:adminID>')
@@ -1534,6 +1730,8 @@ api.add_resource(AddDummyData, '/resetTablesWithDummyData')
 api.add_resource(CreateAward, '/getAwardCreationInfo/<int:awardID>')
 api.add_resource(UserEmail, '/getUserByEmail')
 api.add_resource(AdminEmail, '/getAdminByEmail')
+api.add_resource(TopEmployees, '/getTopEmployees')
+api.add_resource(MostGenerous, '/getGenerousEmployees')
 api.add_resource(FreqChart, '/getFrequencyChart')
 api.add_resource(AnnualAwardTypes, '/getAwardTypes')
 api.add_resource(AllEmployeeRank, '/getRanking')
