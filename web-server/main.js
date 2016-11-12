@@ -62,8 +62,6 @@ app.use(require('./lib/authorization.js'));
 // -------- Authenticated Routers -------
 var adminRouter = require('./lib/admin.js');
 app.use(adminRouter);
-var userRouter = require('./lib/user.js');
-app.use(userRouter.router);
 var awardRouter = require('./lib/award.js');
 app.use(awardRouter);
 
