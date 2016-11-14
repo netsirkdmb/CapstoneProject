@@ -109,8 +109,8 @@ $(document).ready(function(){
 		var userID = $('#ID').text();
 		var formData = {
 			uuid:$('#uuID').text()   ,
-			email: $('#editadminpwd').val()  ,
-			password:  $('#editadminemail').val()
+			email: $('#editadminemail').val()  ,
+			password:  $('#editadminpwd').val()
 
 		};
 		console.log(formData);

@@ -4,6 +4,8 @@ var myRouter = express.Router();
 var request = require('request');
 var uuid = require('node-uuid');
 
+var serverPath = 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/'
+
 /*****************************************************
 		Login Routers 
 *****************************************************/ 
@@ -83,11 +85,171 @@ myRouter.get('/admin/admins', function(req,res){
 myRouter.get('/admin/bi', function(req,res){
 	res.render('admin/bi');
 });
+/*********************************************************************************************************************************
+** 			API Calls for BI Suite
+*********************************************************************************************************************************/
+
+myRouter.route('/admin/API/getRanking').get(function(req,res){
+	request(serverPath + 'getRanking', function(error, response, body){
+		if(error){
+			console.log(error);
+			res.send('error');
+		}
+		else{
+			res.send(body);	
+		}
+	});
+});
+
+myRouter.route('/admin/API/getTopEmployees').get(function(req,res){
+        request(serverPath + 'getTopEmployees', function(error, response, body){
+                if(error){
+                        console.log(error);
+                        res.send('error');
+                }
+                else{
+                        res.send(body);
+                }
+        });
+});
+
+
+myRouter.route('/admin/API/getGenerousEmployees').get(function(req,res){
+        request(serverPath + 'getGenerousEmployees', function(error, response, body){
+                if(error){
+                        console.log(error);
+                        res.send('error');
+                }
+                else{
+                        res.send(body);
+                }
+        });
+});
+
+myRouter.route('/admin/API/getFrequencyChart').get(function(req,res){
+        request(serverPath + 'getFrequencyChart', function(error, response, body){
+                if(error){
+                        console.log(error);
+                        res.send('error');
+                }
+                else{
+                        res.send(body);
+                }
+        });
+});
+
+myRouter.route('/admin/API/getAwardTypes').get(function(req,res){
+        request(serverPath + 'getAwardTypes', function(error, response, body){
+                if(error){
+                        console.log(error);
+                        res.send('error');
+                }
+                else{
+                        res.send(body);
+                }
+        });
+});
+
+
+
+
+
+myRouter.route('/admin/API/getRanking/:id').get(function(req,res){
+        request(serverPath + 'getAwardTypes/request.params.id', function(error, response, body){
+                if(error){
+                        console.log(error);
+                        res.send('error');
+                }
+                else{
+                        res.send(body);
+                }
+        });
+});
+
+
+myRouter.route('/admin/API/getPrestigePoints/:id').get(function(req,res){
+        request(serverPath + 'getPrestigePoints/request.params.id', function(err, response, body){
+                if(error){
+                        console.log(error);
+                        res.send('error');
+                }
+                else{
+                        res.send(body);
+                }
+        });
+});
+
+myRouter.route('/admin/API/getAwardTypes/:id').get(function(req,res){
+        request(serverPath + 'getAwardTypes/request.params.id', function(err, response, body){
+                if(error){
+                        console.log(error);
+                        res.send('error');
+                }
+                else{
+                        res.send(body);
+                }
+        });
+});
+
+myRouter.route('/admin/API/getAwardsRecieved/:id').get(function(req,res){
+        request(serverPath + 'getAwardsRecieved/request.params.id', function(err, response, body){
+                if(error){
+                        console.log(error);
+                        res.send('error');
+                }
+                else{
+                        res.send(body);
+                }
+        });
+});
+
+
+
+myRouter.route('/admin/API/getAwardsGivenFrequency/:id').get(function(req,res){
+        request(serverPath + 'getAwardsGivenFrequency/request.params.id', function(err, response, body){
+                if(error){
+                        console.log(error);
+                        res.send('error');
+                }
+                else{
+                        res.send(body);
+                }
+        });
+});
+
+myRouter.route('/admin/API/getAwardTypesGiven/:id').get(function(req,res){
+        request(serverPath + 'getAwardTypesGiven/request.params.id', function(err, response, body){
+                if(error){
+                        console.log(error);
+                        res.send('error');
+                }
+                else{
+                        res.send(body);
+                }
+        });
+});
+
+
+
+myRouter.route('/admin/API/userAwards/:id').get(function(req,res){
+        request(serverPath + 'userAwards/request.params.id', function(err, response, body){
+                if(error){
+                        console.log(error);
+                        res.send('error');
+                }
+                else{
+                        res.send(body);
+                }
+        });
+});
+
+
+
+
 
 
 /**********************************************************************************************************
-API LINKS
--Handles Crud Requests from user
+**					API LINKS FOR ADMIN
 **********************************************************************************************************/
 
 
@@ -113,19 +275,27 @@ myRouter.route('/admin/API/admin').post(
 	});
 myRouter.route('/admin/API/admin/:uuID')
 	.put(function(req,res){
-		var values =  {password: req.body.password, email:  req.body.email, uuID:  req.body.uuid };
-
-	        request.put({url:'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins/' + req.params.uuID, form:values}, function(err, response,body){
-                        if(!err && response.statusCode < 400){
-                                res.send("1");
-                        }
-                        else{
-                                if(response)
-                                        console.log(err);
-                                console.log(response.body);
-                                res.send("0");
-                        }
-                });
+		var values =  {password: req.body.password, email:  req.body.email};
+		console.log("Passport ID: " + JSON.stringify(req.session.passport.user.id) + ". User ID:  " + req.params.uuID);
+	        if(req.session.passport.user.id == req.params.uuID){
+			request.put({url:'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins/' + req.params.uuID, form:values}, function(err, response,body){
+                        	if(!err && response.statusCode < 400){
+	                                res.send("1");
+        	                }
+                	        else{
+                        	        if(response)
+                                	        console.log(err);
+	                                console.log(response.body);
+        	                        res.send("0");
+                	        }
+			});
+		}
+		else{
+			console.log("Invalid ID");
+			res.send("Invalid Admin ID. A admin can only update there own profile.");
+	
+		}	
+         
 
 	})
 	.delete(function(req,res){
@@ -149,7 +319,6 @@ myRouter.route('/admin/API/admin/:uuID')
 
 /****************************************************************************************************************************************
 **							USERS
-**
 *****************************************************************************************************************************************/
 
 

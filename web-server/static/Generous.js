@@ -6,6 +6,15 @@ $(document).ready(function(){
 	function drawBarChart(){
 		var apiData = getGData(1);
 		var data = google.visualization.arrayToDataTable(apiData);
+		var genData = $.ajax({
+			url: "/admin/api/getGenerousEmployees",
+			data: "json",
+			async: false
+
+		}).responseText; 		
+	
+
+		console.log("genData: " + genData); 
 		var view = new google.visualization.DataView(data);
 		
 		var options = {
@@ -27,7 +36,7 @@ $(document).ready(function(){
 		var chart = new google.visualization.ColumnChart(document.getElementById('nicedogsgraph'));
 		chart.draw(data,options);
 		
-		
+				
 		
 		
 	}

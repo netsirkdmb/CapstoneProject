@@ -7,6 +7,14 @@ $(document).ready(function(){
 	function drawTotals(){
 		var inputData = getData(0);
 		var data = google.visualization.arrayToDataTable(inputData);
+		var freqData = $.ajax({
+			url: "/admin/api/getFrequencyChart",
+			data: "json",
+			async: false
+
+		}).responseText;
+		console.log("Freq Data: " + freqData);
+
 		var options = {
 			title:"Award Frequency",
 			curveType: 'function',
@@ -24,6 +32,13 @@ $(document).ready(function(){
 	function drawTotalsPie(){
 		var inputData = getData(1);
 		var data = google.visualization.arrayToDataTable(inputData);
+		var totalsPieData = $.ajax({
+			url: "/admin/api/getAwardTypes",
+			data: "json",
+			async: false
+
+		}).responseText;
+		console.log("Totals Pie : " + totalsPieData);
 		var options = {
 			title: "Award Types"
 		};
