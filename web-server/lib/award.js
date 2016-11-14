@@ -28,6 +28,47 @@ function dateSortFunc(a, b){
 
 
 /*******************************************
+** Func: emailSortFunc
+** Desc: Function for sorting users by email
+** PreCond: Object must contain email field
+** Return: The email order of the objects
+*******************************************/
+function emailSortFunc(a, b){
+	// Extracts the emails
+	var e1 = a.email.split('@');
+	var e2 = b.email.split('@');
+
+	// Sorts the emails by domain first
+	if (e1[1] != e2[1]) 
+		return (e1[1] > e2[1] ? 1 : -1);
+
+	// Then sorts by email name
+	else if (e1[0] != e2[0])
+		return (e1[0] > e2[0] ? 1 : -1);
+
+	// Returns they match -- should be imposible
+	else
+		return 0;
+}
+
+
+/*******************************************
+** Func: awardSortFunc
+** Desc: Function for sorting award types by name
+** PreCond: Object must contain name feild
+** Return: The award order of the objects
+*******************************************/
+function awardSortFunc(a, b){
+	// Match
+	if (a.name == b.name)
+		return 0;
+	// Non-match
+	else
+		return (a.name > b.name ? 1 : -1);
+}
+
+
+/*******************************************
 ** Router: /award
 ** Desc: Redirects to /award/previous-award
 *******************************************/
@@ -84,6 +125,55 @@ router.get('/award/previous-award', function(req, res, next){
 
 
 /*******************************************
+** Router: /award/give-award
+** Desc: Populates the form with the database data and displays the page
+*******************************************/
+router.get('/award/give-award', function(req, res, next){
+	// Runs the following db queries in parallel
+	async.parallel({
+		// Gets the user list from the database
+		userList: function(callback){
+			var path = '/users';
+			request(hostDB + path, function(err, resDB, body){
+				// An error has occured
+				if (err)
+					callback(err, null);
+
+				// Sorts and saves the body data to the context
+				else 
+					callback(null, JSON.parse(body).Data.sort(emailSortFunc));
+			});
+		},
+
+		// Gets the award type list
+		awardList: function(callback){
+			var path = '/awardTypes';
+			request(hostDB + path, function(err, resDB, body){
+				// An error has occured
+				if (err)
+					callback(err, null);
+
+				// Sorts and saves the body data to the context
+				else 
+					callback(null, JSON.parse(body).Data.sort(awardSortFunc));
+			});
+		}
+
+	// Callback function - Runs at the end context contains the results
+	}, function(err, context){
+		// An error has occured
+		if (err)
+			next(err);
+
+		// Renders the pages
+		else
+			res.render('award/give-award', context);
+	});
+});
+
+
+
+/*******************************************
 ** Router: /award/profile
 ** Desc: Displayes the profile information
 *******************************************/
@@ -107,6 +197,8 @@ router.get('/award/profile', function(req, res, next){
 		// Data found
 		else
 			context.data = body.Data[0];
+		
+		// Renders the page
 		res.render('award/profile', context);
 	});
 });
@@ -163,11 +255,19 @@ router.post('/award/deleteAward', function(req, res, next){
 			});
 		}
 
-		// Callback function - redirects to previous-award
-		], function(err, result){
-			res.redirect('previous-award');
-		}
-	);
+	// Callback function - redirects to previous-award
+	], function(err, result){
+		res.redirect('previous-award');
+	});
+});
+
+
+/*******************************************
+** Router: /award/add-award
+** Desc: processes form data to add award
+*******************************************/
+router.post('/award/add-award', function(req, res, next){
+	console.log(req.body);
 });
 
 // Exports the routers

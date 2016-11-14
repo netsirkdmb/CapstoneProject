@@ -103,10 +103,8 @@ app.use(function(req, res, next){
 
 // Error server error
 app.use(function(err, req, res, next){
-  console.error(err.stack);
-  res.type('plain/text');
-  res.status(500);
-  res.render('500');
+  console.error(err);
+  res.status(500).render('500');
 });
 /*********** END HANDLERS ***********/
 

@@ -1,5 +1,5 @@
 /*************************************************
-** File Name: admins.js
+** File Name: deleteAward.js
 ** Author: William McCumstie
 ** Date: 11/11/2016
 ** Description: Jquery for deleting page
