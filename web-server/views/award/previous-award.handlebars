@@ -17,12 +17,15 @@
 			<tbody>
 				{{#each data}}
 					<tr>
-						<td>{{this.awardDate}}</td>
-						<td><b>NEED TO ADD TO DB</b></td>
+						<td>{{this.date}}</td>
+						<td>{{this.time}}</td>
 						<td>{{this.receiverName}}</td>
 						<td>{{this.awardType}}</td>
 						<td>
-							<button>Delete</button>
+							<form action="/award/deleteAward" method="post">
+								<input type="hidden" name="id" value="{{this.awardID}}">
+								<button type="submit">Delete</button>
+							</form>
 						</td>
 					</tr>
 				{{/each}}
@@ -31,3 +34,25 @@
 	{{/if}}
 </section>
 <link rel="stylesheet" type="text/css" href="../public/awards.css">
+<script type="text/javascript" src="../public/deleteAward.js"></script>
+
+<!-- Delete user confirmation -->
+<div class="modal fade" id="deleteAward" role="dialog">
+	<div class="modal-dialog">
+		<div class = "modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h4 class="modal-title">Delete Award</h4>
+				</div>
+				<div class = modal-body>
+					<div class="form-group">
+						<label>Are you sure you want to delete the award?</label>
+					</div>							
+				</div>
+				<div class= "modal-footer">
+					<button type="button" class = "btn btn-info btn-md" data-dismiss="modal" id="cancelDelete">Cancel </button>
+					<button type="button" class = "btn btn-info btn-md" data-dismiss="modal" id="confirmDelete">Delete </button>
+				</div>
+		</div>
+	</div>
+</div>

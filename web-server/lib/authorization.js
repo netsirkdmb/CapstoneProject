@@ -11,9 +11,8 @@ router.route('/*').all(function(req, res, next){
 	var path = req.path.split('/');
 
 	// Rejects access if no authentication
-	if (passport == undefined) {
+	if (passport == undefined)
 		res.redirect('/login');
-	}
 
 	// Allows access if type matches
 	else if (path[1] == passport.user.type)
