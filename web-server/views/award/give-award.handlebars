@@ -21,17 +21,15 @@
 				{{/each}}
 			</select>
 		</div>
-		<div style="overflow:hidden;">
-			<div class="form-group">
-				<label for="datetime">Time and Date Issued</label>
-	            <div class='input-group date' id='datetimediv'>
-	            	<input type="text" class="form-control" id="datetime">
-	            	<span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-	            </div>
-	        </div>
-	    </div>
+		<div class="form-group">
+			<label for="datetime">Time and Date Issued</label>
+            <div class='input-group date' id='datetimediv'>
+            	<input type="text" class="form-control" id="datetime"data-toggle="popover" data-placement="left" data-content="Required">
+            	<span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
 		<br>
 		<button type="submit" class="btn btn-primary">Submit</button>
 	</form>

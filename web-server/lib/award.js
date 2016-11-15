@@ -2,6 +2,7 @@
 var router = require('express').Router();
 var request = require('request');
 var async = require('async');
+var moment = require('moment');
 var internalError = "An internal error has occured";
 var hostDB = "http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600";
 
@@ -266,19 +267,51 @@ router.post('/award/deleteAward', function(req, res, next){
 ** Desc: processes form data to add award
 *******************************************/
 router.post('/award/add-award', function(req, res, next){
-	// Extracts the data
+	// Extracts and confirms the ID's are valid numbers
 	var receiverID = parseInt(req.body.receipientID, 10);
 	var awardTypeID = parseInt(req.body.awardTypeID, 10);
-	var bodyTime = req.body.timedate;
-
-	// Confirms the ID's are numbers
 	if (!receiverID || !awardTypeID){
 		res.status(400).send(null);
 		return;
 	}
 
-	// Confirms the data follows the correct patern
-	
+	// Extracts and confirms the date and time is valid
+	var re = /\d{1,2}\/\d{1,2}\/\d{4}\s\d{1,2}:\d{1,2}\s(?:AM|PM)/;
+	var bodyTime = re.exec(req.body.timedate)[0];
+	var awardDate = moment(bodyTime, "MM/DD/YYYY hh:mm a").format("YYYY-MM-DD HH:mm:ss")
+	if (awardDate.localeCompare("Invalid date") == 0){
+		res.status(400).send(null);
+		return;
+	}
+
+	// Gets the giver id from the passport
+	var giverID = req.session.passport.user.id;
+
+	// Data to be sent to the database
+	var data = {
+		"receiverID": receiverID,
+		"giverID": giverID,
+		"typeID": awardTypeID,
+		"awardDate": awardDate
+	}
+
+	// Adds the award to the database
+	var path = "/awards";
+	request.post({url:hostDB + path, form:data}, function(err, resDB, body){
+		body = JSON.parse(body);
+		// An error has occured
+		if(err)
+			res.status(500).send("Database error");
+
+		// Confirms it was successfull
+		else if (body.Status == "Success"){
+			res.status(200).send(null);
+		}
+
+		// Failed to add
+		else
+			res.status(500).send(null);
+	});
 });
 
 // Exports the routers

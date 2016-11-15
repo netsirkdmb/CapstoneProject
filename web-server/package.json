@@ -1,8 +1,8 @@
 {
   "name": "employee-recognition",
   "version": "1.0.0",
-  "description": "Installs express",
-  "main": "dynamic-web-page-review.js",
+  "description": "Employee recognition website",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,8 +19,9 @@
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "tether" : "^1.3.7",
-    "randomstring" : "1.1.5",
+    "randomstring" : "^1.1.5",
     "request": "2.76.0",
-    "async": "^2.1.1"
+    "async": "^2.1.1",
+    "moment": "^2.16.0"
   }
 }

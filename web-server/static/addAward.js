@@ -9,13 +9,18 @@ $(document).ready(function(){
 	// Creates the datetime picker
 	$(function () {
         $('#datetimediv').datetimepicker({	
-            inline: true,
             sideBySide: true,
             useCurrent: true,
             showTodayButton: true,
+            widgetPositioning: {
+            	horizontal: 'auto',
+            	vertical: 'bottom'
+            },
             toolbarPlacement: 'bottom'
         });
     });
+
+    // Sets the
 
 	// Processes the add award form
 	$("#addForm").on("submit", function(e){
@@ -30,12 +35,14 @@ $(document).ready(function(){
 			$("#receipientID").popover('show');
 		if (!$("#awardTypeID").val())
 			$("#awardTypeID").popover('show');
+		if (!$("#datetime").val())
+			$("#datetime").popover('show');
 
 		// Sets the popover background color
     	$(".popover").popover().css("background-color", "red");
 		
     	// Exits if not all infomration has been provided
-    	if (!$("#receipientID").val() || !$("#awardTypeID").val())
+    	if (!$("#receipientID").val() || !$("#awardTypeID").val() || !$("#datetime").val())
     		return;
 
     	// Sends the data to the server
@@ -51,6 +58,7 @@ $(document).ready(function(){
 
 	    	// An error has occured
 	    	.fail(function(data){
+	    		console.log(data);
 	    		alert("An error has occured! - Could not issue award");
     		}
     	);
