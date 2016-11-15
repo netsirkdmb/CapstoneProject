@@ -172,7 +172,6 @@ router.get('/award/give-award', function(req, res, next){
 });
 
 
-
 /*******************************************
 ** Router: /award/profile
 ** Desc: Displayes the profile information
@@ -267,7 +266,19 @@ router.post('/award/deleteAward', function(req, res, next){
 ** Desc: processes form data to add award
 *******************************************/
 router.post('/award/add-award', function(req, res, next){
-	console.log(req.body);
+	// Extracts the data
+	var receiverID = parseInt(req.body.receipientID, 10);
+	var awardTypeID = parseInt(req.body.awardTypeID, 10);
+	var bodyTime = req.body.timedate;
+
+	// Confirms the ID's are numbers
+	if (!receiverID || !awardTypeID){
+		res.status(400).send(null);
+		return;
+	}
+
+	// Confirms the data follows the correct patern
+	
 });
 
 // Exports the routers

@@ -8,8 +8,7 @@
 $(document).ready(function(){
 	// Creates the datetime picker
 	$(function () {
-        $('#datetime').datetimepicker({
-            //inline: true,
+        $('#datetimediv').datetimepicker({	
             inline: true,
             sideBySide: true,
             useCurrent: true,
@@ -38,5 +37,22 @@ $(document).ready(function(){
     	// Exits if not all infomration has been provided
     	if (!$("#receipientID").val() || !$("#awardTypeID").val())
     		return;
+
+    	// Sends the data to the server
+    	$.post("add-award",{
+    		receipientID: $("#receipientID").val(),
+    		awardTypeID: $("#awardTypeID").val(),
+    		timedate: $("#datetime").val()
+    	})	
+	    	// Successfully added	
+	    	.done(function(data){
+	    		alert("Award added\nThe receipient has been emailed the award")
+	    	})
+
+	    	// An error has occured
+	    	.fail(function(data){
+	    		alert("An error has occured! - Could not issue award");
+    		}
+    	);
 	});
 });
