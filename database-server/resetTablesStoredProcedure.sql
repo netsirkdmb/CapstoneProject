@@ -20,11 +20,13 @@ BEGIN
 -- adminID - an auto incrementing integer which is the primary key
 -- email - a varchar with a maximum length of 255 characters, cannot be null, must be unique
 -- password - a varchar with a maximum length of 255 characters, cannot be null
+-- salt - a varchar with a maximum length of 255 characters, cannot be null, must be unique
 -- accountCreationTime - the datetime that this record was first created, cannot be null
 	CREATE TABLE admins (
 		adminID INT AUTO_INCREMENT,
 		email VARCHAR(255) NOT NULL UNIQUE,
 		password VARCHAR(255) NOT NULL,
+		salt VARCHAR(16) NOT NULL UNIQUE,
 		accountCreationTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		PRIMARY KEY(adminID)
 	) ENGINE=InnoDB;
@@ -35,6 +37,7 @@ BEGIN
 -- name - a varchar with a maximum length of 255 characters, cannot be null
 -- email - a varchar with a maximum length of 255 characters, cannot be null, must be unique
 -- password - a varchar with a maximum length of 255 characters, cannot be null
+-- salt - a varchar with a maximum length of 255 characters, cannot be null, must be unique
 -- passwordCode - a varchar with a maximum length of 255 characters, default is null
 -- signatureImage - a varchar with a maximum length of 255 characters, cannot be null
 -- region - a varchar with a maximum length of 255 characters, cannot be null
@@ -45,6 +48,7 @@ BEGIN
 		name VARCHAR(255) NOT NULL,
 		email VARCHAR(255) NOT NULL UNIQUE,
 		password VARCHAR(255) NOT NULL,
+		salt VARCHAR(16) NOT NULL UNIQUE,
 		passwordCode VARCHAR(255) DEFAULT NULL,
 		signatureImage VARCHAR(255) NOT NULL,
 		region VARCHAR(255) NOT NULL,
