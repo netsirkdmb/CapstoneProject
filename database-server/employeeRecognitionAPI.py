@@ -29,6 +29,7 @@ import shutil
 import yaml
 import traceback
 import datetime
+import arrow
 
 app = Flask(__name__)
 api = Api(app)
@@ -101,10 +102,6 @@ def after_request(response):
     return response
 
 
-# return message when an exception occurs
-returnException = {"Status": "Fail", "Error": traceback.format_exc()}
-
-
 class AdminsList(Resource):
     # get a list of all of the admins in the database
     def get(self):
@@ -133,7 +130,7 @@ class AdminsList(Resource):
             return {"Status": "Success", "Data": adminList}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
     
     # create a new admin in the database
     def post(self):
@@ -157,7 +154,7 @@ class AdminsList(Resource):
             return {"Status": "Success", "Data": [{"email": adminEmail, "password": adminPassword}]}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
     
     # update admin without adminID error
     def put(self):
@@ -180,7 +177,7 @@ class AdminsList(Resource):
             return {"Status": "Success", "Message": "admins table is now empty."}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class Admin(Resource):
@@ -211,7 +208,7 @@ class Admin(Resource):
             return {"Status": "Success", "Data": adminList}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
     # insert admin with adminID error
     def post(self, adminID):
@@ -239,7 +236,7 @@ class Admin(Resource):
             return {"Status": "Success", "Data": [{"email": adminEmail, "password": adminPassword}]}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
     # delete an admin from the database, errors if the admin does not exist in the database
     def delete(self, adminID):
@@ -260,7 +257,7 @@ class Admin(Resource):
             return {"Status": "Success", "Message": message}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class UsersList(Resource):
@@ -296,7 +293,7 @@ class UsersList(Resource):
             return {"Status": "Success", "Data": userData}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
     
     # create a new user in the database
     def post(self):
@@ -330,7 +327,7 @@ class UsersList(Resource):
             return {"Status": "Success", "Data": returnData}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
     
     # update user without userID error
     def put(self):
@@ -353,7 +350,7 @@ class UsersList(Resource):
             return {"Status": "Success", "Message": "users table is now empty."}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class User(Resource):
@@ -390,7 +387,7 @@ class User(Resource):
             return {"Status": "Success", "Data": userData}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
     # insert user with userID error
     def post(self, userID):
@@ -438,7 +435,7 @@ class User(Resource):
             return {"Status": "Success", "Data": returnData}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
     # delete a user from the database, errors if the user does not exist in the database
     def delete(self, userID):
@@ -459,7 +456,7 @@ class User(Resource):
             return {"Status": "Success", "Message": message}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class AwardTypesList(Resource):
@@ -488,7 +485,7 @@ class AwardTypesList(Resource):
             return {"Status": "Success", "Data": awardTypesData}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
     
     # create a new award type in the database
     def post(self):
@@ -512,7 +509,7 @@ class AwardTypesList(Resource):
             return {"Status": "Success", "Data": [{"name": awardTypeName, "prestigeLevel": awardTypePrestige}]}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
     
     # update award type without awardTypeID error
     def put(self):
@@ -535,7 +532,7 @@ class AwardTypesList(Resource):
             return {"Status": "Success", "Message": "awardTypes table is now empty."}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class AwardType(Resource):
@@ -564,7 +561,7 @@ class AwardType(Resource):
             return {"Status": "Success", "Data": awardTypesData}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
     # insert award type with awardTypeID error
     def post(self, awardTypeID):
@@ -592,7 +589,7 @@ class AwardType(Resource):
             return {"Status": "Success", "Data": [{"name": awardTypeName, "prestigeLevel": awardTypePrestige}]}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
     # delete a award type from the database, errors if the award type does not exist in the database
     def delete(self, awardTypeID):
@@ -613,7 +610,7 @@ class AwardType(Resource):
             return {"Status": "Success", "Message": message}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class AwardsList(Resource):
@@ -656,7 +653,7 @@ class AwardsList(Resource):
             return {"Status": "Success", "Data": awardData}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
     
     # create a new award in the database
     def post(self):
@@ -682,7 +679,7 @@ class AwardsList(Resource):
             return {"Status": "Success", "Data": [{"receiverID": awardReceiverID, "giverID": awardGiverID, "typeID": awardTypeID, "awardDate": awardDate}]}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
     
     # update award without awardID error
     def put(self):
@@ -705,7 +702,7 @@ class AwardsList(Resource):
             return {"Status": "Success", "Message": "awards table is now empty."}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class Award(Resource):
@@ -748,7 +745,7 @@ class Award(Resource):
             return {"Status": "Success", "Data": awardData}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
     # insert award with awardID error
     def post(self, awardID):
@@ -778,7 +775,7 @@ class Award(Resource):
             return {"Status": "Success", "Data": [{"receiverID": awardReceiverID, "giverID": awardGiverID, "typeID": awardTypeID, "awardDate": awardDate}]}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
     # delete a award from the database, errors if the award does not exist in the database
     def delete(self, awardID):
@@ -799,7 +796,7 @@ class Award(Resource):
             return {"Status": "Success", "Message": message}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class AwardUser(Resource):
@@ -842,7 +839,7 @@ class AwardUser(Resource):
             return {"Status": "Success", "Data": awardData}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
     # insert award with userID error
     def post(self, userID):
@@ -871,7 +868,7 @@ class AwardUser(Resource):
             return {"Status": "Success", "Message": message}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class ResetTables(Resource):
@@ -887,7 +884,7 @@ class ResetTables(Resource):
 
             return result
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class AddDummyData(Resource):
@@ -902,7 +899,7 @@ class AddDummyData(Resource):
             app.cursor.callproc('spAddDummyData')
             data = app.cursor.fetchall()
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
         
         if len(data) == 0:
             app.conn.commit()
@@ -928,6 +925,41 @@ def clearTables():
         return {"Status": "Fail", "Message": data}, 400
 
 
+def convertMonth(mon):
+    if mon == 1:
+        return "January"
+    elif mon == 2:
+        return "February"
+    elif mon == 3:
+        return "March"
+    elif mon == 4:
+        return "April"
+    elif mon == 5:
+        return "May"
+    elif mon == 6:
+        return "June"
+    elif mon == 7:
+        return "July"
+    elif mon == 8:
+        return "August"
+    elif mon == 9:
+        return "September"
+    elif mon == 10:
+        return "October"
+    elif mon == 11:
+        return "November"
+    else:
+        return "December"
+
+
+def convertDate(dateText):
+    theDate = arrow.get(dateText)
+    theYear = theDate.format("YYYY")
+    theMonth = theDate.format("MMMM")
+    theDay = theDate.format("Do")
+    return theDay, theMonth, theYear
+
+
 class CreateAward(Resource):
     # get details of award in order to create PDF certificate
     def get(self, awardID):
@@ -951,7 +983,6 @@ class CreateAward(Resource):
             awards = list(app.cursor.fetchall())
 
             awardData = []
-            awardPDF = []
             for award in awards:
                 awardInfo = {}
                 (awardInfo["awardID"], 
@@ -966,29 +997,30 @@ class CreateAward(Resource):
                 awardInfo["awardDate"]) = award
                 awardInfo["awardDate"] = str(awardInfo["awardDate"])
                 awardData.append(awardInfo)
-                awardPDF.append(awardInfo.items())
             
             app.cursor.close()
             app.conn.close()
 
             project = "/api/src/"
             pdf_d = "{0}pdf/".format(project)
-            latexCode = ""
-            for award in awardPDF:
-                for key, value in award:
-                    latexCode = latexCode + "\\newCommand{{\\{0}}}{{{1}}}\n".format(key, value)
-            
-            template = "test"
-            latexCode = (latexCode + """
-                        \\documentclass{{{0}}} % din a4, 11 pt, one-sided, 
-                        \\begin{{document}}
-                        \\end{{document}}
-                        """.format(template))
             
             build_d = "{0}build/".format(project)
-            out_file = "{0}template".format(build_d)
-            ## code to do test certificate
-            test_file = "{0}certificate".format(build_d)
+            out_file = "{0}tempFile".format(build_d)
+            ## code to do certificate with variables
+            test_file = "{0}certificate.tex".format(build_d)
+
+            theDay, theMonth, theYear = convertDate(awardData[0]["awardDate"])
+
+            # open certificate.tex for reading and replace variables
+            with open(test_file, "r") as rf:
+                fileContentsStr = rf.read()
+                fileContentsStr = fileContentsStr.replace("###awardType###", awardData[0]["awardType"])
+                fileContentsStr = fileContentsStr.replace("###giverName###", awardData[0]["giverName"])
+                fileContentsStr = fileContentsStr.replace("###receiverName###", awardData[0]["receiverName"])
+                fileContentsStr = fileContentsStr.replace("###theDay###", theDay)
+                fileContentsStr = fileContentsStr.replace("###theMonth###", theMonth)
+                fileContentsStr = fileContentsStr.replace("###theYear###", theYear)
+                fileContentsStr = fileContentsStr.replace("###giverSignatureImage###", "obama.png")
 
             # create the build directory if not existing
             if not os.path.exists(build_d):
@@ -998,17 +1030,18 @@ class CreateAward(Resource):
             if not os.path.exists(pdf_d):
                 os.makedirs(pdf_d)
             
-            # saves latexCode to output file
+            # saves fileContentsStr to output file
             with open(out_file + ".tex", "w") as f:
-                f.write(latexCode)
+                f.write(fileContentsStr)
             
-            os.system("pdflatex -output-directory {0} {1}".format(os.path.realpath(build_d), os.path.realpath(test_file)))
-            shutil.copy2(test_file + ".pdf", os.path.realpath(pdf_d))
+            os.chdir(os.path.realpath(build_d))
+            os.system("pdflatex -output-directory {0} {1}".format(os.path.realpath(build_d), os.path.realpath(out_file)))
+            shutil.copy2(out_file + ".pdf", os.path.realpath(pdf_d))
 
-            return {"Status": "Success", "Data": awardData, "PDF": awardPDF}, 200
+            return {"Status": "Success", "Data": awardData}, 200
 
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class UserEmail(Resource):
@@ -1048,7 +1081,7 @@ class UserEmail(Resource):
             return {"Status": "Success", "Data": userData}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
     
     # updates user's passwordCode
     def put(self):
@@ -1077,7 +1110,7 @@ class UserEmail(Resource):
             return {"Status": "Success", "Data": [{"email": userEmail, "passwordCode": userPasswordCode}]}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class AdminEmail(Resource):
@@ -1112,35 +1145,8 @@ class AdminEmail(Resource):
             return {"Status": "Success", "Data": adminList}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
     
-
-def convertMonth(mon):
-    if mon == 1:
-        return "January"
-    elif mon == 2:
-        return "February"
-    elif mon == 3:
-        return "March"
-    elif mon == 4:
-        return "April"
-    elif mon == 5:
-        return "May"
-    elif mon == 6:
-        return "June"
-    elif mon == 7:
-        return "July"
-    elif mon == 8:
-        return "August"
-    elif mon == 9:
-        return "September"
-    elif mon == 10:
-        return "October"
-    elif mon == 11:
-        return "November"
-    else:
-        return "December"
-
     
 class FreqChart(Resource):
     # get the count of awards being given in the previous 12 months
@@ -1177,7 +1183,7 @@ class FreqChart(Resource):
             return {"Status": "Success", "Results": rowList}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class AnnualAwardTypes(Resource):
@@ -1216,7 +1222,7 @@ class AnnualAwardTypes(Resource):
             return {"Status": "Success", "Results": rowList}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 class EmployeeRank(Resource):
     # get the employee's all-time ranking based on awards received
@@ -1256,7 +1262,7 @@ class EmployeeRank(Resource):
             return {"Status": "Success", "Results": rowList}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class AllEmployeeRank(Resource):
@@ -1297,7 +1303,7 @@ class AllEmployeeRank(Resource):
             return {"Status": "Success", "Results": rowList}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class EmployeePrestigePoints(Resource):
@@ -1353,7 +1359,7 @@ class EmployeePrestigePoints(Resource):
             return {"Status": "Success", "Results": rowList}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class EmployeeAwardTypes(Resource):
@@ -1390,7 +1396,7 @@ class EmployeeAwardTypes(Resource):
             return {"Status": "Success", "Results": rowList}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class AwardUserReceived(Resource):
@@ -1434,7 +1440,7 @@ class AwardUserReceived(Resource):
             return {"Status": "Success", "Data": awardData}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class AwardUserGivenFreq(Resource):
@@ -1487,7 +1493,7 @@ class AwardUserGivenFreq(Resource):
             return {"Status": "Success", "Data": rowList}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class AwardUserGivenTypes(Resource):
@@ -1519,7 +1525,7 @@ class AwardUserGivenTypes(Resource):
             return {"Status": "Success", "Data": rowList}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class TopEmployees(Resource):
@@ -1619,7 +1625,7 @@ class TopEmployees(Resource):
             return {"Status": "Success", "Results": resultsList}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 class MostGenerous(Resource):
@@ -1712,7 +1718,7 @@ class MostGenerous(Resource):
             return {"Status": "Success", "Results": resultsList}, 200
         
         except Exception:
-            return returnException, 400
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
 # create routes for API
