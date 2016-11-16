@@ -118,6 +118,3 @@ function hash(userID, password, func, salt){
 
 // Exports the module
 module.exports = hash;
-
-// 
-h = hash(2, "password", function(err, res){console.log(err), console.log(res)});
