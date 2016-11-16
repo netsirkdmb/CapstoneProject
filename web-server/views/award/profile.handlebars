@@ -2,11 +2,38 @@
 <section class='award-wrapper'>
 	<h1>Profile Information</h1>
 	{{#if errorMssg}}
-		<b>{{errorMssg}}</b>
+	<b>{{errorMssg}}</b>
 	{{else}}
-		<h4>Name:</h4> {{data.name}} <button>Edit</button><br>
-		<h4>Email:</h4> {{data.email}}<br>
-		<h4>Date Created:</h4> {{data.accountCreationTime}}
+	<div class='table-wrapper'>
+		<table class="table">
+			<tr>
+				<th scope="row">Name</th>
+				<td>
+					<a id="showName">{{data.name}}</a>
+					<form id="editName" method="post" action="changeName">
+						<input id="editNameInput" name="name" href="editName">
+						<button type="submit">Change Name</button>
+					</form>
+					<script type="text/javascript">
+						$("#editName").hide();
+					</script>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">Email</th>
+				<td>
+					{{data.email}}
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">Created</th>
+				<td>
+					{{data.accountCreationTime}}
+				</td>
+			</tr>
+		</table>
+	</div>
 	{{/if}}
 </section>
 <link rel="stylesheet" type="text/css" href="../public/awards.css">
+<script type="text/javascript" src="../../public/editName.js"></script>

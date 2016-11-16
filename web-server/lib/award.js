@@ -109,7 +109,18 @@ router.get('/award/previous-award', function(req, res, next){
 			for (c = 0; c < data.length; c++){
 				dateArr = data[c].awardDate.split(/ |,|-|:/);
 				data[c].date = "" + dateArr[1] + "-" + dateArr[2] + "-" + dateArr[0];
-				data[c].time = "" + dateArr[3] + ":" + dateArr[4];
+				// Midnight
+				if ((dateArr[3] == 0) && (dateArr[4] == "00"))
+					data[c].time = "12:" + dateArr[4] + " midnight";
+				// Noon
+				else if ((dateArr[3] == 12) && (dateArr[4] == "00"))
+					data[c].time = "12:" + dateArr[4] + " noon";
+				// AM
+				else if (dateArr[3] < 12)
+					data[c].time = "" + dateArr[3] + ":" + dateArr[4] + " AM";
+				// PM
+				else
+					data[c].time = "" + (dateArr[3] - 12) + ":" + dateArr[4] + " PM";
 			}
 
 			// Sorts the data into date order
@@ -185,21 +196,79 @@ router.get('/award/profile', function(req, res, next){
 	var path = "/users/" + userID;
 	request(hostDB + path, function(err, resDB, body){
 		var context = {};
-		body = JSON.parse(body);
+		var body = JSON.parse(body);
 		// An error has occured
 		if (err){
 			console.log(err);
 			context.errorMssg = internalError;
 		}
+
 		// No data found
 		else if (body.Data.length == 0)
 			context.errorMssg = "User profile not found";
-		// Data found
-		else
-			context.data = body.Data[0];
 		
-		// Renders the page
-		res.render('award/profile', context);
+		// Extracts the data and renders the page
+		else {
+			context.data = body.Data[0];
+			var datetime = context.data.accountCreationTime;
+			datetime = moment(datetime, "YYYY-MM-DD HH:mm:ss").format("HH:mm MM-DD-YYYY");
+			context.data.accountCreationTime = datetime;
+			res.render('award/profile', context);
+		}
+	});
+});
+
+
+/*******************************************
+** Router: /award/changeName
+** Desc: Changes the users name
+*******************************************/
+router.post('/award/changeName', function(req, res, next){
+	// Runs the following commands in series	
+	var path = "/users/" + req.session.passport.user.id;
+	async.waterfall([
+		// Validates the name
+		function(callback) {
+			var regex = /(?:[a-z]|[A-Z]|[0-9]|\s)*/;
+			var name = regex.exec(req.body.name)[0];
+			if ((req.body.name != name) || (name == ""))
+				callback(true, null);
+
+			// Moves to next func
+			else
+				callback(null, name);
+		},
+
+		// Pulls the existing data in db
+		function(name, callback){
+			request(hostDB + path, function(err, resDB, body){
+				var body = JSON.parse(body);
+				// An error has occured
+				if (err)
+					callback(true, null);
+
+				// No user data received
+				else if (body.Data == [])
+					callback(true, null);
+				
+				// Updates the name
+				else {
+					body.Data[0].name = name;
+					callback(null, body.Data[0]);
+				}
+			});
+		},
+
+		// Updates the name
+		function(data, callback){
+			request.put({url:hostDB + path, form:data}, function(err, resDB, body){
+				callback(null, null);
+			});
+		} 
+
+	// Call back function, redirects to the profile page
+	], function(err, result) {
+		res.redirect('profile');
 	});
 });
 
@@ -304,9 +373,8 @@ router.post('/award/add-award', function(req, res, next){
 			res.status(500).send("Database error");
 
 		// Confirms it was successfull
-		else if (body.Status == "Success"){
+		else if (body.Status == "Success")
 			res.status(200).send(null);
-		}
 
 		// Failed to add
 		else
