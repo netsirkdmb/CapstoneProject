@@ -112,9 +112,25 @@ function hash(userID, password, func, salt){
 
 	// Runs there call back function
 	], function(err, res){
-		func(err, res);
+		func(err, res[2]);
 	});
 }
 
+
+/**************************************
+** Func: getRandomSalt()
+** Desc: Generates a random salt
+**************************************/
+function getRandomSalt() {
+	return crypto.randomBytes(16).toString('hex');
+}
+
 // Exports the module
-module.exports = hash;
+module.exports = {
+	hash : hash,
+	getRandomSalt : getRandomSalt
+}
+
+salt = getRandomSalt();
+console.log(salt);
+hash(1, "wm", function(err, key){console.log(key)}, salt);
