@@ -7,7 +7,7 @@
 //Begin loading when document is ready
 $(document).ready(function(){
 	//Load apis needed for this chart
-	google.charts.load('current', {packages: ['corechart', 'bar', 'table' , 'controls']});
+	google.charts.load('current', {packages: ['corechart',  'table' , 'controls']});
 	google.charts.setOnLoadCallback(drawDashBoard);
 
 	function drawDashBoard(){
@@ -24,18 +24,40 @@ $(document).ready(function(){
 
 		
 		var trimmedResults = jsonData.Results.slice(0,5);
-		var annualData = $.ajax({
+		var annualData = JSON.parse($.ajax({
 			url: "/admin/api/getTopEmployees",
 			data: "json",
 			async: false
 
-		}).responseText;
+		}).responseText);
 
-		console.log(trimmedResults);
-		console.log(annualData);
+		var chartData = [
+				['Name', 'Points', 'Month']
+		];
+		for (var entry in annualData.Results){
+
+			for(var point in annualData.Results[entry]){
+				var newEntry = [];
+				if( annualData.Results[entry][point].name != undefined){
+					newEntry.push(annualData.Results[entry][point].name);
+					newEntry.push(annualData.Results[entry][point].points);
+					if(entry == 'Year')
+
+						newEntry.push(0);
+					else
+						if (point <10)
+							newEntry.push(parseInt(entry.substring(0,1)));
+						else
+							 newEntry.push(parseInt(entry.substring(0,2)))				
+					chartData.push(newEntry);
+				}
+			}		
+		}
+
 		//create data table
 		 var data = new google.visualization.arrayToDataTable(
-			
+			chartData			
+/*
 [
 			
                 	['Name', 'Points', 'Month', {role: 'style'}],
@@ -50,6 +72,7 @@ $(document).ready(function(){
 
 
                         ]
+*/
 
 		);
 
@@ -92,7 +115,8 @@ $(document).ready(function(){
                                 	'title': 'Points'
                         	},
                        		'legend': {'position': "none" }
-                	}
+                	},
+			'view' : {'columns': [0,1]} 
 		});
 
 		//bind the dashboard with the controls and barchart				
