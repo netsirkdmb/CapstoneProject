@@ -45,26 +45,27 @@ app.config.update(configDict)
 adminAccountParser = reqparse.RequestParser(bundle_errors=True)
 adminAccountParser.add_argument("email", type=str, help="Email address for new admin.", required=True)
 adminAccountParser.add_argument("password", type=str, help="Password for new admin.", required=True)
+adminAccountParser.add_argument("salt", type=str, help="Salt for password.", required=True)
 
 # parser for creating users
 userAccountParser = reqparse.RequestParser(bundle_errors=True)
 userAccountParser.add_argument("name", type=str, help="Name for new user.", required=True)
 userAccountParser.add_argument("email", type=str, help="Email address for new user.", required=True)
 userAccountParser.add_argument("password", type=str, help="Password for new user.", required=True)
+userAccountParser.add_argument("salt", type=str, help="Salt for password.", required=True)
 userAccountParser.add_argument("signatureImage", type=str, help="Signature for new user.", required=True)
 userAccountParser.add_argument("region", type=str, help="Region for new user.", required=True)
-# change startDate to required after mid-point check
-userAccountParser.add_argument("startDate", type=inputs.date, help="User's start date.", required=False)
+userAccountParser.add_argument("startDate", type=inputs.date, help="User's start date.", required=True)
 
 # parser for updating user
 userAccountUpdateParser = reqparse.RequestParser(bundle_errors=True)
 userAccountUpdateParser.add_argument("name", type=str, help="Name for user.", required=True)
 userAccountUpdateParser.add_argument("email", type=str, help="Email address for user.", required=True)
 userAccountUpdateParser.add_argument("password", type=str, help="Password for user.", required=True)
+userAccountUpdateParser.add_argument("salt", type=str, help="Salt for password.", required=True)
 userAccountUpdateParser.add_argument("signatureImage", type=str, help="Signature for user.", required=False)
 userAccountUpdateParser.add_argument("region", type=str, help="Region for user.", required=True)
-# change startDate to required after mid-point check
-userAccountUpdateParser.add_argument("startDate", type=inputs.date, help="User's start date.", required=False)
+userAccountUpdateParser.add_argument("startDate", type=inputs.date, help="User's start date.", required=True)
 
 # parser for email
 emailParser = reqparse.RequestParser(bundle_errors=True)
@@ -73,6 +74,7 @@ emailParser.add_argument("email", type=str, help="Email address.", required=True
 # parser for passwordCode
 passwordCodeParser = reqparse.RequestParser(bundle_errors=True)
 passwordCodeParser.add_argument("passwordCode", type=str, help="User's password code.", required=True)
+passwordCodeParser.add_argument("salt", type=str, help="Salt for password.", required=True)
 
 # parser for creating awardTypes
 awardTypeParser = reqparse.RequestParser(bundle_errors=True)
@@ -109,7 +111,7 @@ class AdminsList(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT adminID, email, password, accountCreationTime FROM admins"
+            query = "SELECT adminID, email, password, salt, accountCreationTime FROM admins"
             app.cursor.execute(query)
 
             admins = list(app.cursor.fetchall())
@@ -120,6 +122,7 @@ class AdminsList(Resource):
                 (adminInfo["adminID"], 
                 adminInfo["email"], 
                 adminInfo["password"], 
+                adminInfo["salt"], 
                 adminInfo["accountCreationTime"]) = admin
                 adminInfo["accountCreationTime"] = str(adminInfo["accountCreationTime"])
                 adminList.append(adminInfo)
@@ -138,20 +141,21 @@ class AdminsList(Resource):
 
         adminEmail = admin["email"]
         adminPassword = admin["password"]
+        adminSalt = admin["salt"]
 
         try:
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            stmt = "INSERT INTO admins (email, password) VALUES (%s, %s)"
-            app.cursor.execute(stmt, (adminEmail, adminPassword))
+            stmt = "INSERT INTO admins (email, password, salt) VALUES (%s, %s, %s)"
+            app.cursor.execute(stmt, (adminEmail, adminPassword, adminSalt))
 
             app.conn.commit()
 
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [{"email": adminEmail, "password": adminPassword}]}, 200
+            return {"Status": "Success", "Data": [{"email": adminEmail, "password": adminPassword, "salt": adminSalt}]}, 200
         
         except Exception:
             return {"Status": "Fail", "Error": traceback.format_exc()}, 400
@@ -187,7 +191,7 @@ class Admin(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT adminID, email, password, accountCreationTime FROM admins WHERE adminID = %s"
+            query = "SELECT adminID, email, password, salt, accountCreationTime FROM admins WHERE adminID = %s"
             app.cursor.execute(query, int(adminID))
 
             admins = list(app.cursor.fetchall())
@@ -198,6 +202,7 @@ class Admin(Resource):
                 (adminInfo["adminID"], 
                 adminInfo["email"], 
                 adminInfo["password"], 
+                adminInfo["salt"], 
                 adminInfo["accountCreationTime"]) = admin
                 adminInfo["accountCreationTime"] = str(adminInfo["accountCreationTime"])
                 adminList.append(adminInfo)
@@ -220,20 +225,21 @@ class Admin(Resource):
 
         adminEmail = admin["email"]
         adminPassword = admin["password"]
+        adminSalt = admin["salt"]
 
         try:
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            stmt = "UPDATE admins SET email = %s, password = %s WHERE adminID = %s"
-            app.cursor.execute(stmt, (adminEmail, adminPassword, adminID))
+            stmt = "UPDATE admins SET email = %s, password = %s, salt = %s WHERE adminID = %s"
+            app.cursor.execute(stmt, (adminEmail, adminPassword, adminSalt, adminID))
 
             app.conn.commit()
 
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [{"email": adminEmail, "password": adminPassword}]}, 200
+            return {"Status": "Success", "Data": [{"email": adminEmail, "password": adminPassword, "salt": adminSalt}]}, 200
         
         except Exception:
             return {"Status": "Fail", "Error": traceback.format_exc()}, 400
@@ -267,7 +273,7 @@ class UsersList(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT userID, name, email, password, passwordCode, region, startDate, accountCreationTime FROM users"
+            query = "SELECT userID, name, email, password, salt, passwordCode, region, startDate, accountCreationTime FROM users"
             app.cursor.execute(query)
 
             users = list(app.cursor.fetchall())
@@ -279,6 +285,7 @@ class UsersList(Resource):
                 userInfo["name"], 
                 userInfo["email"], 
                 userInfo["password"], 
+                userInfo["salt"], 
                 userInfo["passwordCode"], 
                 userInfo["region"], 
                 userInfo["startDate"], 
@@ -302,29 +309,24 @@ class UsersList(Resource):
         userName = user["name"]
         userEmail = user["email"]
         userPassword = user["password"]
+        userSalt = user["salt"]
         userSignature = user["signatureImage"]
         userRegion = user["region"]
-        if user["startDate"]:
-            userStartDate = user["startDate"]
+        userStartDate = user["startDate"]
 
         try:
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
-            returnData = []
-            if userStartDate:
-                stmt = "INSERT INTO users (name, email, password, signatureImage, region, startDate) VALUES (%s, %s, %s, %s, %s, %s)"
-                app.cursor.execute(stmt, (userName, userEmail, userPassword, userSignature, userRegion, userStartDate))
-                returnData = [{"name": userName, "email": userEmail, "password": userPassword, "signatureImage": userSignature, "region": userRegion, "startDate": str(userStartDate)[:-9]}]
-            else:
-                stmt = "INSERT INTO users (name, email, password, signatureImage, region) VALUES (%s, %s, %s, %s, %s)"
-                app.cursor.execute(stmt, (userName, userEmail, userPassword, userSignature, userRegion))
-                returnData = [{"name": userName, "email": userEmail, "password": userPassword, "signatureImage": userSignature, "region": userRegion}]
+            
+            stmt = "INSERT INTO users (name, email, password, signatureImage, region, startDate) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            app.cursor.execute(stmt, (userName, userEmail, userPassword, userSalt, userSignature, userRegion, userStartDate))
+
             app.conn.commit()
 
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": returnData}, 200
+            return {"Status": "Success", "Data": [{"name": userName, "email": userEmail, "password": userPassword, "salt": userSalt, "signatureImage": userSignature, "region": userRegion, "startDate": str(userStartDate)[:-9]}]}, 200
         
         except Exception:
             return {"Status": "Fail", "Error": traceback.format_exc()}, 400
@@ -360,7 +362,7 @@ class User(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT userID, name, email, password, passwordCode, signatureImage, region, startDate, accountCreationTime FROM users WHERE userID = %s"
+            query = "SELECT userID, name, email, password, salt, passwordCode, signatureImage, region, startDate, accountCreationTime FROM users WHERE userID = %s"
             app.cursor.execute(query, int(userID))
 
             users = list(app.cursor.fetchall())
@@ -372,6 +374,7 @@ class User(Resource):
                 userInfo["name"], 
                 userInfo["email"], 
                 userInfo["password"], 
+                userInfo["salt"], 
                 userInfo["passwordCode"], 
                 userInfo["signatureImage"], 
                 userInfo["region"], 
@@ -400,32 +403,24 @@ class User(Resource):
         userName = user["name"]
         userEmail = user["email"]
         userPassword = user["password"]
+        userSalt = user["salt"]
         if user["signatureImage"]:
             userSignature = user["signatureImage"]
         userRegion = user["region"]
-        if user["startDate"]:
-            userStartDate = user["startDate"]
+        userStartDate = user["startDate"]
 
         try:
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
             returnData = []
-            if userSignature and userStartDate:
-                stmt = "UPDATE users SET name = %s, email = %s, password = %s, signatureImage = %s, region = %s, startDate = %s WHERE userID = %s"
-                app.cursor.execute(stmt, (userName, userEmail, userPassword, userSignature, userRegion, userStartDate, userID))
-                returnData = [{"name": userName, "email": userEmail, "password": userPassword, "signatureImage": userSignature, "region": userRegion, "startDate": userStartDate}]
-            elif userSignature and not userStartDate:
-                stmt = "UPDATE users SET name = %s, email = %s, password = %s, signatureImage = %s, region = %s WHERE userID = %s"
-                app.cursor.execute(stmt, (userName, userEmail, userPassword, userSignature, userRegion, userID))
-                returnData = [{"name": userName, "email": userEmail, "password": userPassword, "signatureImage": userSignature, "region": userRegion}]
-            elif userStartDate and not userSignature:
-                stmt = "UPDATE users SET name = %s, email = %s, password = %s, region = %s, startDate = %s WHERE userID = %s"
-                app.cursor.execute(stmt, (userName, userEmail, userPassword, userRegion, userStartDate, userID))
-                returnData = [{"name": userName, "email": userEmail, "password": userPassword, "region": userRegion, "startDate": userStartDate}]
+            if userSignature:
+                stmt = "UPDATE users SET name = %s, email = %s, password = %s, salt = %s, signatureImage = %s, region = %s, startDate = %s WHERE userID = %s"
+                app.cursor.execute(stmt, (userName, userEmail, userPassword, userSalt, userSignature, userRegion, userStartDate, userID))
+                returnData = [{"name": userName, "email": userEmail, "password": userPassword, "salt": userSalt, "signatureImage": userSignature, "region": userRegion, "startDate": userStartDate}]
             else:
-                stmt = "UPDATE users SET name = %s, email = %s, password = %s, region = %s WHERE userID = %s"
-                app.cursor.execute(stmt, (userName, userEmail, userPassword, userRegion, userID))
-                returnData = [{"name": userName, "email": userEmail, "password": userPassword, "region": userRegion}]
+                stmt = "UPDATE users SET name = %s, email = %s, password = %s, region = %s, startDate = %s WHERE userID = %s"
+                app.cursor.execute(stmt, (userName, userEmail, userPassword, userSalt, userRegion, userStartDate, userID))
+                returnData = [{"name": userName, "email": userEmail, "password": userPassword, "salt": userSalt, "region": userRegion, "startDate": userStartDate}]
             
             app.conn.commit()
 
@@ -1055,7 +1050,7 @@ class UserEmail(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT userID, name, email, password, passwordCode, region, startDate, accountCreationTime FROM users WHERE email = %s"
+            query = "SELECT userID, name, email, password, salt, passwordCode, region, startDate, accountCreationTime FROM users WHERE email = %s"
             app.cursor.execute(query, userEmail)
 
             users = list(app.cursor.fetchall())
@@ -1067,6 +1062,7 @@ class UserEmail(Resource):
                 userInfo["name"], 
                 userInfo["email"], 
                 userInfo["password"], 
+                userInfo["salt"], 
                 userInfo["passwordCode"], 
                 userInfo["region"], 
                 userInfo["startDate"],
@@ -1090,24 +1086,25 @@ class UserEmail(Resource):
 
         passwordCode = passwordCodeParser.parse_args()
         userPasswordCode = passwordCode["passwordCode"]
+        userSalt = passwordCode["salt"]
 
         try:
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
             if userPasswordCode == "":
-                stmt = "UPDATE users SET passwordCode = NULL WHERE email = %s"
-                app.cursor.execute(stmt, (userEmail))
+                stmt = "UPDATE users SET passwordCode = NULL, salt = %s WHERE email = %s"
+                app.cursor.execute(stmt, (userSalt, userEmail))
             else:
-                stmt = "UPDATE users SET passwordCode = %s WHERE email = %s"
-                app.cursor.execute(stmt, (userPasswordCode, userEmail))
+                stmt = "UPDATE users SET passwordCode = %s, salt = %s WHERE email = %s"
+                app.cursor.execute(stmt, (userPasswordCode, userSalt, userEmail))
 
             app.conn.commit()
 
             app.cursor.close()
             app.conn.close()
 
-            return {"Status": "Success", "Data": [{"email": userEmail, "passwordCode": userPasswordCode}]}, 200
+            return {"Status": "Success", "Data": [{"email": userEmail, "passwordCode": userPasswordCode, "salt": userSalt}]}, 200
         
         except Exception:
             return {"Status": "Fail", "Error": traceback.format_exc()}, 400
@@ -1124,7 +1121,7 @@ class AdminEmail(Resource):
             app.conn = mysql.connect()
             app.cursor = app.conn.cursor()
 
-            query = "SELECT adminID, email, password, accountCreationTime FROM admins WHERE email = %s"
+            query = "SELECT adminID, email, password, salt, accountCreationTime FROM admins WHERE email = %s"
             app.cursor.execute(query, email)
 
             admins = list(app.cursor.fetchall())
@@ -1135,6 +1132,7 @@ class AdminEmail(Resource):
                 (adminInfo["adminID"], 
                 adminInfo["email"], 
                 adminInfo["password"], 
+                adminInfo["salt"], 
                 adminInfo["accountCreationTime"]) = admin
                 adminInfo["accountCreationTime"] = str(adminInfo["accountCreationTime"])
                 adminList.append(adminInfo)
@@ -1143,6 +1141,36 @@ class AdminEmail(Resource):
             app.conn.close()
 
             return {"Status": "Success", "Data": adminList}, 200
+        
+        except Exception:
+            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
+    
+    # updates admin's passwordCode
+    def put(self):
+        email = emailParser.parse_args()
+        adminEmail = email["email"]
+
+        passwordCode = passwordCodeParser.parse_args()
+        adminPasswordCode = passwordCode["passwordCode"]
+        adminSalt = passwordCode["salt"]
+
+        try:
+            app.conn = mysql.connect()
+            app.cursor = app.conn.cursor()
+
+            if adminPasswordCode == "":
+                stmt = "UPDATE admins SET passwordCode = NULL, salt = %s WHERE email = %s"
+                app.cursor.execute(stmt, (adminSalt, adminEmail))
+            else:
+                stmt = "UPDATE admins SET passwordCode = %s, salt = %s WHERE email = %s"
+                app.cursor.execute(stmt, (adminPasswordCode, adminSalt, adminEmail))
+
+            app.conn.commit()
+
+            app.cursor.close()
+            app.conn.close()
+
+            return {"Status": "Success", "Data": [{"email": adminEmail, "passwordCode": adminPasswordCode, "salt": adminSalt}]}, 200
         
         except Exception:
             return {"Status": "Fail", "Error": traceback.format_exc()}, 400
