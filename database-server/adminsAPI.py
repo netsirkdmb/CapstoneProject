@@ -1,23 +1,7 @@
 ###############################################################################################
 # Kristen Dhuse, Bryant Hall, William McCumstie                                               #
 # CS419 - API                                                                                 #
-# Description: This API is hosted on Amazon Web Services and allows the user and admin sites  #
-#              to make queries to the MySQL database for our employee recognition system.     #
-# References:                                                                                 #
-# - for help with Flask                                                                       #
-#       http://flask.pocoo.org/                                                               #
-# - for help with Jinja2                                                                      #
-#       https://realpython.com/blog/python/primer-on-jinja-templating/                        #
-# - for help setting up virtual environment on AWS                                            #
-#       http://docs.python-guide.org/en/latest/dev/virtualenvs/                               #
-# - for help with Flask-restful                                                               #
-#       http://flask-restful-cn.readthedocs.io/en/0.3.4/quickstart.html                       #
-# - for help with LaTeX in Python                                                             #
-#       http://akuederle.com/Automatization-with-Latex-and-Python-1                           #
-# - for help with MySQL queries between two dates                                             #
-#       http://stackoverflow.com/questions/9511409/creating-a-list-of-month-names-between-two-dates-in-mysql
-# - for help with MySQL queries and ranking                                                   #
-#       http://stackoverflow.com/questions/24118393/mysql-rank-with-ties                      #
+# Description: This is the admins portion of the employee recognition system API.             #
 ###############################################################################################
 
 

@@ -14,6 +14,8 @@
 #       http://flask-restful-cn.readthedocs.io/en/0.3.4/quickstart.html                       #
 # - for help with LaTeX in Python                                                             #
 #       http://akuederle.com/Automatization-with-Latex-and-Python-1                           #
+# - for help with defining variables in LaTeX                                                 #
+#       http://latex-community.org/forum/viewtopic.php?t=21390                                #
 # - for help with MySQL queries between two dates                                             #
 #       http://stackoverflow.com/questions/9511409/creating-a-list-of-month-names-between-two-dates-in-mysql
 # - for help with MySQL queries and ranking                                                   #
