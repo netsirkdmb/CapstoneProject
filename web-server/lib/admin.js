@@ -310,10 +310,17 @@ myRouter.route('/admin/API/getUserByEmail').post(function(req,res){
 //Handle Remove Create and Update Operations Here. Take data from site and redirect to Database server
 
 myRouter.route('/admin/API/admin').post(
-		 function(req,res){
+	function(req,res){
+
+		//generate salt value here
+                var saltValue = uuid.v4();
+                var saltValueArr = saltValue.split("-");
+                saltValue = saltValueArr[0] + saltValue[1];
 		
-		var values =  {password: req.body.password, email:  req.body.email, uuID:  uuid.v4() };
+		var values =  {password: req.body.password, email:  req.body.email, salt:  saltValue };
 		console.log("Post Values");
+
+
 		request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins', form: values }, function(err, response,body){
 		        if(!err && response.statusCode < 400){
                                 res.send("1");
@@ -381,9 +388,13 @@ myRouter.route('/admin/API/admin/:uuID')
 myRouter.route('/admin/API/user')
         //create New Router
         .post( function(req,res){
-
-                var values =  {password: req.body.password, email:  req.body.email, uuID: uuid.v4()  , region: req.body.region, signatureImage: "comingsoon", name: req.body.name };
-                console.log(values);
+		//generate salt value here
+		var saltValue = uuid.v4();
+		var saltValueArr = saltValue.split("-");
+		saltValue = saltValueArr[0] + saltValue[1];
+		console.log(saltValue);  
+                var values =  {password: req.body.password, email:  req.body.email, salt: saltValue   , region: req.body.region, signatureImage: "comingsoon", name: req.body.name };
+                //console.log(values);
                 request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users', form: values }, function(err, response,body){
                         if(!err && response.statusCode < 400){
                                 console.log(JSON.stringify(body));
@@ -392,7 +403,7 @@ myRouter.route('/admin/API/user')
                         else{
                                 if(response)
                                         console.log(err);
-                                console.log(response);
+                                console.log(response.body);
                                 res.send("0");
                         }
                 });
