@@ -32,26 +32,22 @@ passwordCodeParser.add_argument("salt", type=str, help="Salt for password.", req
 
 def uploadSignatureImage(request, userID):
     if "image" not in request.files:
-        return {"Status": "Fail", "Error": "Image not received."}
+        raise Exception("Image not received.")
     
     image = request.files["image"]
 
     if image.filename == "":
-        return {"Status": "Fail", "Error": "Image must have a filename."}
+        raise Exception("Image must have a filename.")
     
     filename = secure_filename(image.filename)
     base, f_extension = os.path.splitext(filename)
 
     signatureImage = str(userID) + f_extension
 
-    try:
-            stmt = "UPDATE users SET signatureImage = %s WHERE userID = %s"
-            app.cursor.execute(stmt, (signatureImage, userID))
+    stmt = "UPDATE users SET signatureImage = %s WHERE userID = %s"
+    app.cursor.execute(stmt, (signatureImage, userID))
 
-            app.conn.commit()
-    
-    except Exception:
-            return {"Status": "Fail", "Error": traceback.format_exc()}, 400
+    app.conn.commit()
 
     filePath = "/api/src/upload/" + signatureImage
 
@@ -122,15 +118,9 @@ class UsersList(Resource):
             query = "SELECT userID FROM users WHERE email = %s"
             app.cursor.execute(query, userEmail)
 
-            users = list(app.cursor.fetchall())
+            userID = list(app.cursor.fetchone())
 
-            userData = []
-            for user in users:
-                userInfo = {}
-                userInfo["userID"] = user
-                userData.append(userInfo)
-            
-            imageMessage = uploadSignatureImage(request, userData[0]["userID"])
+            imageMessage = uploadSignatureImage(request, userID[0])
 
             return {"Status": "Success", "Data": [{"name": userName, "email": userEmail, "password": userPassword, "salt": userSalt, "region": userRegion, "startDate": str(userStartDate)[:-9]}], "Image": imageMessage}, 200
         
@@ -148,6 +138,13 @@ class UsersList(Resource):
             app.cursor.execute(stmt)
 
             app.conn.commit()
+
+            # delete all images from upload folder
+            project = "/api/src/"
+            upload_d = os.path.join(project, "upload")
+            for item in os.listdir(upload_d):
+                f = os.path.join(upload_d, item)
+                os.remove(f)
 
             return {"Status": "Success", "Message": "users table is now empty."}, 200
         
@@ -193,7 +190,7 @@ class User(Resource):
 
     # update user in database, errors if the user does not exist in the database
     def put(self, userID):
-        user = userAccountUpdateParser.parse_args()
+        user = userAccountParser.parse_args()
 
         userName = user["name"]
         userEmail = user["email"]
@@ -203,14 +200,17 @@ class User(Resource):
         userStartDate = user["startDate"]
 
         try:
-            stmt = "UPDATE users SET name = %s, email = %s, password = %s, region = %s, startDate = %s WHERE userID = %s"
+            stmt = "UPDATE users SET name = %s, email = %s, password = %s, salt = %s, region = %s, startDate = %s WHERE userID = %s"
             app.cursor.execute(stmt, (userName, userEmail, userPassword, userSalt, userRegion, userStartDate, userID))
             
             app.conn.commit()
-
-            imageMessage = uploadSignatureImage(request, userID)
-
-            return {"Status": "Success", "Data": [{"name": userName, "email": userEmail, "password": userPassword, "salt": userSalt, "region": userRegion, "startDate": str(userStartDate)}], "Image": imageMessage}, 200
+            
+            if "image" in request.files:
+                imageMessage = uploadSignatureImage(request, userID)
+                return {"Status": "Success", "Data": [{"name": userName, "email": userEmail, "password": userPassword, "salt": userSalt, "region": userRegion, "startDate": str(userStartDate)}], "Image": imageMessage}, 200
+            
+            else:
+                return {"Status": "Success", "Data": [{"name": userName, "email": userEmail, "password": userPassword, "salt": userSalt, "region": userRegion, "startDate": str(userStartDate)}]}, 200
         
         except Exception:
             return {"Status": "Fail", "Error": traceback.format_exc()}, 400
@@ -224,6 +224,15 @@ class User(Resource):
             app.conn.commit()
 
             message = str(userID) + " has now been deleted from users table."
+
+            # delete user's image from upload folder
+            project = "/api/src/"
+            upload_d = os.path.join(project, "upload")
+            f = str(userID) + "."
+            for item in os.listdir(upload_d):
+                if item.startswith(f):
+                    item = os.path.join(upload_d, item)
+                    os.remove(item)
 
             return {"Status": "Success", "Message": message}, 200
         

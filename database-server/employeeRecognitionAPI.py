@@ -20,12 +20,16 @@
 #       http://stackoverflow.com/questions/9511409/creating-a-list-of-month-names-between-two-dates-in-mysql
 # - for help with MySQL queries and ranking                                                   #
 #       http://stackoverflow.com/questions/24118393/mysql-rank-with-ties                      #
+# - for help copying files from one directory to another                                      #
+#       http://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-pyth
 ###############################################################################################
 
 
 from flask import Flask, request
 from flask_restful import Resource, Api
 from flaskext.mysql import MySQL
+import os
+import shutil
 import yaml
 import traceback
 from adminsAPI import *
@@ -69,6 +73,14 @@ def clearTables():
     data = app.cursor.fetchall()
     if len(data) == 0:
         app.conn.commit()
+
+        # delete all images from upload folder
+        project = "/api/src/"
+        upload_d = os.path.join(project, "upload")
+        for item in os.listdir(upload_d):
+            f = os.path.join(upload_d, item)
+            os.remove(f)
+
         return {"Status": "Success"}, 200
     else:
         return {"Status": "Fail", "Message": data}, 400
@@ -84,6 +96,14 @@ class ResetTables(Resource):
             return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
 
+# copy all files in src directory to dst directory
+def copytree(src, dst, symlinks=False, ignore=None):
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        shutil.copy2(s, d)
+
+
 class AddDummyData(Resource):
     def post(self):
         data = None
@@ -92,11 +112,17 @@ class AddDummyData(Resource):
             clearTables()
             app.cursor.callproc('spAddDummyData')
             data = app.cursor.fetchall()
+
         except Exception:
             return {"Status": "Fail", "Error": traceback.format_exc()}, 400
         
         if len(data) == 0:
             app.conn.commit()
+
+            project = "/api/src/"
+            dummyFiles_d = os.path.join(project, "dummyFiles")
+            upload_d = os.path.join(project, "upload")
+            copytree(dummyFiles_d, upload_d)
 
             return {"Status": "Success"}, 200
         else:
