@@ -74,12 +74,26 @@ def clearTables():
     if len(data) == 0:
         app.conn.commit()
 
-        # delete all images from upload folder
         project = "/api/src/"
+
+        # delete all images from upload folder
         upload_d = os.path.join(project, "upload")
         for item in os.listdir(upload_d):
             f = os.path.join(upload_d, item)
             os.remove(f)
+        
+        # delete any remaining temporary certificate files in build and pdf folders
+        build_d = os.path.join(project, "build")
+        f = "tempFile"
+        for item in os.listdir(build_d):
+            if item.startswith(f):
+                item = os.path.join(build_d, item)
+                os.remove(item)
+        pdf_d = os.path.join(project, "pdf")
+        for item in os.listdir(pdf_d):
+            if item.startswith(f):
+                item = os.path.join(pdf_d, item)
+                os.remove(item)
 
         return {"Status": "Success"}, 200
     else:

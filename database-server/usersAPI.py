@@ -174,7 +174,7 @@ class User(Resource):
                 userInfo["region"], 
                 userInfo["startDate"],
                 userInfo["accountCreationTime"]) = user
-                userInfo["signatureImage"] = "http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/images/" + userInfo["signatureImage"]
+                userInfo["signatureImage"] = "/images/" + userInfo["signatureImage"]
                 userInfo["startDate"] = str(userInfo["startDate"])
                 userInfo["accountCreationTime"] = str(userInfo["accountCreationTime"])
                 userData.append(userInfo)

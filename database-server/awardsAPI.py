@@ -16,6 +16,8 @@ import traceback
 import arrow
 import shutil
 import os
+import random
+import sys
 
 # parser for creating/updating awards
 awardParser = reqparse.RequestParser(bundle_errors=True)
@@ -222,15 +224,22 @@ class CreateAward(Resource):
             pdf_d = "{0}pdf/".format(project)
             
             build_d = "{0}build/".format(project)
-            out_file = "{0}tempFile".format(build_d)
+            tempFile = "tempFile"
+            out_file = build_d + tempFile
+
+            rnd = random.SystemRandom()
+            randomNum = str(rnd.randint(1, sys.maxint))
+            out_file = out_file + randomNum
+            tempFile = tempFile + randomNum
+
             ## code to do certificate with variables
-            test_file = "{0}certificate.tex".format(build_d)
+            base_file = "{0}certificate.tex".format(build_d)
 
             theDay, theMonth, theYear = convertDate(awardData[0]["awardDate"])
             signature = "/api/src/upload/" + awardData[0]["giverSignatureImage"]
 
             # open certificate.tex for reading and replace variables
-            with open(test_file, "r") as rf:
+            with open(base_file, "r") as rf:
                 fileContentsStr = rf.read()
                 fileContentsStr = fileContentsStr.replace("###awardType###", awardData[0]["awardType"])
                 fileContentsStr = fileContentsStr.replace("###giverName###", awardData[0]["giverName"])
@@ -251,10 +260,26 @@ class CreateAward(Resource):
             # saves fileContentsStr to output file
             with open(out_file + ".tex", "w") as f:
                 f.write(fileContentsStr)
-            
+
             os.chdir(os.path.realpath(build_d))
             os.system("pdflatex -output-directory {0} {1}".format(os.path.realpath(build_d), os.path.realpath(out_file)))
             shutil.copy2(out_file + ".pdf", os.path.realpath(pdf_d))
+
+            emailFileName = pdf_d + tempFile + ".pdf"
+
+
+            # TODO: EMAIL CERTIFICATE TO USER!!!! ########################################################
+
+        
+            # delete temp certificate files from build directory
+            for item in os.listdir("."):
+                if item.startswith(tempFile):
+                    item = os.path.join(build_d, item)
+                    os.remove(item)
+            
+
+            # TODO: DELETE TEMP FILE FROM PDF DIRECTORY!!!! ########################################################
+
 
             return {"Status": "Success", "Data": awardData}, 200
 
