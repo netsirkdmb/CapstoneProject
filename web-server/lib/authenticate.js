@@ -3,6 +3,8 @@ var passport = require('passport');
 var localStrategy = require('passport-local').Strategy;
 var request = require('request');
 var hostDB = "http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600";
+var async = require('async');
+var cryptoHash = require('./cryptoHash.js');
 
 // Function for serializing the user
 passport.serializeUser(function(data, done) {
@@ -17,6 +19,7 @@ passport.deserializeUser(function(user, done) {
   done(null, user);
 });
 
+
 /******************************************
 ** Var: userLogin
 ** Desc: Authentication strategy for users logins
@@ -26,22 +29,46 @@ function userLogin(username, password, done) {
 	if ((username == 'test') && (password == 'test'))
 		return done(null, [1, "award"]);
 
-	// Pulls the password saved in the database
-	var path = "/getUserByEmail";
-	request.post({url:(hostDB + path), form:{"email": username}}, function(err, res, body){
-		body = JSON.parse(body);
-		// Prevents access if there is an error
-		if (err)
-			return done(err); 
-		// Email not found (or to many response)
-		else if (body.Data.length != 1)
-			return done(null, false);
-		// Correct password supplied
-		else if (body.Data[0].password == password)
-			return done(null, [body.Data[0].userID, "award"]);
-		// Catch all - denied access
-		else
-			return done(null, false);
+	// Runs the following commands in series
+	async.waterfall([
+		// Pulls the data from the database
+		function(callback){
+			var path = "/getUserByEmail";
+			request.post({url:(hostDB + path), form:{"email": username}}, function(err, res, body){
+				// An error has occurred
+				if (err) callback(true, null);
+
+				// Email not found (or to many response)
+				body = JSON.parse(body);
+				if (body.Data.length != 1) callback(true, null);
+
+				// Passes the password hash and salt to the next function
+				data = body.Data[0];
+				callback(false, data.password, data.salt, data.userID);
+			});
+		},
+
+		// Hashes the password
+		function(passwordHashDB, salt, id, callback){
+			cryptoHash.hash(salt, password, function(err, passwordHash){
+				// An error has occurred
+				if (err) callback(true, null);
+
+				// The hash matches
+				if (passwordHash == passwordHashDB) callback(false, id);
+
+				// Password hash doesn't match, error
+				else { callback(true, null); }
+			});
+		}
+
+	// Callback function
+	], function(err, id){
+		// An error has occurred, deny entrance
+		if (err) done(null, false);
+
+		// Password matches, allow entrance
+		else done(null, [id, "award"]);
 	});
 }
 
@@ -52,24 +79,48 @@ function userLogin(username, password, done) {
 function adminLogin (username, password, done) {
 	// Backdoor for testing
 	if ((username == 'test') && (password == 'test'))
-		return done(null, [1, "admin"]);
+		return done(null, [1, "award"]);
 
-	// Pulls the password saved in the database
-	var path = "/getAdminByEmail";
-	request.post({url:(hostDB + path), form:{"email": username}}, function(err, res, body){
-		body = JSON.parse(body);
-		// Prevents access if there is an error
-		if (err)
-			return done(err); 
-		// Email not found (or to many response)
-		else if (body.Data.length != 1)
-			return done(null, false);
-		// Correct password supplied
-		else if (body.Data[0].password == password)
-			return done(null, [body.Data[0].adminID, "admin"]);
-		// Catch all - denied access
-		else
-			return done(null, false);
+	// Runs the following commands in series
+	async.waterfall([
+		// Pulls the data from the database
+		function(callback){
+			var path = "/getAdminByEmail";
+			request.post({url:(hostDB + path), form:{"email": username}}, function(err, res, body){
+				// An error has occurred
+				if (err) callback(true, null);
+
+				// Email not found (or to many response)
+				body = JSON.parse(body);
+				if (body.Data.length != 1) callback(true, null);
+
+				// Passes the password hash and salt to the next function
+				data = body.Data[0];
+				callback(false, data.password, data.salt, data.adminID);
+			});
+		},
+
+		// Hashes the password
+		function(passwordHashDB, salt, id, callback){
+			cryptoHash.hash(salt, password, function(err, passwordHash){
+				// An error has occurred
+				if (err) callback(true, null);
+
+				// The hash matches
+				if (passwordHash == passwordHashDB) callback(false, id);
+
+				// Password hash doesn't match, error
+				else callback(true, null);
+			});
+		}
+
+	// Callback function
+	], function(err, result){
+		// An error has occurred, deny entrance
+		if (err) done(null, false);
+
+		// Password matches, allow entrance
+		else done(null, [id, "award"]);
 	});
 }
 

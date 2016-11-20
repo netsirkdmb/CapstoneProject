@@ -15,7 +15,7 @@ var digest = "sha512";
 
 // Default error message
 var errMssg = [];
-errMssg[0] = "Error: An error has occured";
+errMssg[0] = "Error: An error has occurred";
 errMssg[1] = "Correct: hash(salt, password, callback())";
 errMssg[2] = "password: Must be a non empty string";
 errMssg[3] = "salt: Non-empty string"
@@ -84,7 +84,3 @@ module.exports = {
 	hash : hash,
 	getRandomSalt : getRandomSalt
 }
-
-salt = getRandomSalt();
-console.log(salt);
-hash(salt, "test26", function(err, res){console.log(err);console.log(res)});
