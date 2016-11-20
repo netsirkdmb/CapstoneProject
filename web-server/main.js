@@ -23,7 +23,7 @@ app.use(session({
   secret: randomString.generate(),
   resave: false,
   saveUninitialized: false, 
-  cookie: { secure: true, maxAge: 10/*min*/*60/*s*/*1000/*ms*/}
+  cookie: { secure: true, maxAge: 60/*min*/*60/*s*/*1000/*ms*/}
 }));
 
 // Sets up the https server

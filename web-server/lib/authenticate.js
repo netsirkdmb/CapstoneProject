@@ -115,12 +115,12 @@ function adminLogin (username, password, done) {
 		}
 
 	// Callback function
-	], function(err, result){
+	], function(err, id){
 		// An error has occurred, deny entrance
 		if (err) done(null, false);
 
 		// Password matches, allow entrance
-		else done(null, [id, "award"]);
+		else done(null, [id, "admin"]);
 	});
 }
 
