@@ -39,7 +39,7 @@ BEGIN
 -- password - a varchar with a maximum length of 255 characters, cannot be null
 -- salt - a varchar with a maximum length of 255 characters, cannot be null, must be unique
 -- passwordCode - a varchar with a maximum length of 255 characters, default is null
--- signatureImage - a varchar with a maximum length of 255 characters, cannot be null
+-- signatureImage - a varchar with a maximum length of 255 characters, default is null
 -- region - a varchar with a maximum length of 255 characters, cannot be null
 -- startDate - the date that this user started, cannot be null
 -- accountCreationTime - the datetime that this record was first created, cannot be null
@@ -47,10 +47,10 @@ BEGIN
 		userID INT AUTO_INCREMENT,
 		name VARCHAR(255) NOT NULL,
 		email VARCHAR(255) NOT NULL UNIQUE,
-		password VARCHAR(512) NOT NULL,
+		password VARCHAR(255) NOT NULL,
 		salt VARCHAR(16) NOT NULL UNIQUE,
 		passwordCode VARCHAR(255) DEFAULT NULL,
-		signatureImage VARCHAR(255) NOT NULL,
+		signatureImage VARCHAR(255) DEFAULT NULL,
 		region VARCHAR(255) NOT NULL,
 		startDate DATE NOT NULL,
 		accountCreationTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -83,7 +83,7 @@ BEGIN
 		giverID INT NOT NULL,
 		typeID INT NOT NULL,
 		datetimeGranted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		awardDate DATETIME NOT NULL,
+		awardDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		PRIMARY KEY(awardID),
 		CONSTRAINT receiverID
 			FOREIGN KEY(receiverID)
