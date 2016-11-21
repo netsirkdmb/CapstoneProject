@@ -20,7 +20,7 @@ $(document).ready(function(){
 		$('#ID').text(modalData[0]);
 		$('#editname').val(modalData[1]);
 		$('#editemail').val(modalData[2]);
-		$('#editimage').val(modalData[4]);
+		//$('#editimage').val(modalData[4]);
 		$('#editregion').val(modalData[5]);
 		//Show the modal
 		$('#editusers').modal('show');
