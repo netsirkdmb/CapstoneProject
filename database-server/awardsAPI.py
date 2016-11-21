@@ -18,6 +18,8 @@ import shutil
 import os
 import random
 import sys
+from validation import *
+
 
 # parser for creating/updating awards
 awardParser = reqparse.RequestParser(bundle_errors=True)
@@ -73,10 +75,16 @@ class AwardsList(Resource):
         awardDate = award["awardDate"]
 
         try:
+            if not datetimeValidation(awardDate):
+                raise Exception("Award Date is not a valid datetime.")
+            
             stmt = "INSERT INTO awards (receiverID, giverID, typeID, awardDate) VALUES (%s, %s, %s, %s)"
             app.cursor.execute(stmt, (awardReceiverID, awardGiverID, awardTypeID, awardDate))
 
             app.conn.commit()
+
+            if app.cursor.rowcount == 0:
+                raise Exception("Award not added to database due to invalid foreign keys for giver, receiver, or type.")
 
             return {"Status": "Success", "Data": [{"receiverID": awardReceiverID, "giverID": awardGiverID, "typeID": awardTypeID, "awardDate": awardDate}]}, 200
         
@@ -118,6 +126,9 @@ class Award(Resource):
 
             awards = list(app.cursor.fetchall())
 
+            if app.cursor.rowcount == 0:
+                raise Exception("Award does not exist in the database.") 
+
             awardData = []
             for award in awards:
                 awardInfo = {}
@@ -151,17 +162,23 @@ class Award(Resource):
         awardDate = award["awardDate"]
 
         try:
+            if not datetimeValidation(awardDate):
+                raise Exception("Award Date is not a valid datetime.")
+            
             stmt = "UPDATE awards SET receiverID = %s, giverID = %s, typeID = %s, awardDate = %s WHERE awardID = %s"
             app.cursor.execute(stmt, (awardReceiverID, awardGiverID, awardTypeID, awardDate, awardID))
 
             app.conn.commit()
+
+            if app.cursor.rowcount == 0:
+                raise Exception("Award cannot be updated because it does not exist in the database.")
 
             return {"Status": "Success", "Data": [{"receiverID": awardReceiverID, "giverID": awardGiverID, "typeID": awardTypeID, "awardDate": awardDate}]}, 200
         
         except Exception:
             return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
-    # delete a award from the database, errors if the award does not exist in the database
+    # delete a award from the database, database is not changed if the award does not exist in the database
     def delete(self, awardID):
         try:
             stmt = "DELETE FROM awards WHERE awardID = %s"
@@ -203,6 +220,9 @@ class CreateAward(Resource):
             app.cursor.execute(query, int(awardID))
 
             awards = list(app.cursor.fetchall())
+
+            if app.cursor.rowcount == 0:
+                raise Exception("Award does not exist in the database.")
 
             awardData = []
             for award in awards:

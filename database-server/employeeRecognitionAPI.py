@@ -173,6 +173,6 @@ api.add_resource(SignatureImage, '/uploadSignatureImage/<int:userID>')
 
 
 if __name__ == "__main__":
-    # context = ("cert.crt", "key.key")
+    # context = ("/api/src/keys/cert.pem", "/api/src/keys/key.pem")
     # app.run(ssl_context=context, debug=False, port=5600, host="0.0.0.0")
     app.run(debug=False, port=5600, host="0.0.0.0")

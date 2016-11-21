@@ -82,6 +82,9 @@ class AwardType(Resource):
 
             awardTypes = list(app.cursor.fetchall())
 
+            if app.cursor.rowcount == 0:
+                raise Exception("Award type does not exist in database.")
+
             awardTypesData = []
             for awardType in awardTypes:
                 awardTypeInfo = {}
@@ -112,12 +115,15 @@ class AwardType(Resource):
 
             app.conn.commit()
 
+            if app.cursor.rowcount == 0:
+                raise Exception("Award type not updated because it does not exist in the database.")
+
             return {"Status": "Success", "Data": [{"name": awardTypeName, "prestigeLevel": awardTypePrestige}]}, 200
         
         except Exception:
             return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
-    # delete a award type from the database, errors if the award type does not exist in the database
+    # delete a award type from the database, database is not changed if the award type does not exist in the database
     def delete(self, awardTypeID):
         try:
             stmt = "DELETE FROM awardTypes WHERE awardTypeID = %s"
