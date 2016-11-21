@@ -14,10 +14,9 @@ $(document).ready(function(){
 		$(this).find("td").each(function(){
 	            modalData.push($(this).html());
         	});
+		//copy image over
 		$('#ID').text(modalData[0]);
 		$('#editadminemail').val(modalData[1]);
-		$('#editadminpwd').val(modalData[2]);
-		$('#uuID').text(modalData[4]);
 		$('#updateUser').modal('show');
 		
 	});

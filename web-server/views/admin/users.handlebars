@@ -7,6 +7,7 @@
 					<li class="active"><a href="#">Users</a></li>
 					<li><a href="admins">Administrators</a></li>
 					<li><a href="bi">Business Intelligence Suite</a></li>
+					<li><a href="../logout">Log Out</a></li>
 				</ul>
 			</div>
 		</nav>
@@ -24,7 +25,6 @@
 								<th>ID</th>
 								<th>Name</th>								
 								<th>Email</th>
-								<th>Password</th>
 								<th>AccountCreationTime</th>
 								<th>signatureImage</th>
 								<th>region</th>
@@ -36,9 +36,8 @@
 								<td>{{this.uid}}</td>
 								<td>{{this.name}}</td>
 								<td>{{this.email}}</td>
-								<td>{{this.password}}</td>
 								<td>{{this.time}}</td>
-								<td>{{this.image}}</td>
+								<td><img width='30' height ='30' src={{this.signatureImage}}></img>{{this.image}}</td>
 								<td>{{this.region}}</td>
 								<td style="display:none;">{{this.uuid}}</td>
 							  </tr>
@@ -73,9 +72,15 @@
 											</div>
 										
 											
-											<label for="image">Image:</label>
-											<input type="file" class="form-control" id="image">
-											
+											<div class = "form-group">
+
+												<label for="image">Image:</label>
+												<input type="file" class="form-control" id="image" onchange='readURL(this);'/>
+
+												<img  id="newImage" src="" class = "img-circle"></img>
+											</div>
+											<div>
+											</div>
 											<div class="form-group">
 												<label for="region">Region:</label>
 												<input type="text" class="form-control" id="region">
@@ -114,14 +119,13 @@
 										
 											<div class="form-group">
 												<label for="image">Image:</label>
-												<input type="text" class="form-control" id="editimage">
+												<input type="file"  onchange='readURL(this);' class="form-control" id="editimage">
 											</div>
 											<div class="form-group">
 												<label for="region">Region:</label>
 												<input type="text" class="form-control" id="editregion">
 											</div>
 									</div>
-									<p id="uuID" hidden></p>
 									<div class= "modal-footer">
 									<button type="button" class = "btn btn-info btn-md" data-dismiss="modal" id="updateduserbutton">Update </button>
 										<button type="button" class = "btn btn-info btn-md" data-dismiss="modal" id="deleteuserbutton">Delete </button>
@@ -135,4 +139,4 @@
 		<div class = "col-md-1"></div>
 	</div>
 	<script src = "/public/Users.js"></script>
-	
+	<script src = "/public/Upload.js"></script>	

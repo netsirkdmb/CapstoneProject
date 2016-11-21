@@ -20,10 +20,8 @@ $(document).ready(function(){
 		$('#ID').text(modalData[0]);
 		$('#editname').val(modalData[1]);
 		$('#editemail').val(modalData[2]);
-		$('#editpwd').val(modalData[3]);
-		$('#editimage').val(modalData[5]);
-		$('#editregion').val(modalData[6]);
-		$('#uuID').text(modalData[7]);
+		//$('#editimage').val(modalData[4]);
+		$('#editregion').val(modalData[5]);
 		//Show the modal
 		$('#editusers').modal('show');
 	});
@@ -84,7 +82,6 @@ $(document).ready(function(){
                 }
                 var userID = $('#ID').text();
                 var formData = {
-                        uuid: $('#uuID').text(),
 			name:$('#editname').val()   ,
                         email: $('#editpwd').val()  ,
                         password:  $('#editemail').val(),
@@ -111,7 +108,7 @@ $(document).ready(function(){
 
 	
 	//function to submit new user request
-      //Create new Admin Button
+      //Create new User Button
         $('#createuserbutton').click(function(){
                 //add code to check form values are filled out
 		if( $('#name').val()=="" || $('#pwd').val()=="" || $('#email').val()=="", $('#image').val()=="", $('#region').val()==""){
@@ -132,8 +129,16 @@ $(document).ready(function(){
                         }
                         return;
                 }
+		//convert image to base 64
+		var origImage = $('#newImage');
+		if(!origImage){
+			alert('Message Failed to Upload');
+			return;
+		}
+			
+		alert(origImage.prop('src'));
 		//serialize form data
-                var formData  = "password=" + $('#pwd').val() + "&uuID=" + $('#name').val() + "&email=" + $('#email').val() + "&signatureImage=" + "comingsoon"  +  "&region=" + $('#region').val() + "&name=" +  $('#name').val();
+                var formData  = "password=" + $('#pwd').val() + "&uuID=" + $('#name').val() + "&email=" + $('#email').val() + "&signatureImage=" + "comingsoon"  +  "&region=" + $('#region').val() + "&name=" +  $('#name').val() + "&image=" + origImage.prop('src');
                 console.log(formData);
 		 $.ajax({
                         url: '/admin/API/user',
@@ -160,4 +165,6 @@ $(document).ready(function(){
 
 	});
 
+
+		
 });

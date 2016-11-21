@@ -31,7 +31,7 @@ myRouter.get('/admin/users' , function (req,res){
 				name: jsonResult.Data[entry].name,
 				email: jsonResult.Data[entry].email,
 				password: jsonResult.Data[entry].password,
-				time: jsonResult.Data[entry],
+				time: jsonResult.Data[entry].accountCreationTime,
 				image: jsonResult.Data[entry].signatureImage,
 				region: jsonResult.Data[entry].region		
 						
@@ -59,6 +59,7 @@ myRouter.get('/admin/admins', function(req,res){
         //send out request to server to get data needed for current admins
         request('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins', function(err, response,body){
                 //convert response to JSON and process it
+		console.log(body);
                 var jsonResult = JSON.parse(body);
 
                 //go through every result in JSON data and append to a results array.
@@ -68,7 +69,7 @@ myRouter.get('/admin/admins', function(req,res){
                                 id: jsonResult.Data[entry].adminID,
                                 email: jsonResult.Data[entry].email,
                                 password: jsonResult.Data[entry].password,
-                                time: "Coming Soon"
+                                time: jsonResult.Data[entry].accountCreationTime
                         }
                         );
                 }
@@ -83,11 +84,12 @@ myRouter.get('/admin/admins', function(req,res){
 
 //renders business intelligence page 
 myRouter.get('/admin/bi', function(req,res){
-	res.render('admin/bi');
+res.render('admin/bi');
 });
 /*********************************************************************************************************************************
 ** 			API Calls for BI Suite
 *********************************************************************************************************************************/
+
 
 myRouter.route('/admin/API/getRanking').get(function(req,res){
 	request(serverPath + 'getRanking', function(error, response, body){
@@ -108,7 +110,7 @@ myRouter.route('/admin/API/getTopEmployees').get(function(req,res){
                         res.send('error');
                 }
                 else{
-                        res.send(body);
+                       res.send(body);
                 }
         });
 });
@@ -151,11 +153,15 @@ myRouter.route('/admin/API/getAwardTypes').get(function(req,res){
 });
 
 
+/************************************************************************************************
+Section 4 Calls
+
+************************************************************************************************/
 
 
 
 myRouter.route('/admin/API/getRanking/:id').get(function(req,res){
-        request(serverPath + 'getAwardTypes/request.params.id', function(error, response, body){
+        request(serverPath + 'getRanking/' + req.params.id, function(error, response, body){
                 if(error){
                         console.log(error);
                         res.send('error');
@@ -167,9 +173,10 @@ myRouter.route('/admin/API/getRanking/:id').get(function(req,res){
 });
 
 
+//Used for line chart in upper left quadrant
 myRouter.route('/admin/API/getPrestigePoints/:id').get(function(req,res){
-        request(serverPath + 'getPrestigePoints/request.params.id', function(err, response, body){
-                if(error){
+        request(serverPath + 'getPrestigePoints/' + req.params.id, function(err, response, body){
+                if(err){
                         console.log(error);
                         res.send('error');
                 }
@@ -180,8 +187,8 @@ myRouter.route('/admin/API/getPrestigePoints/:id').get(function(req,res){
 });
 
 myRouter.route('/admin/API/getAwardTypes/:id').get(function(req,res){
-        request(serverPath + 'getAwardTypes/request.params.id', function(err, response, body){
-                if(error){
+        request(serverPath + 'getAwardTypes/' + req.params.id, function(err, response, body){
+                if(err){
                         console.log(error);
                         res.send('error');
                 }
@@ -191,9 +198,25 @@ myRouter.route('/admin/API/getAwardTypes/:id').get(function(req,res){
         });
 });
 
+//get awards recieved by user for use in table
 myRouter.route('/admin/API/getAwardsRecieved/:id').get(function(req,res){
-        request(serverPath + 'getAwardsRecieved/request.params.id', function(err, response, body){
-                if(error){
+        request(serverPath + 'getAwardsReceived/' + req.params.id, function(err, response, body){
+                if(err){
+                        console.log(error);
+                        res.send('error');
+                }
+                else{
+                        res.send(body);
+                }
+        });
+});
+
+//get individual awards given to user id for use in table
+
+
+myRouter.route('/admin/API/userAwards/:id').get(function(req,res){
+        request(serverPath + 'userAwards/' +  req.params.id, function(err, response, body){
+                if(err){
                         console.log(error);
                         res.send('error');
                 }
@@ -204,10 +227,13 @@ myRouter.route('/admin/API/getAwardsRecieved/:id').get(function(req,res){
 });
 
 
+
+//Used for Bar Chart for awards given in lower left quadrant
 
 myRouter.route('/admin/API/getAwardsGivenFrequency/:id').get(function(req,res){
-        request(serverPath + 'getAwardsGivenFrequency/request.params.id', function(err, response, body){
-                if(error){
+        console.log("Getting User Awards Given");
+	request(serverPath + 'getAwardsGivenFrequency/' + req.params.id, function(err, response, body){
+                if(err){
                         console.log(error);
                         res.send('error');
                 }
@@ -217,9 +243,12 @@ myRouter.route('/admin/API/getAwardsGivenFrequency/:id').get(function(req,res){
         });
 });
 
+//Used for PI Chart 
+
 myRouter.route('/admin/API/getAwardTypesGiven/:id').get(function(req,res){
-        request(serverPath + 'getAwardTypesGiven/request.params.id', function(err, response, body){
-                if(error){
+	console.log("Getting Types: " +  req.params.id);
+        request(serverPath + 'getAwardTypesGiven/' + req.params.id, function(err, response, body){
+                if(err){
                         console.log(error);
                         res.send('error');
                 }
@@ -232,7 +261,7 @@ myRouter.route('/admin/API/getAwardTypesGiven/:id').get(function(req,res){
 
 
 myRouter.route('/admin/API/userAwards/:id').get(function(req,res){
-        request(serverPath + 'userAwards/request.params.id', function(err, response, body){
+        request(serverPath + 'userAwards/' + req.params.id, function(err, response, body){
                 if(error){
                         console.log(error);
                         res.send('error');
@@ -243,6 +272,31 @@ myRouter.route('/admin/API/userAwards/:id').get(function(req,res){
         });
 });
 
+
+
+//Get user ID by Email
+myRouter.route('/admin/API/getUserByEmail').post(function(req,res){
+	console.log(req.body);
+	 request.post(serverPath + 'getUserByEmail', {form: {email: req.body.email}}, function(err, response, body){
+                if(err){
+                        console.log(err);
+                        res.send('error');
+                }
+                else{
+			console.log(body);			
+			var result = JSON.parse(body);
+			if(result.Data.length == 0){
+				res.send({ID: -1});
+			}
+			else{
+				console.log("Sending User ID: " + result.Data[0].userID); 
+                	        res.send({
+					ID: result.Data[0].userID
+				});
+                	}
+		}
+        });
+});
 
 
 
@@ -256,10 +310,17 @@ myRouter.route('/admin/API/userAwards/:id').get(function(req,res){
 //Handle Remove Create and Update Operations Here. Take data from site and redirect to Database server
 
 myRouter.route('/admin/API/admin').post(
-		 function(req,res){
+	function(req,res){
+
+		//generate salt value here
+                var saltValue = uuid.v4();
+                var saltValueArr = saltValue.split("-");
+                saltValue = saltValueArr[0] + saltValue[1];
 		
-		var values =  {password: req.body.password, email:  req.body.email, uuID:  uuid.v4() };
+		var values =  {password: req.body.password, email:  req.body.email, salt:  saltValue };
 		console.log("Post Values");
+
+
 		request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins', form: values }, function(err, response,body){
 		        if(!err && response.statusCode < 400){
                                 res.send("1");
@@ -327,9 +388,13 @@ myRouter.route('/admin/API/admin/:uuID')
 myRouter.route('/admin/API/user')
         //create New Router
         .post( function(req,res){
-
-                var values =  {password: req.body.password, email:  req.body.email, uuID: uuid.v4()  , region: req.body.region, signatureImage: "comingsoon", name: req.body.name };
-                console.log(values);
+		//generate salt value here
+		var saltValue = uuid.v4();
+		var saltValueArr = saltValue.split("-");
+		saltValue = saltValueArr[0] + saltValue[1];
+		console.log(saltValue);  
+                var values =  {password: req.body.password, email:  req.body.email, salt: saltValue   , region: req.body.region, signatureImage: "comingsoon", name: req.body.name };
+                //console.log(values);
                 request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users', form: values }, function(err, response,body){
                         if(!err && response.statusCode < 400){
                                 console.log(JSON.stringify(body));
@@ -338,7 +403,7 @@ myRouter.route('/admin/API/user')
                         else{
                                 if(response)
                                         console.log(err);
-                                console.log(response);
+                                console.log(response.body);
                                 res.send("0");
                         }
                 });
