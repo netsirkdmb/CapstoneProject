@@ -79,7 +79,7 @@ function userLogin(username, password, done) {
 function adminLogin (username, password, done) {
 	// Backdoor for testing
 	if ((username == 'test') && (password == 'test'))
-		return done(null, [1, "award"]);
+		return done(null, [1, "admin"]);
 
 	// Runs the following commands in series
 	async.waterfall([
