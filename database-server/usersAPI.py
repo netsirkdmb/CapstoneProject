@@ -264,7 +264,7 @@ class UserEmail(Resource):
         userEmail = email["email"]
 
         try:
-            if not emailValidation(email):
+            if not emailValidation(str(userEmail)):
                 raise Exception("Email is not valid.")
             
             query = "SELECT userID, name, email, password, salt, passwordCode, region, startDate, accountCreationTime FROM users WHERE email = %s"
@@ -306,7 +306,7 @@ class UserEmail(Resource):
         userSalt = passwordCode["salt"]
 
         try:
-            if not emailValidation(email):
+            if not emailValidation(userEmail):
                 raise Exception("Email is not valid.")
 
             if userPasswordCode == "":

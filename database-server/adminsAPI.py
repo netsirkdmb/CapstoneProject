@@ -169,14 +169,14 @@ class AdminEmail(Resource):
     def post(self):
         email = emailParser.parse_args()
 
-        email = email["email"]
+        adminEmail = email["email"]
 
         try:
-            if not emailValidation(email):
+            if not emailValidation(adminEmail):
                 raise Exception("Email is not valid.")
             
             query = "SELECT adminID, email, password, salt, accountCreationTime FROM admins WHERE email = %s"
-            app.cursor.execute(query, email)
+            app.cursor.execute(query, adminEmail)
 
             admins = list(app.cursor.fetchall())
 
@@ -209,7 +209,7 @@ class AdminEmail(Resource):
         adminSalt = passwordCode["salt"]
 
         try:
-            if not emailValidation(email):
+            if not emailValidation(adminEmail):
                 raise Exception("Email is not valid.")
 
             if adminPasswordCode == "":
