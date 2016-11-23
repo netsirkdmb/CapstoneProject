@@ -37,6 +37,7 @@ from usersAPI import *
 from awardTypesAPI import *
 from awardsAPI import *
 from businessIntelligenceAPI import *
+from flask_mail import Mail, Message
 
 app = Flask(__name__, static_folder="upload", static_url_path="/images")
 api = Api(app)
@@ -44,10 +45,19 @@ app.mysql = MySQL()
 
 # MySQL configurations
 f = open("/api/src/MySQLPasswords.yaml")
-configDict = yaml.load(f)
-app.config.update(configDict)
+mysqlConfigDict = yaml.load(f)
+app.config.update(mysqlConfigDict)
 
 app.mysql.init_app(app)
+
+# Email configuration
+f = open("/api/src/EmailPasswords.yaml")
+emailConfigDict = yaml.load(f)
+app.config.update(emailConfigDict)
+
+# create mail object
+app.mail = Mail()
+app.mail.init_app(app)
 
 
 @app.after_request
@@ -84,7 +94,7 @@ def clearTables():
         
         # delete any remaining temporary certificate files in build and pdf folders
         build_d = os.path.join(project, "build")
-        f = "tempFile"
+        f = "certificate"
         for item in os.listdir(build_d):
             if item.startswith(f):
                 item = os.path.join(build_d, item)
