@@ -21,12 +21,14 @@ BEGIN
 -- email - a varchar with a maximum length of 255 characters, cannot be null, must be unique
 -- password - a varchar with a maximum length of 255 characters, cannot be null
 -- salt - a varchar with a maximum length of 255 characters, cannot be null, must be unique
+-- passwordCode - a varchar with a maximum length of 255 characters, default is null
 -- accountCreationTime - the datetime that this record was first created, cannot be null
 	CREATE TABLE admins (
 		adminID INT AUTO_INCREMENT,
 		email VARCHAR(255) NOT NULL UNIQUE,
 		password VARCHAR(1024) NOT NULL,
 		salt VARCHAR(32) NOT NULL UNIQUE,
+		passwordCode VARCHAR(255) DEFAULT NULL,
 		accountCreationTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		PRIMARY KEY(adminID)
 	) ENGINE=InnoDB;

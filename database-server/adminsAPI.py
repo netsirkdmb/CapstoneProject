@@ -175,7 +175,7 @@ class AdminEmail(Resource):
             if not emailValidation(adminEmail):
                 raise Exception("Email is not valid.")
             
-            query = "SELECT adminID, email, password, salt, accountCreationTime FROM admins WHERE email = %s"
+            query = "SELECT adminID, email, password, salt, passwordCode, accountCreationTime FROM admins WHERE email = %s"
             app.cursor.execute(query, adminEmail)
 
             admins = list(app.cursor.fetchall())
@@ -190,6 +190,7 @@ class AdminEmail(Resource):
                 adminInfo["email"], 
                 adminInfo["password"], 
                 adminInfo["salt"], 
+                adminInfo["passwordCode"], 
                 adminInfo["accountCreationTime"]) = admin
                 adminInfo["accountCreationTime"] = str(adminInfo["accountCreationTime"])
                 adminList.append(adminInfo)
