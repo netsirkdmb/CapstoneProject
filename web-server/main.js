@@ -55,6 +55,7 @@ app.use(function(req, res, next) {
 // ------ NON-Authenticated Routers -----
 app.use(require('./lib/base.js')); // Routers: '/'
 app.use(require('./lib/login.js')(passport)); // Login + Logout
+app.use(require('./lib/resetPassword.js')); // Reset password routers
 
 // Loads the authorization module
 app.use(require('./lib/authorization.js'));

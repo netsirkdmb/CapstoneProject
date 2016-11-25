@@ -35,12 +35,18 @@ function userLogin(username, password, done) {
 		function(callback){
 			var path = "/getUserByEmail";
 			request.post({url:(hostDB + path), form:{"email": username}}, function(err, res, body){
+				body = JSON.parse(body);
 				// An error has occurred
-				if (err) callback(true, null);
+				if ((err) || (body.Status == "Fail")) {
+					callback(true, null);
+					return;
+				}
 
 				// Email not found (or to many response)
-				body = JSON.parse(body);
-				if (body.Data.length != 1) callback(true, null);
+				if (body.Data.length != 1) {
+					callback(true, null);
+					return;
+				}
 
 				// Passes the password hash and salt to the next function
 				data = body.Data[0];
@@ -87,12 +93,18 @@ function adminLogin (username, password, done) {
 		function(callback){
 			var path = "/getAdminByEmail";
 			request.post({url:(hostDB + path), form:{"email": username}}, function(err, res, body){
+				body = JSON.parse(body);
 				// An error has occurred
-				if (err) callback(true, null);
+				if ((err) || (body.Status == "Fail")) {
+					callback(true, null);
+					return;
+				}
 
 				// Email not found (or to many response)
-				body = JSON.parse(body);
-				if (body.Data.length != 1) callback(true, null);
+				if (body.Data.length != 1) {
+					callback(true, null);
+					return;
+				}
 
 				// Passes the password hash and salt to the next function
 				data = body.Data[0];
