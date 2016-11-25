@@ -30,7 +30,7 @@ class AdminsList(Resource):
     # get a list of all of the admins in the database
     def get(self):
         try:
-            query = "SELECT adminID, email, password, salt, accountCreationTime FROM admins"
+            query = "SELECT adminID, email, password, salt, passwordCode, accountCreationTime FROM admins"
             app.cursor.execute(query)
 
             admins = list(app.cursor.fetchall())
@@ -42,6 +42,7 @@ class AdminsList(Resource):
                 adminInfo["email"], 
                 adminInfo["password"], 
                 adminInfo["salt"], 
+                adminInfo["passwordCode"], 
                 adminInfo["accountCreationTime"]) = admin
                 adminInfo["accountCreationTime"] = str(adminInfo["accountCreationTime"])
                 adminList.append(adminInfo)
@@ -95,7 +96,7 @@ class Admin(Resource):
     # get admin with matching adminID if it exists, error if admin doesn't exist
     def get(self, adminID):
         try:
-            query = "SELECT adminID, email, password, salt, accountCreationTime FROM admins WHERE adminID = %s"
+            query = "SELECT adminID, email, password, salt, passwordCode, accountCreationTime FROM admins WHERE adminID = %s"
             app.cursor.execute(query, int(adminID))
 
             admins = list(app.cursor.fetchall())
@@ -110,6 +111,7 @@ class Admin(Resource):
                 adminInfo["email"], 
                 adminInfo["password"], 
                 adminInfo["salt"], 
+                adminInfo["passwordCode"], 
                 adminInfo["accountCreationTime"]) = admin
                 adminInfo["accountCreationTime"] = str(adminInfo["accountCreationTime"])
                 adminList.append(adminInfo)

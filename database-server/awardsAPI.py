@@ -7,6 +7,8 @@
 #       http://akuederle.com/Automatization-with-Latex-and-Python-1                           #
 # - for help with defining variables in LaTeX                                                 #
 #       http://latex-community.org/forum/viewtopic.php?t=21390                                #
+# - for help with Flask-mail                                                                  #
+#       https://pythonhosted.org/Flask-Mail/                                                  #
 ###############################################################################################
 
 
@@ -19,6 +21,7 @@ import os
 import random
 import sys
 from validation import *
+from flask_mail import Mail, Message
 
 
 # parser for creating/updating awards
@@ -244,7 +247,7 @@ class CreateAward(Resource):
             pdf_d = "{0}pdf/".format(project)
             
             build_d = "{0}build/".format(project)
-            tempFile = "tempFile"
+            tempFile = "certificate"
             out_file = build_d + tempFile
 
             rnd = random.SystemRandom()
@@ -253,7 +256,7 @@ class CreateAward(Resource):
             tempFile = tempFile + randomNum
 
             ## code to do certificate with variables
-            base_file = "{0}certificate.tex".format(build_d)
+            base_file = "{0}templateCertificate.tex".format(build_d)
 
             theDay, theMonth, theYear = convertDate(awardData[0]["awardDate"])
             signature = "/api/src/upload/" + awardData[0]["giverSignatureImage"]
@@ -286,10 +289,19 @@ class CreateAward(Resource):
             shutil.copy2(out_file + ".pdf", os.path.realpath(pdf_d))
 
             emailFileName = pdf_d + tempFile + ".pdf"
+            fileName = tempFile + ".pdf"
 
+            receiverEmail = awardData[0]["receiverEmail"]
+            bodyText = "<p>Congratulations on receiving the " + awardData[0]["awardType"] + " award! Here is a copy of your award certificate!</p>"
 
-            # TODO: EMAIL CERTIFICATE TO USER!!!! ########################################################
-
+            # message to send to the recipient
+            msg = Message(subject="You have received an award for your hard work at Angama!", sender="noreply@employeerecognitionangama.co.uk", recipients=[receiverEmail], bcc=["dhusek@oregonstate.edu"], html=bodyText)
+            
+            with app.open_resource(emailFileName) as fp:
+                msg.attach(fileName, "application/pdf", fp.read())
+            
+            # send
+            app.mail.send(msg)
         
             # delete temp certificate files from build directory
             for item in os.listdir("."):
@@ -297,8 +309,11 @@ class CreateAward(Resource):
                     item = os.path.join(build_d, item)
                     os.remove(item)
             
-
-            # TODO: DELETE TEMP FILE FROM PDF DIRECTORY!!!! ########################################################
+            # delete temp certificate files from pdf directory
+            for item in os.listdir(pdf_d):
+                if item.startswith(tempFile):
+                    item = os.path.join(pdf_d, item)
+                    os.remove(item)
 
 
             return {"Status": "Success", "Data": awardData}, 200
