@@ -204,13 +204,20 @@ router.post('/login/change-password', function(req, res, next){
 				return;
 			}
 
-			// Confirms the password match and type
+			// Confirms the passwords match and type
 			if (pass1 != pass2) {
 				callback(true, null);
 				return;
 			}
 			var regexPass = /\w+/;
 			if (!regexPass.test(pass1)){
+				callback(true, null);
+				return;
+			}
+
+			// Confirms the code isn't expired
+			var timeStamp = parseInt((/-[0-9]+/).exec(code)[0].slice(1));
+			if ((new Date).getTime() - epoch - timeStamp > 24/*hr*/*60/*min*/*60/*s*/*1000/*ms*/) {
 				callback(true, null);
 				return;
 			}
