@@ -25,9 +25,9 @@ function init(passport) {
 	// Redirect function
 	var redirFunc = function(req, res){
 		// Handles Admin Logins
-		if (req.body.hasOwnProperty('admin-login')) { res.redirect(307, '/login-admin'); }
+		if (req.body.hasOwnProperty('admin-login')) { res.redirect(307, '/login/admin'); }
 		// Handles User Logins
-		else { res.redirect(307, '/login-user'); }
+		else { res.redirect(307, '/login/user'); }
 	}
 
 	// Redirects user and admin logins to correct handler
@@ -39,12 +39,12 @@ function init(passport) {
 	});
 
 	// Handles submitted user logins
-	router.post('/login-user', passport.authenticate('user-login', { failureRedirect: '/login' }), function(req, res, next){
+	router.post('/login/user', passport.authenticate('user-login', { failureRedirect: '/login' }), function(req, res, next){
 		res.redirect('/award/give-award');
 	});
 
 	// Handles submitted admin logins
-	router.post('/login-admin', passport.authenticate('admin-login', { failureRedirect: '/login' }), function(req, res, next){
+	router.post('/login/admin', passport.authenticate('admin-login', { failureRedirect: '/login' }), function(req, res, next){
 		res.redirect('/admin/users');
 	});
 
@@ -55,26 +55,6 @@ function init(passport) {
 /****************************************
 ************ Login Routers **************
 ****************************************/
-// Main login page
-router.get('/login',function(req, res, next){
-  res.render('login');
-});
-
-// Reset Password Page
-router.get('/login/reset-password', function(req, res, next){
-  res.render('login/get-reset-code');
-});
-
-// Handles reset password attemps
-router.post('/login/reset-password', function(req, res, next){
-  mainResetPassword(req, res, next);
-});
-
-// Change password website
-router.post('/login/change-password', function(req, res, next){
-  res.render('login/change-password');
-});
-
 // Logouts the user
 router.get('/logout', function(req, res, next){
 	req.session.destroy(function(err){

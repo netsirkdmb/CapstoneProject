@@ -44,6 +44,9 @@ app.use(bodyParser.json({limit:'50mb'}));
 /**************************************
 **    START OF WEBSITE HANDLERS      **
 **************************************/
+// Loads the authorization module
+app.use(require('./lib/authorization.js'));
+
 // URI Clean-up: Removes trailing slash
 app.use(function(req, res, next) {
    if(req.url.substr(-1) == '/' && req.url.length > 1)
@@ -52,15 +55,10 @@ app.use(function(req, res, next) {
        next();
 });
 
-// ------ NON-Authenticated Routers -----
+// -------- Authenticated Routers -------
 app.use(require('./lib/base.js')); // Routers: '/'
 app.use(require('./lib/login.js')(passport)); // Login + Logout
 app.use(require('./lib/resetPassword.js')); // Reset password routers
-
-// Loads the authorization module
-app.use(require('./lib/authorization.js'));
-
-// -------- Authenticated Routers -------
 var adminRouter = require('./lib/admin.js');
 app.use(adminRouter);
 var awardRouter = require('./lib/award.js');
