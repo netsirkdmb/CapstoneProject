@@ -10,6 +10,7 @@ from flask_restful import Resource, reqparse, inputs
 import traceback
 import os
 from werkzeug.utils import secure_filename
+from validation import *
 
 # parser for creating users
 userAccountParser = reqparse.RequestParser(bundle_errors=True)
@@ -48,6 +49,9 @@ def uploadSignatureImage(request, userID):
     app.cursor.execute(stmt, (signatureImage, userID))
 
     app.conn.commit()
+
+    if app.cursor.rowcount == 0:
+        raise Exception("User cannot be updated because it does not exist in the database.")
 
     filePath = "/api/src/upload/" + signatureImage
 
@@ -110,6 +114,9 @@ class UsersList(Resource):
         userStartDate = user["startDate"]
 
         try:
+            if not emailValidation(userEmail):
+                raise Exception("Email is not valid.")
+            
             stmt = "INSERT INTO users (name, email, password, salt, region, startDate) VALUES (%s, %s, %s, %s, %s, %s)"
             app.cursor.execute(stmt, (userName, userEmail, userPassword, userSalt, userRegion, userStartDate))
 
@@ -153,13 +160,16 @@ class UsersList(Resource):
 
 
 class User(Resource):
-    # get user with matching userID if it exists
+    # get user with matching userID if it exists, error if the user does not exist
     def get(self, userID):
         try:
             query = "SELECT userID, name, email, password, salt, passwordCode, signatureImage, region, startDate, accountCreationTime FROM users WHERE userID = %s"
             app.cursor.execute(query, int(userID))
 
             users = list(app.cursor.fetchall())
+
+            if app.cursor.rowcount == 0:
+                raise Exception("User does not exist in the database.") 
 
             userData = []
             for user in users:
@@ -200,10 +210,16 @@ class User(Resource):
         userStartDate = user["startDate"]
 
         try:
+            if not emailValidation(userEmail):
+                raise Exception("Email is not valid.")
+
             stmt = "UPDATE users SET name = %s, email = %s, password = %s, salt = %s, region = %s, startDate = %s WHERE userID = %s"
             app.cursor.execute(stmt, (userName, userEmail, userPassword, userSalt, userRegion, userStartDate, userID))
             
             app.conn.commit()
+
+            if app.cursor.rowcount == 0:
+                raise Exception("User cannot be updated because it does not exist in the database.") 
             
             if "image" in request.files:
                 imageMessage = uploadSignatureImage(request, userID)
@@ -215,14 +231,14 @@ class User(Resource):
         except Exception:
             return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
-    # delete a user from the database, errors if the user does not exist in the database
+    # delete a user from the database, database is not changed if the user does not exist in the database
     def delete(self, userID):
         try:
             stmt = "DELETE FROM users WHERE userID = %s"
             app.cursor.execute(stmt, userID)
 
             app.conn.commit()
-
+            
             message = str(userID) + " has now been deleted from users table."
 
             # delete user's image from upload folder
@@ -248,10 +264,16 @@ class UserEmail(Resource):
         userEmail = email["email"]
 
         try:
+            if not emailValidation(str(userEmail)):
+                raise Exception("Email is not valid.")
+            
             query = "SELECT userID, name, email, password, salt, passwordCode, region, startDate, accountCreationTime FROM users WHERE email = %s"
             app.cursor.execute(query, userEmail)
 
             users = list(app.cursor.fetchall())
+
+            if app.cursor.rowcount == 0:
+                raise Exception("User does not exist in the database.")
 
             userData = []
             for user in users:
@@ -284,6 +306,9 @@ class UserEmail(Resource):
         userSalt = passwordCode["salt"]
 
         try:
+            if not emailValidation(userEmail):
+                raise Exception("Email is not valid.")
+
             if userPasswordCode == "":
                 stmt = "UPDATE users SET passwordCode = NULL, salt = %s WHERE email = %s"
                 app.cursor.execute(stmt, (userSalt, userEmail))
@@ -292,6 +317,9 @@ class UserEmail(Resource):
                 app.cursor.execute(stmt, (userPasswordCode, userSalt, userEmail))
 
             app.conn.commit()
+
+            if app.cursor.rowcount == 0:
+                raise Exception("User cannot be updated because it does not exist in the database.")
 
             return {"Status": "Success", "Data": [{"email": userEmail, "passwordCode": userPasswordCode, "salt": userSalt}]}, 200
         

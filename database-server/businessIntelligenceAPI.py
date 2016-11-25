@@ -125,6 +125,9 @@ class EmployeeRank(Resource):
 
             rows = list(app.cursor.fetchall())
 
+            if app.cursor.rowcount == 0:
+                raise Exception("User does not exist in the database.") 
+
             rowList = []
             for row in rows:
                 rowInfo = {}
@@ -210,6 +213,9 @@ class EmployeePrestigePoints(Resource):
 
             rows = list(app.cursor.fetchall())
 
+            if app.cursor.rowcount == 0:
+                raise Exception("User does not exist in the database.")
+
             rowList = []
             for row in rows:
                 rowInfo = {}
@@ -243,6 +249,9 @@ class EmployeeAwardTypes(Resource):
 
             rows = list(app.cursor.fetchall())
 
+            if app.cursor.rowcount == 0:
+                raise Exception("User does not exist in the database.")
+
             rowList = []
             for row in rows:
                 rowInfo = {}
@@ -275,6 +284,9 @@ class AwardUserReceived(Resource):
             app.cursor.execute(query, int(userID))
 
             awards = list(app.cursor.fetchall())
+
+            if app.cursor.rowcount == 0:
+                raise Exception("User does not exist in the database.")
 
             awardData = []
             for award in awards:
@@ -328,6 +340,9 @@ class AwardUserGivenFreq(Resource):
 
             rows = list(app.cursor.fetchall())
 
+            if app.cursor.rowcount == 0:
+                raise Exception("User does not exist in the database.")
+
             rowList = []
             for row in rows:
                 rowInfo = {}
@@ -355,6 +370,9 @@ class AwardUserGivenTypes(Resource):
             app.cursor.execute(query, int(userID))
 
             rows = list(app.cursor.fetchall())
+
+            if app.cursor.rowcount == 0:
+                raise Exception("User does not exist in the database.")
 
             rowList = []
             for row in rows:
@@ -567,6 +585,9 @@ class AwardUser(Resource):
 
             awards = list(app.cursor.fetchall())
 
+            if app.cursor.rowcount == 0:
+                raise Exception("User does not exist in the database.")
+
             awardData = []
             for award in awards:
                 awardInfo = {}
@@ -594,7 +615,7 @@ class AwardUser(Resource):
     def put(self, userID):
         return {"Status": "Fail", "Message": "You are not allowed to do a bulk update of all the awards that the user has given."}, 400
 
-    # delete a award from the database, errors if the award does not exist in the database
+    # delete awards given by userID from the database, database is not changed if the user does not exist in the database
     def delete(self, userID):
         try:
             stmt = "DELETE FROM awards WHERE giverID = %s"

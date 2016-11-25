@@ -8,6 +8,7 @@
 from flask import Flask, request, current_app as app
 from flask_restful import Resource, reqparse, inputs
 import traceback
+from validation import *
 
 # parser for creating admins
 adminAccountParser = reqparse.RequestParser(bundle_errors=True)
@@ -59,6 +60,9 @@ class AdminsList(Resource):
         adminSalt = admin["salt"]
 
         try:
+            if not emailValidation(adminEmail):
+                raise Exception("Email is not valid.")
+            
             stmt = "INSERT INTO admins (email, password, salt) VALUES (%s, %s, %s)"
             app.cursor.execute(stmt, (adminEmail, adminPassword, adminSalt))
 
@@ -88,13 +92,16 @@ class AdminsList(Resource):
 
 
 class Admin(Resource):
-    # get admin with matching adminID if it exists
+    # get admin with matching adminID if it exists, error if admin doesn't exist
     def get(self, adminID):
         try:
             query = "SELECT adminID, email, password, salt, accountCreationTime FROM admins WHERE adminID = %s"
             app.cursor.execute(query, int(adminID))
 
             admins = list(app.cursor.fetchall())
+
+            if app.cursor.rowcount == 0:
+                raise Exception("Admin does not exist in the database.") 
 
             adminList = []
             for admin in admins:
@@ -125,17 +132,23 @@ class Admin(Resource):
         adminSalt = admin["salt"]
 
         try:
+            if not emailValidation(adminEmail):
+                raise Exception("Email is not valid.")
+            
             stmt = "UPDATE admins SET email = %s, password = %s, salt = %s WHERE adminID = %s"
             app.cursor.execute(stmt, (adminEmail, adminPassword, adminSalt, adminID))
-
+            
             app.conn.commit()
+            
+            if app.cursor.rowcount == 0:
+                raise Exception("Admin cannot be updated because it does not exist in the database.")         
 
             return {"Status": "Success", "Data": [{"email": adminEmail, "password": adminPassword, "salt": adminSalt}]}, 200
         
         except Exception:
             return {"Status": "Fail", "Error": traceback.format_exc()}, 400
 
-    # delete an admin from the database, errors if the admin does not exist in the database
+    # delete an admin from the database, database is not changed if admin doesn't exist
     def delete(self, adminID):
         try:
             stmt = "DELETE FROM admins WHERE adminID = %s"
@@ -156,14 +169,20 @@ class AdminEmail(Resource):
     def post(self):
         email = emailParser.parse_args()
 
-        email = email["email"]
+        adminEmail = email["email"]
 
         try:
+            if not emailValidation(adminEmail):
+                raise Exception("Email is not valid.")
+            
             query = "SELECT adminID, email, password, salt, accountCreationTime FROM admins WHERE email = %s"
-            app.cursor.execute(query, email)
+            app.cursor.execute(query, adminEmail)
 
             admins = list(app.cursor.fetchall())
 
+            if app.cursor.rowcount == 0:
+                raise Exception("Admin does not exist in the database.")
+            
             adminList = []
             for admin in admins:
                 adminInfo = {}
@@ -190,6 +209,9 @@ class AdminEmail(Resource):
         adminSalt = passwordCode["salt"]
 
         try:
+            if not emailValidation(adminEmail):
+                raise Exception("Email is not valid.")
+
             if adminPasswordCode == "":
                 stmt = "UPDATE admins SET passwordCode = NULL, salt = %s WHERE email = %s"
                 app.cursor.execute(stmt, (adminSalt, adminEmail))
@@ -199,6 +221,9 @@ class AdminEmail(Resource):
 
             app.conn.commit()
 
+            if app.cursor.rowcount == 0:
+                raise Exception("Admin does not exist in the database.")
+            
             return {"Status": "Success", "Data": [{"email": adminEmail, "passwordCode": adminPasswordCode, "salt": adminSalt}]}, 200
         
         except Exception:
