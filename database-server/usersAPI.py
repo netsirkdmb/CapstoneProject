@@ -76,7 +76,7 @@ class UsersList(Resource):
     # get a list of all of the users in the database
     def get(self):
         try:
-            query = "SELECT userID, name, email, password, salt, passwordCode, region, startDate, accountCreationTime FROM users"
+            query = "SELECT userID, name, email, password, salt, passwordCode, signatureImage, region, startDate, accountCreationTime FROM users"
             app.cursor.execute(query)
 
             users = list(app.cursor.fetchall())
@@ -90,9 +90,11 @@ class UsersList(Resource):
                 userInfo["password"], 
                 userInfo["salt"], 
                 userInfo["passwordCode"], 
+                userInfo["signatureImage"], 
                 userInfo["region"], 
                 userInfo["startDate"], 
                 userInfo["accountCreationTime"]) = user
+                userInfo["signatureImage"] = "/images/" + userInfo["signatureImage"]
                 userInfo["startDate"] = str(userInfo["startDate"])
                 userInfo["accountCreationTime"] = str(userInfo["accountCreationTime"])
                 userData.append(userInfo)
