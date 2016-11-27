@@ -39,6 +39,11 @@ def uploadSignatureImage(request, userID):
 
     if image.filename == "":
         raise Exception("Image must have a filename.")
+
+    stmt = "UPDATE users SET signatureImage = NULL WHERE userID = %s"
+    app.cursor.execute(stmt, int(userID))
+
+    app.conn.commit()
     
     filename = secure_filename(image.filename)
     base, f_extension = os.path.splitext(filename)
@@ -46,7 +51,7 @@ def uploadSignatureImage(request, userID):
     signatureImage = str(userID) + f_extension
 
     stmt = "UPDATE users SET signatureImage = %s WHERE userID = %s"
-    app.cursor.execute(stmt, (signatureImage, userID))
+    app.cursor.execute(stmt, (signatureImage, int(userID)))
 
     app.conn.commit()
 
@@ -220,7 +225,7 @@ class User(Resource):
             
             app.conn.commit()
 
-            if app.cursor.rowcount == 0:
+            if app.cursor.rowcount == 0 and "image" not in request.files:
                 raise Exception("User cannot be updated because it does not exist in the database.") 
             
             if "image" in request.files:
