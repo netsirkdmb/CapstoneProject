@@ -133,12 +133,15 @@ class Admin(Resource):
         adminPassword = admin["password"]
         adminSalt = admin["salt"]
 
+        passwordCode = passwordCodeParser.parse_args()
+        adminPasswordCode = passwordCode["passwordCode"]
+
         try:
             if not emailValidation(adminEmail):
                 raise Exception("Email is not valid.")
             
-            stmt = "UPDATE admins SET email = %s, password = %s, salt = %s WHERE adminID = %s"
-            app.cursor.execute(stmt, (adminEmail, adminPassword, adminSalt, adminID))
+            stmt = "UPDATE admins SET email = %s, password = %s, salt = %s, passwordCode = %s WHERE adminID = %s"
+            app.cursor.execute(stmt, (adminEmail, adminPassword, adminSalt, adminPasswordCode, adminID))
             
             app.conn.commit()
             
