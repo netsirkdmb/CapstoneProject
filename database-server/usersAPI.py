@@ -68,6 +68,7 @@ def uploadSignatureImage(request, userID):
 
 
 class SignatureImage(Resource):
+    # upload a user's signature image by id
     def post(self, userID):
         try:
             result = uploadSignatureImage(request, userID)
@@ -216,12 +217,15 @@ class User(Resource):
         userRegion = user["region"]
         userStartDate = user["startDate"]
 
+        passwordCode = passwordCodeParser.parse_args()
+        userPasswordCode = passwordCode["passwordCode"]
+
         try:
             if not emailValidation(userEmail):
                 raise Exception("Email is not valid.")
 
-            stmt = "UPDATE users SET name = %s, email = %s, password = %s, salt = %s, region = %s, startDate = %s WHERE userID = %s"
-            app.cursor.execute(stmt, (userName, userEmail, userPassword, userSalt, userRegion, userStartDate, userID))
+            stmt = "UPDATE users SET name = %s, email = %s, password = %s, salt = %s, passwordCode = %s, region = %s, startDate = %s WHERE userID = %s"
+            app.cursor.execute(stmt, (userName, userEmail, userPassword, userSalt, userPasswordCode, userRegion, userStartDate, userID))
             
             app.conn.commit()
 

@@ -37,7 +37,7 @@ https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com
 
 **Awards Table:** [/awards](https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com/awards)
 - get: returns all awards in the database
-- post: creates a new award in the database
+- post: creates a new award in the database and emails PDF to recipient
 - put: invalid
 - delete: deletes all awards in the database
 
@@ -45,7 +45,7 @@ https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com
 **Awards Table by awardID:** [/awards/1234](https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com/awards/1)
 - get: returns award with specified id _(specified id is represented by "1234")_
 - post: invalid
-- put: updates award with specified id
+- put: updates award with specified id and emails updated PDF to recipient
 - delete: deletes award with specified id
 
 
