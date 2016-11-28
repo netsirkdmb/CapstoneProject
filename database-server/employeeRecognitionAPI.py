@@ -22,6 +22,8 @@
 #       http://stackoverflow.com/questions/24118393/mysql-rank-with-ties                      #
 # - for help copying files from one directory to another                                      #
 #       http://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-pyth
+# - for help running Apache with https                                                        #
+#       http://superuser.com/questions/915356/proper-apache-redirection-from-http-to-https    #
 ###############################################################################################
 
 
@@ -165,7 +167,7 @@ api.add_resource(Award, '/awards/<int:awardID>')
 api.add_resource(AwardUser, '/userAwards/<int:userID>')
 api.add_resource(ResetTables, '/resetTables')
 api.add_resource(AddDummyData, '/resetTablesWithDummyData')
-api.add_resource(CreateAward, '/getAwardCreationInfo/<int:awardID>')
+api.add_resource(CreateAward, '/createAwardPDF/<int:awardID>')
 api.add_resource(UserEmail, '/getUserByEmail')
 api.add_resource(AdminEmail, '/getAdminByEmail')
 api.add_resource(TopEmployees, '/getTopEmployees')
