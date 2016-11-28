@@ -6,9 +6,13 @@
 		<div class="form-group">
 			<label for="email">Recipient Email:</label>
 			<select class="form-control" id="receipientID" data-toggle="popover" data-placement="left" data-content="Required">
-				<option disabled="" selected="">Please Select A Receipient</option>
+				<option disabled="" selected="">Please Select A Recipient</option>
 				{{#each userList}}
-					<option value="{{this.userID}}">{{this.email}}</option>
+					<option value="{{this.userID}}">
+						{{this.email}};
+						&nbsp;&nbsp;&nbsp;
+						&lt;{{this.name}}&gt;
+					</option>
 				{{/each}}
 			</select>
 		</div>
@@ -37,5 +41,5 @@
 <link rel="stylesheet" type="text/css" href="../public/awards.css">
 <script type="text/javascript" src="../public/addAward.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css" />
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script> 
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
