@@ -1,48 +1,55 @@
 // Required Files
-var aws = require("aws-sdk");
-var ses = new aws.SES({"region":'us-west-2'});
 var router = require("express").Router();
 var request = require('request');
 var async = require('async');
 var crypto = require('crypto');
-var hostDB = "http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600";
+var cryptoHash = require('./cryptoHash.js');
+var hostDB = "https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com";
+var fs = require('fs');
+var aws = require("aws-sdk");
+var ses = new aws.SES({"region":'us-west-2'});
+var epoch = 1480052740669;
 
 // Message to be sent
-var params = {
-  Destination: { /* required */
-    ToAddresses: [
-      'william.mccumstie@gmail.com'
-    ]
-  },
-  Message: { /* required */
-    Body: { /* required */
-      Text: {
-        Data: 'This is the body', /* required */
-        Charset: 'utf-8'
-      }
-    },
-    Subject: { /* required */
-      Data: 'This is the Subject', /* required */
-      Charset: 'utf-8'
-    }
-  },
-  Source: 'noreply@employeerecognitionangama.co.uk', /* required */
-  Tags: [
-    {
-      Name: 'unknown_key', /* required */
-      Value: 'unknown_value' /* required */
-    },
-    /* more items */
-  ]
-};
-/*
-ses.sendEmail(params, function(err, data){
-	console.log(ses);
-	console.log("err = "+err);
-	console.log("data = "+JSON.stringify(data));
-});
-*/
+var Email = {
+	// Email object
+	params: {
+	  Destination: { /* required */
+	    ToAddresses: []
+	  },
+	  Message: { /* required */
+	    Body: { /* required */
+	      Text: {
+	        Data: "", /* required */
+	        Charset: 'utf-8'
+	      }
+	    },
+	    Subject: { /* required */
+	      Data: 'Reset Password', /* required */
+	      Charset: 'utf-8'
+	    }
+	  },
+	  Source: 'noreply@employeerecognitionangama.co.uk'
+	},
 
+	body: function(name, passwordCode) {
+		var body = "Dear " + name + ',\n\n';
+		body += "Please follow the link provided in order to reset your password. "
+		body += "The password code provided will be valid for up to 24hrs.\n\n"
+		body += "Link: https://www.employeerecognitionangama.co.uk/login/change-password\n";
+		body += "Password Code: " + passwordCode + "\n\n";
+		body += "Regards,\n";
+		body += "Employee Recognition Team\n";
+		return body;
+	},
+
+	// Sends the message
+	sendEmail: function(email, name, passwordCode, callback) {
+		this.params.Destination.ToAddresses.push(email);
+		this.params.Message.Body.Text.Data = this.body(name, passwordCode);
+		ses.sendEmail(this.params, callback);
+	}
+}
 
 /*****************************************
 ** Func: validateEmail()
@@ -60,28 +67,28 @@ function validateEmail(mail) {
 ** Router: get-reset-code
 ** Desc: Generates the reset password code
 *****************************************/
-router.post('/get-reset-code', function(req, res, next){
+router.post('/login/get-reset-code', function(req, res, next){
 	// Extracts the data
 	var isAdmin = (req.body.admin == "admin");
 	var email = req.body.email;
 	
 	// Validates the email
 	if (!validateEmail(email)) {
-		res.render('login/get-reset-code', {isInValid: true});
+		res.render('login/reset-password', {isInValid: true});
 		return;
 	}
+
+	// Sets the path for db request (user or admin)
+	var path;
+	if (!isAdmin)
+		path = "/getUserByEmail";
+	else
+		path = "/getAdminByEmail";
 
 	// Runs to following commands in series
 	async.waterfall([
 		// Pulls the current user data
 		function(callback){
-			var path;
-			// Sets the path for db request (user or admin)
-			if (!isAdmin)
-				path = "/getUserByEmail";
-			else
-				path = "/getAdminByEmail";
-
 			// Gets the user data
 			request.post({url: (hostDB + path), form: {"email": email}}, function(err, resDB, body){
 				// An error has occurred
@@ -103,23 +110,22 @@ router.post('/get-reset-code', function(req, res, next){
 
 		// Generates the reset password code
 		function(userData, callback) {
-			// TODO: CAN'T UPDATED admin password - no code provided
-			if (isAdmin) {
-				next("ERROR: No password code returned for admin");
-				return;
-			}
-
 			// Extracts the ID
-			var id;
+			var id, codeID;
 			if (!isAdmin) {
-				id = "u" + userData.userID;
+				id = userData.userID;
+				codeID = "u" + id;
+			}
+			else {
+				id = userData.adminID;
+				codeID = "a" + id;
 			}
 
 			// Gets the current time stamp (ms from epoch)
-			var timeStamp = (new Date).getTime();
+			var timeStamp = (new Date).getTime() - epoch;
 
 			// Randomly generated key
-			require('crypto').randomBytes(128, function(err, buffer) {
+			require('crypto').randomBytes(32, function(err, buffer) {
 				// An error has occurred
 				if (err) callback(true, null);
 
@@ -128,16 +134,185 @@ router.post('/get-reset-code', function(req, res, next){
 					var key = buffer.toString('hex');
 					
 					// Creates the code and passes the data on
-					userData.passwordCode = key + "-" + timeStamp + "-" + id;
-					callback(false, userData);		
+					userData.passwordCode = key + "-" + timeStamp + "-" + codeID;
+					callback(false, userData, id);		
 				}
+			});
+		},
+
+		// Updates the database with the new password code
+		function(userData, id, callback) {
+			// Makes the request
+			request.put({url: hostDB + path, form: userData}, function(err, resDB){
+				body = JSON.parse(resDB.body);
+				// An error
+				if (err) callback(true, null);
+
+				// Rejects failed adds
+				if (body.Status != "Success") callback(true, null);
+
+				// Pass user data to the next function
+				else callback(null, userData);
+			});
+		},
+
+		// Emails the code out
+		function(userData, callback){
+			// Updates admin names
+			if (isAdmin)
+				userData.name = userData.email;
+
+			// Emails the code
+			Email.sendEmail(userData.email, userData.name, userData.passwordCode, function(err, data){
+				callback(null, null);
 			});
 		}
 	
 	// Callback - renders the page
 	], function(err, result){
-		res.render('login/get-reset-code', {sentEmail: true});
+		res.render('login/reset-password', {sentEmail: true});
 	});
+});
+
+
+/*****************************************
+** Router: reset-password
+** Desc: Processes the reset password form
+*****************************************/
+router.post('/login/change-password', function(req, res, next){
+	// Extracts the data
+	var code = req.body.code;
+	var pass1 = req.body.newpass1;
+	var pass2 = req.body.newpass2;
+	var isAdmin = null;
+	var id;
+	var pathID;
+
+	// Runs the following in series
+	async.waterfall([
+		// Validates the inputs and confirms the code matches
+		function(callback){
+			// Confirms data was extracted properly
+			if ((code == undefined) || (pass1 == undefined) || (pass2 == undefined)) {
+				callback(true, null);
+				return;
+			}
+
+			// Confirms the code is in the correct format
+			var regexCode = /\w+-[0-9]+-(a|u)[0-9]+\0/;
+			if (!regexCode.test(code + '\0')) {
+				callback(true, null);
+				return;
+			}
+
+			// Confirms the passwords match and type
+			if (pass1 != pass2) {
+				callback(true, null);
+				return;
+			}
+			var regexPass = /\w+/;
+			if (!regexPass.test(pass1)){
+				callback(true, null);
+				return;
+			}
+
+			// Confirms the code isn't expired
+			var timeStamp = parseInt((/-[0-9]+/).exec(code)[0].slice(1));
+			if ((new Date).getTime() - epoch - timeStamp > 24/*hr*/*60/*min*/*60/*s*/*1000/*ms*/) {
+				callback(true, null);
+				return;
+			}
+
+			// Extracts the user type from the code
+			var regexAdmin = /-a[0-9]+/;
+			var regexUser = /-u[0-9]+/;
+			if (regexAdmin.test(code)) isAdmin = true;
+			else isAdmin = false;
+
+			// Extracts the id and sets the path variables
+			if (isAdmin) {
+				id = regexAdmin.exec(code)[0].slice(2);
+				pathID = "/admins/" + id;
+			}
+			else {
+				id = regexUser.exec(code)[0].slice(2);
+				pathID = "/users/" + id;
+			}
+
+			// Confirms the code matches the one in the database
+			request.get(hostDB + pathID, function(err, resDB){
+				// An error has occurred
+				if (err) {
+					callback(true, null);
+					return;
+				}
+
+				// Confirms the status
+				body = JSON.parse(resDB.body);
+				if (body.Status != "Success")
+					callback(true, null);
+
+				// Confirms the code matches
+				else if (code === body.Data[0].passwordCode)
+					callback(null, body.Data[0]);
+
+				// Doesn't match, error
+				else 
+					callback(true, null);
+			});
+		},
+
+		// Generates a new salt and hashes the password
+		function(userData, callback) {
+			userDataCopy = JSON.parse(JSON.stringify(userData));
+			// Updates the salt and the password code
+			userData.salt = cryptoHash.getRandomSalt();
+			userData.passwordCode = "";
+			
+			// Hashes the password
+			cryptoHash.hash(userData.salt, pass1, function(err, hash) {
+				// An error has occurred
+				if (err) 
+					callback(true, null);
+
+				// Else update the hash
+				else {
+					userData.password = hash;
+					callback(null, userData);
+				}
+			});
+		},
+
+		// Updates the database
+		function(userData, callback) {
+			request.put({url: hostDB + pathID, form: userData}, function(err, resDB) {
+				// An error has occurred
+				if (err) {
+					callback(true, null);
+					return;
+				}
+					
+				// Data was updated correctly
+				var body = JSON.parse(resDB.body);
+				if (body.Status == "Success")
+					callback(null, null);
+
+				// An error has occurred
+				else {
+					console.log(body);
+					callback(true, null);
+				}
+			});
+		}
+
+	// Callback function
+	], function(err, result){
+		// An error occurred, password not reset
+		if (err) res.render('login/change-password', {failed: true});
+
+		// Else added correctly
+		else res.render('login/change-password', {success: true});
+	})
 });
 
 
