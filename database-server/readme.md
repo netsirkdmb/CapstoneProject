@@ -92,7 +92,7 @@ https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com
 - get: returns the overall employee ranking based on awards received all-Time
 
 
-**Most Generous Employees:** [/getGenerousEmployees]https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com/getGenerousEmployees)
+**Most Generous Employees:** [/getGenerousEmployees](https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com/getGenerousEmployees)
 - get: returns the top 5 most generous employees for each month of the previous year as well as the top 5 employees overall for the past year
 
 
