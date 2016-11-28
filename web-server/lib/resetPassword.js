@@ -3,7 +3,8 @@ var router = require("express").Router();
 var request = require('request');
 var async = require('async');
 var crypto = require('crypto');
-var hostDB = "http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600";
+var cryptoHash = require('./cryptoHash.js');
+var hostDB = "https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com";
 var fs = require('fs');
 var aws = require("aws-sdk");
 var ses = new aws.SES({"region":'us-west-2'});
@@ -73,7 +74,7 @@ router.post('/login/get-reset-code', function(req, res, next){
 	
 	// Validates the email
 	if (!validateEmail(email)) {
-		res.render('login/get-reset-code', {isInValid: true});
+		res.render('login/reset-password', {isInValid: true});
 		return;
 	}
 
@@ -169,7 +170,7 @@ router.post('/login/get-reset-code', function(req, res, next){
 	
 	// Callback - renders the page
 	], function(err, result){
-		res.render('login/get-reset-code', {sentEmail: true});
+		res.render('login/reset-password', {sentEmail: true});
 	});
 });
 
@@ -185,7 +186,7 @@ router.post('/login/change-password', function(req, res, next){
 	var pass2 = req.body.newpass2;
 	var isAdmin = null;
 	var id;
-	var pathEmail, pathID;
+	var pathID;
 
 	// Runs the following in series
 	async.waterfall([
@@ -231,33 +232,76 @@ router.post('/login/change-password', function(req, res, next){
 			// Extracts the id and sets the path variables
 			if (isAdmin) {
 				id = regexAdmin.exec(code)[0].slice(2);
-				pathEmail = "/getAdminByEmail";
 				pathID = "/admins/" + id;
 			}
 			else {
 				id = regexUser.exec(code)[0].slice(2);
-				pathEmail = "/getUserByEmail";
 				pathID = "/users/" + id;
 			}
 
 			// Confirms the code matches the one in the database
 			request.get(hostDB + pathID, function(err, resDB){
-				// Converts the body to JSON
-				if (resDB.body != undefined)
-					var body = JSON.parse(resDB.body);
-				else {
+				// An error has occurred
+				if (err) {
 					callback(true, null);
 					return;
 				}
-			
-				// An error has occurred
-				if (err) callback(true, null);
 
 				// Confirms the status
-				else if (body.Status != "Success")
+				body = JSON.parse(resDB.body);
+				if (body.Status != "Success")
 					callback(true, null);
 
-				// Confirms the co
+				// Confirms the code matches
+				else if (code === body.Data[0].passwordCode)
+					callback(null, body.Data[0]);
+
+				// Doesn't match, error
+				else 
+					callback(true, null);
+			});
+		},
+
+		// Generates a new salt and hashes the password
+		function(userData, callback) {
+			userDataCopy = JSON.parse(JSON.stringify(userData));
+			// Updates the salt and the password code
+			userData.salt = cryptoHash.getRandomSalt();
+			userData.passwordCode = "";
+			
+			// Hashes the password
+			cryptoHash.hash(userData.salt, pass1, function(err, hash) {
+				// An error has occurred
+				if (err) 
+					callback(true, null);
+
+				// Else update the hash
+				else {
+					userData.password = hash;
+					callback(null, userData);
+				}
+			});
+		},
+
+		// Updates the database
+		function(userData, callback) {
+			request.put({url: hostDB + pathID, form: userData}, function(err, resDB) {
+				// An error has occurred
+				if (err) {
+					callback(true, null);
+					return;
+				}
+					
+				// Data was updated correctly
+				var body = JSON.parse(resDB.body);
+				if (body.Status == "Success")
+					callback(null, null);
+
+				// An error has occurred
+				else {
+					console.log(body);
+					callback(true, null);
+				}
 			});
 		}
 

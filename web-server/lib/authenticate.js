@@ -2,7 +2,7 @@
 var passport = require('passport');
 var localStrategy = require('passport-local').Strategy;
 var request = require('request');
-var hostDB = "http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600";
+var hostDB = "https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com";
 var async = require('async');
 var cryptoHash = require('./cryptoHash.js');
 
@@ -35,14 +35,15 @@ function userLogin(username, password, done) {
 		function(callback){
 			var path = "/getUserByEmail";
 			request.post({url:(hostDB + path), form:{"email": username}}, function(err, res, body){
-				body = JSON.parse(body);
 				// An error has occurred
 				if ((err) || (body.Status == "Fail")) {
+					console.log(err);
 					callback(true, null);
 					return;
 				}
 
 				// Email not found (or to many response)
+				body = JSON.parse(body);
 				if (body.Data.length != 1) {
 					callback(true, null);
 					return;

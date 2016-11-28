@@ -4,7 +4,7 @@ var request = require('request');
 var async = require('async');
 var moment = require('moment');
 var internalError = "An internal error has occured";
-var hostDB = "http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600";
+var hostDB = "https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com";
 
 /*******************************************
 ** Func: dateSortFunc

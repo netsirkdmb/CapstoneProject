@@ -40,6 +40,9 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false, limit:'50mb' }));
 app.use(bodyParser.json({limit:'50mb'}));
 
+// Allows self signed cert for requests
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+
 // ------ END MODULE SETUP -----------
 /**************************************
 **    START OF WEBSITE HANDLERS      **

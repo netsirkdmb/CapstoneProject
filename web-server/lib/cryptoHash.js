@@ -6,7 +6,6 @@
 // Required files
 const crypto = require('crypto');
 const async = require('async');
-const request = require('request');
 
 // Base cryptographic set-up parameters
 var iterations = 10000;
