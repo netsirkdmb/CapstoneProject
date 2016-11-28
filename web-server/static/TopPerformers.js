@@ -34,46 +34,33 @@ $(document).ready(function(){
 		var chartData = [
 				['Name', 'Points', 'Month']
 		];
+		console.log(annualData.Results);
 		for (var entry in annualData.Results){
 
 			for(var point in annualData.Results[entry]){
+	
 				var newEntry = [];
 				if( annualData.Results[entry][point].name != undefined){
+					console.log(entry);
+
 					newEntry.push(annualData.Results[entry][point].name);
 					newEntry.push(annualData.Results[entry][point].points);
 					if(entry == 'Year')
-
 						newEntry.push(0);
-					else
-						if (point <10)
-							newEntry.push(parseInt(entry.substring(0,1)));
-						else
-							 newEntry.push(parseInt(entry.substring(0,2)))				
+					else{
+
+						var month = entry.split('-');
+						console.log(month[0]);							
+						newEntry.push(month[0]);						
+					}
 					chartData.push(newEntry);
 				}
 			}		
 		}
-
+		console.log(chartData);
 		//create data table
 		 var data = new google.visualization.arrayToDataTable(
 			chartData			
-/*
-[
-			
-                	['Name', 'Points', 'Month', {role: 'style'}],
-                        ['Mike', 500, 1, 'gold'],
-                        ['Jim', 400, 1, 'silver'],
-                        ['Alice', 300, 1, 'orange'],
-                        ['Bob', 200, 1 ,  'black'],
-                        ['Mike', 800,2, 'gold'],
-                        ['Jim', 500, 2, 'silver'],
-                        ['Alice', 400, 2, 'orange'],
-                        ['Bob', 250, 2 ,  'black']
-
-
-                        ]
-*/
-
 		);
 
 		//create a control  wrapper for data
@@ -83,9 +70,13 @@ $(document).ready(function(){
 			'containerId': 'filter_div',
 			'options': {
 				'filterColumnLabel': 'Month',
-				'ui': {'allowMultiple': false}
-			}
-
+				'ui': {
+					'allowMultiple': false,
+					'allowNone': false
+					
+				}
+			},
+			'state' : {'selectedValues': ['0']}
 
 	  	 });
 		//create data table

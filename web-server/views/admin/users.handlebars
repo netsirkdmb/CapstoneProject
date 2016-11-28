@@ -26,8 +26,9 @@
 								<th>Name</th>								
 								<th>Email</th>
 								<th>AccountCreationTime</th>
-								<th>signatureImage</th>
-								<th>region</th>
+								
+								<th>Start Date</th>
+								<th>Region</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -37,7 +38,7 @@
 								<td>{{this.name}}</td>
 								<td>{{this.email}}</td>
 								<td>{{this.time}}</td>
-								<td><img width='30' height ='30' src={{this.signatureImage}}></img>{{this.image}}</td>
+								<td>{{this.startDate}}</td>
 								<td>{{this.region}}</td>
 								<td style="display:none;">{{this.uuid}}</td>
 							  </tr>
@@ -52,11 +53,14 @@
  				<! -- Create USER MODAL -->
 				  <div class = "modal fade" id= "createusermodal" role ="dialog">
 						<div class="modal-dialog">
+
 							<div class = "modal-content">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal">×</button>
 									<h4 class="modal-title"> Add User </h4>
 									</div>
+									<form id= "newuserform" method="post" >										
+
 									<div class = modal-body>
 											<div class="form-group">
 												<label for="name">Name:</label>
@@ -76,20 +80,23 @@
 
 												<label for="image">Image:</label>
 												<input type="file" class="form-control" id="image" onchange='readURL(this);'/>
-
 												<img  id="newImage" src="" class = "img-circle"></img>
 											</div>
-											<div>
+											<div class ="form-group">
+												<label for = "datepicker"> Start Date:</label>
+												<input type = "date" id = "datepicker">
 											</div>
 											<div class="form-group">
 												<label for="region">Region:</label>
 												<input type="text" class="form-control" id="region">
 											</div>
+										
 									</div>
 									<div class= "modal-footer">
 										<button type="button" class = "btn btn-info btn-md" data-dismiss="modal" id="createuserbutton">Submit </button>
 									
 									</div>
+									</form>
 							</div>
 						</div>
 					</div>
@@ -119,8 +126,17 @@
 										
 											<div class="form-group">
 												<label for="image">Image:</label>
-												<input type="file"  onchange='readURL(this);' class="form-control" id="editimage">
+
+												<input type="file"  onchange='editURL(this);' class="form-control" id="editimage">
+												<img src="" id="editimagepic" class="img-circle"> </img>
+
 											</div>
+											<div class="form-group">								
+												<label for="editdatepicker">Start Date:  </label>
+												<input type="date" id="editdatepicker" onchange="editURL(this);">
+
+											</div>
+
 											<div class="form-group">
 												<label for="region">Region:</label>
 												<input type="text" class="form-control" id="editregion">

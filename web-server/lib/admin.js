@@ -2,7 +2,12 @@
 var express = require('express'); 
 var myRouter = express.Router(); 
 var request = require('request');
-var uuid = require('node-uuid');
+var async = require('async');
+var cryptoHash = require('./cryptoHash.js'); 
+var multer  = require('multer')
+var upload = multer({ dest: 'lib/uploads/' })
+var fs = require('fs');
+var FormData = require('form-data');
 
 var serverPath = 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/'
 
@@ -32,14 +37,13 @@ myRouter.get('/admin/users' , function (req,res){
 				email: jsonResult.Data[entry].email,
 				password: jsonResult.Data[entry].password,
 				time: jsonResult.Data[entry].accountCreationTime,
-				image: jsonResult.Data[entry].signatureImage,
+				startDate: jsonResult.Data[entry].startDate,
 				region: jsonResult.Data[entry].region		
 						
 				}
 			);
 		}
 
-		console.log("JSON to render for user page: " + results);
 
 		//send data to be rendered
 		context.data = results;
@@ -59,7 +63,6 @@ myRouter.get('/admin/admins', function(req,res){
         //send out request to server to get data needed for current admins
         request('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins', function(err, response,body){
                 //convert response to JSON and process it
-		console.log(body);
                 var jsonResult = JSON.parse(body);
 
                 //go through every result in JSON data and append to a results array.
@@ -86,6 +89,50 @@ myRouter.get('/admin/admins', function(req,res){
 myRouter.get('/admin/bi', function(req,res){
 res.render('admin/bi');
 });
+
+/***********************************************************************************************************************************
+** API Call for Image
+**********************************************************************************************************************************/
+myRouter.route('/admin/API/images').get(function(req,res){
+	console.log(serverPath + req.query['url']);
+	var imageName = req.query['url'].split('/');
+	imageName = imageName[2];
+	console.log(imageName);
+	//var readStream = fs.createReadStream('lib/uploads/' + imageName);
+	var ws = fs.createWriteStream('uploads/'+ imageName);
+	//get file from server and save to directory
+	request(serverPath + req.query['url']).pipe(ws).on('close', function(){
+		var path = 'uploads/' + imageName;
+		fs.readFile(path, function(err,data){
+			if (err)
+				console.log(error);
+			else{
+				var fileType = imageName.split('.');
+				fileType = fileType[1];
+				if(fileType == 'jpeg' || fileType == 'jpg'){
+					res.writeHead(200, {'Content-Type': 'image/jpeg'});
+					//send the file to the browser
+					res.end(data);
+				}
+				else{
+					res.writeHead(200, {'Content-Type': 'image/png'});
+                        	        //send the file to the browser
+	                                res.end(data);
+				}
+			}
+		});
+	});
+});
+
+
+
+
+
+
+
+
+
+
 /*********************************************************************************************************************************
 ** 			API Calls for BI Suite
 *********************************************************************************************************************************/
@@ -313,50 +360,57 @@ myRouter.route('/admin/API/admin').post(
 	function(req,res){
 
 		//generate salt value here
-                var saltValue = uuid.v4();
-                var saltValueArr = saltValue.split("-");
-                saltValue = saltValueArr[0] + saltValue[1];
-		
+		var saltValue = cryptoHash.getRandomSalt();
 		var values =  {password: req.body.password, email:  req.body.email, salt:  saltValue };
-		console.log("Post Values");
-
-
-		request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins', form: values }, function(err, response,body){
+		
+		cryptoHash.hash(saltValue, req.body.password, function(err, passwordHash){
+			values.password =  passwordHash;
+			console.log(passwordHash);
+			request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins', form: values }, function(err, response,body){
 		        if(!err && response.statusCode < 400){
-                                res.send("1");
+                                res.send("Admin Created");
                         }
                         else{
 				console.log("ERROR");
                                 if(response)
                                         console.log(err);
-                                console.log(response);
-				res.send("0");
+				res.send("Error Creating User");
                         }
-		});		
+			});		
+
+
+
+		});
+
+
 	});
 myRouter.route('/admin/API/admin/:uuID')
 	.put(function(req,res){
-		var values =  {password: req.body.password, email:  req.body.email};
-		console.log("Passport ID: " + JSON.stringify(req.session.passport.user.id) + ". User ID:  " + req.params.uuID);
-	        if(req.session.passport.user.id == req.params.uuID){
-			request.put({url:'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins/' + req.params.uuID, form:values}, function(err, response,body){
-                        	if(!err && response.statusCode < 400){
-	                                res.send("1");
-        	                }
-                	        else{
-                        	        if(response)
-                                	        console.log(err);
-	                                console.log(response.body);
-        	                        res.send("0");
-                	        }
-			});
-		}
-		else{
-			console.log("Invalid ID");
-			res.send("Invalid Admin ID. A admin can only update there own profile.");
+                var saltValue = cryptoHash.getRandomSalt();
+		var values =  {password: req.body.password, email:  req.body.email, salt: saltValue};
+
+
+		cryptoHash.hash(saltValue, req.body.password, function(err, passwordHash){		
+		        if(req.session.passport.user.id == req.params.uuID){
+				values.password = passwordHash;
+				request.put({url:'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins/' + req.params.uuID, form:values}, function(err, response,body){
+                	        	if(!err && response.statusCode < 400){
+	                	                res.send("Admin Updated!");
+	        	                }
+        	        	        else{
+                        		        if(response)
+                	                	        console.log(err);
+	                        	        console.log(response.body);
+        	                        	res.send(err);
+ 		               	        }
+				});
+			}
+			else{
+				console.log("Invalid ID");
+				res.send("Invalid Admin ID. A admin can only update there own profile.");
 	
-		}	
-         
+			}	
+         	});
 
 	})
 	.delete(function(req,res){
@@ -364,14 +418,14 @@ myRouter.route('/admin/API/admin/:uuID')
 		request.delete('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins/' + req.params.uuID, function(err, response,body){
 			console.log(req.session);
 			if(!err && response.statusCode < 400){
-				res.send("1");
+				res.send("Admin Deleted!");
 			}
 			else{
 				console.log("ERRROR!!!!");
 				if(response)
 					console.log(err);
 				console.log(response);
-				res.send("0");	
+				res.send(err);	
 			}
 		});
 });
@@ -387,58 +441,145 @@ myRouter.route('/admin/API/admin/:uuID')
 
 myRouter.route('/admin/API/user')
         //create New Router
-        .post( function(req,res){
+        .post(upload.single('avatar'), function(req,res){
+		console.log("Body: " + JSON.stringify(req.body));
 		//generate salt value here
-		var saltValue = uuid.v4();
-		var saltValueArr = saltValue.split("-");
-		saltValue = saltValueArr[0] + saltValue[1];
-		console.log(saltValue);  
-                var values =  {password: req.body.password, email:  req.body.email, salt: saltValue   , region: req.body.region, signatureImage: "comingsoon", name: req.body.name };
-                //console.log(values);
-                request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users', form: values }, function(err, response,body){
-                        if(!err && response.statusCode < 400){
-                                console.log(JSON.stringify(body));
-                                res.send("1");
-                        }
-                        else{
-                                if(response)
-                                        console.log(err);
-                                console.log(response.body);
-                                res.send("0");
-                        }
-                });
+		var saltValue = cryptoHash.getRandomSalt();
+		console.log(req.file);
+	
+               
+		cryptoHash.hash(saltValue, req.body.password, function(err, passwordHash){
+		     	var filepath = req.file.path;
+			var newFilePath
+			if(req.file.mimetype = 'image/jpeg'){
+				newFilePath = filepath + '.jpeg';
+			}
+			else if (req.file.mimetype = 'image/png'){
+				newFilePath = filepath + '.png';
+			}
+			else{
+				res.send("Invalid File Type");
+				return;
+			}
+			fs.rename(filepath, newFilePath, function(err){
+				if(err) throw err;
+				console.log(newFilePath);
+        	         	var values =  {
+					image: fs.createReadStream(newFilePath), 
+					password: req.body.password, 
+					email:  req.body.email, 
+					salt: saltValue   , 
+					region: req.body.region,  
+					name: req.body.name, 
+					startDate: req.body.startDate
+				}; 
+
+				values.password = passwordHash;
+				request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users', formData: values }, function(err, response,body){
+					
+                        		if(err){
+        	        		        if(response)
+                	                	        console.log(err);
+	                	   			console.log(response);
+					     	        res.send("Error Creating User");
+
+        	        	        }
+	        	                else{
+	                        	        console.log("User Created!");
+	       	                      		res.send({result:"User Created!"});
+						fs.unlinkSync(newFilePath);
+		                        }
+	        	        });
+			});
+		});
         });
+
 myRouter.route('/admin/API/user/:ID')
-        .put(function(req,res){
-                console.log("Update Request for ID: " + req.params.ID);
-		var values =  {password: req.body.password, email:  req.body.email,  region: req.body.region, signatureImage: "comingsoon", name: req.body.name };
-                console.log(values);
-		request.put({url:'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users/' + req.params.ID, form: values}, function(err, response,body){
+        .get(function(req,res){
+		console.log("Getting User Data:" + req.params.ID);
+		 request.get({url: serverPath + 'users/' + req.params.ID}, function(err, response,body){
                         if(!err && response.statusCode < 400){
                                 console.log(body);
-                                res.send("1");
+                                res.send(body);
                         }
                         else{
                                 if(response)
                                         console.log(err);
                                 console.log(response.body);
-                                res.send("0");
+                                res.send(response);
                         }
                 });
 
+
+
+
+	})
+
+	.put(upload.single('avatar'),function(req,res){
+                //generate salt value here
+                var saltValue = cryptoHash.getRandomSalt();
+                console.log(req.file);
+		console.log(req.body);
+
+                cryptoHash.hash(saltValue, req.body.password, function(err, passwordHash){
+                        var filepath = req.file.path;
+                        var newFilePath
+                        if(req.file.mimetype = 'image/jpeg'){
+                                newFilePath = filepath + '.jpeg';
+                        }
+                        else if (req.file.mimetype = 'image/png'){
+                                newFilePath = filepath + '.png';
+                        }
+                        else{
+                                res.send("Invalid File Type");
+                                return;
+                        }
+                        fs.rename(filepath, newFilePath, function(err){
+                                if(err) throw err;
+                                console.log(newFilePath);
+                                var values =  {
+                                        image: fs.createReadStream(newFilePath),
+                                        password: req.body.password,
+                                        email:  req.body.email,
+                                        salt: saltValue   ,
+                                        region: req.body.region,
+                                        name: req.body.name,
+                                        startDate: req.body.startDate
+                                };
+
+                                values.password = passwordHash;
+                     		console.log(values);
+			        request.put({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users/' + req.params.ID, formData: values }, function(err, response,body){
+                                        
+					if(err){
+                                                if(response)
+                                                        console.log(err);
+                                                        console.log(response);
+                                                        res.send("Error Creating User");
+
+                                        }
+                                        else{
+                                                console.log("User Updated!");
+                                                res.send({result:"User Updated!"});
+						fs.unlinkSync(newFilePath);
+                                        }
+
+                                });
+                        });
+                });
         })
         .delete(function(req,res){
                 console.log("Delete Request for ID: " + req.params.ID);
                 request.delete('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users/' + req.params.ID, function(err, response,body){
                         if(!err && response.statusCode < 400){
                                 console.log(body);
-                                res.send("1");
+                                res.send("User Deleted!");
                         }
                         else{
                                 if(response)
                                         console.log(err);
                                 console.log(response);
-                                res.send("0");
+                                res.send(err);
                         }
                 });
 

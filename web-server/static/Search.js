@@ -63,7 +63,6 @@ $(document).ready(function(){
 			
 		})
 		.done(function(returnData){
-			//console.log(returnData);
 			var jsonData = JSON.parse(returnData);
 
 			//format data
@@ -76,13 +75,11 @@ $(document).ready(function(){
 				formattedData.push(newEntry);
 
 			} 
-			//console.log(formattedData);
 			//drawdata
 
 			var data = google.visualization.arrayToDataTable(formattedData);
 	                var options={
         	                showRowNumber: false
-
                 	};
 
 	                var chart = new google.visualization.Table(document.getElementById('indiTableGiven'));
@@ -135,7 +132,6 @@ $(document).ready(function(){
 
 		})
 		.done(function(data){
-			//console.log(data);
 			//format data
 			 var jsonData = JSON.parse(data);
 
@@ -149,25 +145,21 @@ $(document).ready(function(){
 
                         }
 
-//                        console.log(formattedData);
                         formattedData = google.visualization.arrayToDataTable(formattedData);
 			var options = {
                         	title:"Awards Given Frequency",
-	                        curveType: 'function',
-        	                lengend: {position: 'bottom' }
+        	                legend: {position: 'bottom' },
+				width: 500,
+				height: 400,
+				viewWindowMode: 'explicit',
+				vAxis: {minValue: 0}			
                 	};
 
 
 
 	                var chart = new google.visualization.LineChart(document.getElementById('indiBarGiven'));
         	        chart.draw(formattedData,options);
-
-
-
 		});
-
-		
-		
 	};
 	
 	
@@ -179,7 +171,6 @@ $(document).ready(function(){
 
 		})
 		.done(function(data){
-			console.log(data);
                         //format data
                          var jsonData = JSON.parse(data);
 
@@ -193,12 +184,12 @@ $(document).ready(function(){
 
                         }
 
-                        console.log(formattedData);
                         formattedData = google.visualization.arrayToDataTable(formattedData);
 			var options = {
 	                        title:"Awards Recieved Value",
-        	                curveType: 'function',
-	                        lengend: {position: 'bottom' }
+	                        legend: {position: 'bottom' },
+				width: 500,
+				height: 400
         	        };
 
 	                var chart = new google.visualization.LineChart(document.getElementById('indiLineRecieved'));
@@ -215,7 +206,6 @@ $(document).ready(function(){
 
 		}).
 		done(function(data){
-			console.log(data);
 			var jsonData = JSON.parse(data);
 
                         //format data
@@ -228,24 +218,14 @@ $(document).ready(function(){
 
                         }
 
-                        console.log(formattedData);
                         formattedData = google.visualization.arrayToDataTable(formattedData);
-
-
-
 	                var options = {
         	                title:"Types of Award Breakdown"
-
                 	};
+
 	                var chart = new google.visualization.PieChart(document.getElementById('indiPieRecieved'));
         	        chart.draw(formattedData,options);
-
-
-
 		});
-
-
-
 
 
 		var inputData = [
@@ -302,22 +282,6 @@ $(document).ready(function(){
 
 		});
 
-/*
-		var inputData = [
-		["From", "Award Type", "Date"],
-		["Kat", "Gold Star", "8/17/2015"],
-		["Joan", "Silver Star", "8/30/2016"],
-		["Marianne", "Bronze", "8/12/2012"]
-		];
-		var data = google.visualization.arrayToDataTable(inputData);
-		var options = {
-			showRowNumber: false
-			
-		};
-		
-		var resultTable = new google.visualization.Table(document.getElementById('indiTableRecieved'));
-		resultTable.draw(data,options);
-*/
 		
 	};
 	

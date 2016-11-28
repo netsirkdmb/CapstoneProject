@@ -8,6 +8,8 @@ var randomString = require('randomstring');
 // Loads the express, handlebars engine
 var express = require('express');
 var app = express();
+var multer  = require('multer')
+var upload = multer({ dest: 'uploads/' })
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');

@@ -75,13 +75,8 @@ $(document).ready(function(){
 			type:"DELETE"
 		})
 		.done(function(result){
-			if(result == "1"){
-				alert('User ' + userID + ' Deleted!');
-				location.reload();			
-			}
-			else
-				alert("Delete Failed");	
-		
+			alert(result);		
+			location.reload();
 		})
 		.fail(function(result){
 			alert('Failed: ' + result);
