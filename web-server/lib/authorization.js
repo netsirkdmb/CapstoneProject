@@ -10,8 +10,12 @@ router.route('/*').all(function(req, res, next){
 	var passport = req.session.passport;
 	var path = req.path.split('/');
 
+	// Allows access to login pages
+	if (path[1] == 'login')
+		next();
+
 	// Rejects access if no authentication
-	if (passport == undefined)
+	else if (passport == undefined)
 		res.redirect('/login');
 
 	// Allows access if type matches

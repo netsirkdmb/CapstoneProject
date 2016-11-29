@@ -1,10 +1,10 @@
-// Global Variable Decleration
+// Global Variable Deceleration
 var router = require('express').Router();
 var request = require('request');
 var async = require('async');
 var moment = require('moment');
 var internalError = "An internal error has occured";
-var hostDB = "http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600";
+var hostDB = "https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com";
 
 /*******************************************
 ** Func: dateSortFunc
@@ -47,7 +47,7 @@ function emailSortFunc(a, b){
 	else if (e1[0] != e2[0])
 		return (e1[0] > e2[0] ? 1 : -1);
 
-	// Returns they match -- should be imposible
+	// Returns they match -- should be impossible
 	else
 		return 0;
 }
@@ -56,7 +56,7 @@ function emailSortFunc(a, b){
 /*******************************************
 ** Func: awardSortFunc
 ** Desc: Function for sorting award types by name
-** PreCond: Object must contain name feild
+** PreCond: Object must contain name field
 ** Return: The award order of the objects
 *******************************************/
 function awardSortFunc(a, b){
@@ -91,7 +91,7 @@ router.get('/award/previous-award', function(req, res, next){
 		var context = {};
 		body = JSON.parse(body);
 		
-		// An error has occured
+		// An error has occurred
 		if (err){
 			console.log(err);
 			context.errorMssg = internalError;
@@ -103,7 +103,7 @@ router.get('/award/previous-award', function(req, res, next){
 		
 		// Processes the data found
 		else {
-			// Spilts the time date object
+			// Splits the time date object
 			var data = body.Data;
 			var dateArr;
 			for (c = 0; c < data.length; c++){
@@ -147,13 +147,23 @@ router.get('/award/give-award', function(req, res, next){
 		userList: function(callback){
 			var path = '/users';
 			request(hostDB + path, function(err, resDB, body){
-				// An error has occured
+				// An error has occurred
 				if (err)
 					callback(err, null);
 
 				// Sorts and saves the body data to the context
-				else 
-					callback(null, JSON.parse(body).Data.sort(emailSortFunc));
+				else {
+					// Removes the logged in user from the list
+					var userID = req.session.passport.user.id;
+					body = JSON.parse(body);
+					var c = 0;
+					while (body.Data[c].userID != userID)
+						c++;
+					body.Data.splice(c, 1);
+
+					// Sorts the data and renders the page
+					callback(null, body.Data.sort(emailSortFunc));
+				}
 			});
 		},
 
@@ -161,7 +171,7 @@ router.get('/award/give-award', function(req, res, next){
 		awardList: function(callback){
 			var path = '/awardTypes';
 			request(hostDB + path, function(err, resDB, body){
-				// An error has occured
+				// An error has occurred
 				if (err)
 					callback(err, null);
 
@@ -173,7 +183,7 @@ router.get('/award/give-award', function(req, res, next){
 
 	// Callback function - Runs at the end context contains the results
 	}, function(err, context){
-		// An error has occured
+		// An error has occurred
 		if (err)
 			next(err);
 
@@ -186,7 +196,7 @@ router.get('/award/give-award', function(req, res, next){
 
 /*******************************************
 ** Router: /award/profile
-** Desc: Displayes the profile information
+** Desc: Displays the profile information
 *******************************************/
 router.get('/award/profile', function(req, res, next){
 	// Pulls the user ID from the session
@@ -197,7 +207,7 @@ router.get('/award/profile', function(req, res, next){
 	request(hostDB + path, function(err, resDB, body){
 		var context = {};
 		var body = JSON.parse(body);
-		// An error has occured
+		// An error has occurred
 		if (err){
 			console.log(err);
 			context.errorMssg = internalError;
@@ -243,7 +253,7 @@ router.post('/award/changeName', function(req, res, next){
 		function(name, callback){
 			request(hostDB + path, function(err, resDB, body){
 				var body = JSON.parse(body);
-				// An error has occured
+				// An error has occurred
 				if (err)
 					callback(true, null);
 
@@ -355,6 +365,12 @@ router.post('/award/add-award', function(req, res, next){
 
 	// Gets the giver id from the passport
 	var giverID = req.session.passport.user.id;
+
+	// Prevents issuing an award to one self
+	if (giverID == receiverID) {
+		res.status(400).send(null);
+		return;
+	}
 
 	// Data to be sent to the database
 	var data = {
