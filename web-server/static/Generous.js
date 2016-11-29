@@ -19,7 +19,7 @@ $(document).ready(function(){
                         ['Name', 'Frequency', 'Month']
 		];
              
-
+		//Filter and Process the data in a array for ingenstion by google charts
 		for (var entry in genData.Results){
 			for(var point in genData.Results[entry]){
                                 var newEntry = [];
@@ -27,7 +27,7 @@ $(document).ready(function(){
                                         newEntry.push(genData.Results[entry][point].name);
                                         newEntry.push(genData.Results[entry][point].frequency);
                                         if(entry == 'Year')
-                                                newEntry.push(0);
+                                                newEntry.push('All Time');
                                         else{
                                 		var month = entry.split('-');
                                                 newEntry.push(month[0]);
@@ -55,7 +55,7 @@ $(document).ready(function(){
 					'allowNone': false
 				}
                         },
-			'state': {'selectedValues': ['0']}
+			'state': {'selectedValues': ['All Time']}
 
 	
 		});

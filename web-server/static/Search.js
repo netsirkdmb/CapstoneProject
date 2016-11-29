@@ -11,9 +11,6 @@ $(document).ready(function(){
 			data: "json",
 			method: "POST",
 			data: { "email": searchIndex}	
-		
-
-
 		}).done(function(result){
 			 //valid name
 			if(result.ID >0){
@@ -42,16 +39,10 @@ $(document).ready(function(){
 		                //Given Awards
 		                $("#given_title").show();
 
-                		//alert($("#ename").val());
-
-
-
 			}		
 			else{
 				alert("Invalid Username.");
 			}
-
-
 		});
 		
 	});
@@ -112,7 +103,6 @@ $(document).ready(function(){
 
                         }
 
-                        console.log(formattedData);
 	                formattedData = google.visualization.arrayToDataTable(formattedData);
 
         	        var options = {
@@ -243,7 +233,6 @@ $(document).ready(function(){
 		};
 		var chart = new google.visualization.PieChart(document.getElementById('indiPieRecieved'));
 		chart.draw(data,options);
-		
 	}
 	
 	function getRecievedTransactions(){
@@ -252,8 +241,6 @@ $(document).ready(function(){
 			format:"json"	
 
 		}).done(function(data){
-			console.log(data);
-
 			var jsonData = JSON.parse(data);
 
                         //format data
@@ -264,31 +251,17 @@ $(document).ready(function(){
                                 newEntry.push(jsonData.Data[entry].awardType);
                                 newEntry.push(jsonData.Data[entry].awardDate);
                                 formattedData.push(newEntry);
-
                         }
 
-                        console.log(formattedData);
                         formattedData = google.visualization.arrayToDataTable(formattedData);
 	                var options = {
         	                showRowNumber: false
-
                 	};
 	
         	        var resultTable = new google.visualization.Table(document.getElementById('indiTableRecieved'));
                 	resultTable.draw(formattedData,options);
-
-
-
-
 		});
-
-		
 	};
 	
 	
-	function getData(){
-		
-		
-		
-	};
 });
