@@ -8,8 +8,9 @@ var multer  = require('multer')
 var upload = multer({ dest: 'lib/uploads/' })
 var fs = require('fs');
 var FormData = require('form-data');
+var serverPath = 'https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com/'
 
-var serverPath = 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/'
+//var serverPath = 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/'
 
 /*****************************************************
 		Login Routers 
@@ -22,7 +23,7 @@ myRouter.get('/admin/users' , function (req,res){
 	var results=[];  //used to store processed results from server
 
 	//send out request to server to get data needed for current admins
-	request('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users', function(err, response,body){
+	request(serverPath + 'users', function(err, response,body){
 		//convert response to JSON and process it
 		var jsonResult = JSON.parse(body);
 		
@@ -61,7 +62,7 @@ myRouter.get('/admin/admins', function(req,res){
 	 var results=[];  //used to store processed results from server
 
         //send out request to server to get data needed for current admins
-        request('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins', function(err, response,body){
+        request(serverPath + 'admins', function(err, response,body){
                 //convert response to JSON and process it
                 var jsonResult = JSON.parse(body);
 
@@ -366,7 +367,7 @@ myRouter.route('/admin/API/admin').post(
 		cryptoHash.hash(saltValue, req.body.password, function(err, passwordHash){
 			values.password =  passwordHash;
 			console.log(passwordHash);
-			request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins', form: values }, function(err, response,body){
+			request.post({url: serverPath + 'admins', form: values }, function(err, response,body){
 		        if(!err && response.statusCode < 400){
                                 res.send("Admin Created");
                         }
@@ -393,7 +394,7 @@ myRouter.route('/admin/API/admin/:uuID')
 		cryptoHash.hash(saltValue, req.body.password, function(err, passwordHash){		
 		        if(req.session.passport.user.id == req.params.uuID){
 				values.password = passwordHash;
-				request.put({url:'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins/' + req.params.uuID, form:values}, function(err, response,body){
+				request.put({url: serverPath +  'admins/' + req.params.uuID, form:values}, function(err, response,body){
                 	        	if(!err && response.statusCode < 400){
 	                	                res.send("Admin Updated!");
 	        	                }
@@ -415,7 +416,7 @@ myRouter.route('/admin/API/admin/:uuID')
 	})
 	.delete(function(req,res){
 		console.log("Delete Request for ID: " + req.params.ID);
-		request.delete('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/admins/' + req.params.uuID, function(err, response,body){
+		request.delete( serverPath + 'admins/' + req.params.uuID, function(err, response,body){
 			console.log(req.session);
 			if(!err && response.statusCode < 400){
 				res.send("Admin Deleted!");
@@ -475,7 +476,7 @@ myRouter.route('/admin/API/user')
 				}; 
 
 				values.password = passwordHash;
-				request.post({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users', formData: values }, function(err, response,body){
+				request.post({url: serverPath + '/users', formData: values }, function(err, response,body){
 					
                         		if(err){
         	        		        if(response)
@@ -549,7 +550,7 @@ myRouter.route('/admin/API/user/:ID')
 
                                 values.password = passwordHash;
                      		console.log(values);
-			        request.put({url: 'http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users/' + req.params.ID, formData: values }, function(err, response,body){
+			        request.put({url: serverPath + 'users/' + req.params.ID, formData: values }, function(err, response,body){
                                         
 					if(err){
                                                 if(response)
@@ -570,7 +571,7 @@ myRouter.route('/admin/API/user/:ID')
         })
         .delete(function(req,res){
                 console.log("Delete Request for ID: " + req.params.ID);
-                request.delete('http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600/users/' + req.params.ID, function(err, response,body){
+                request.delete( serverPath + 'users/' + req.params.ID, function(err, response,body){
                         if(!err && response.statusCode < 400){
                                 console.log(body);
                                 res.send("User Deleted!");

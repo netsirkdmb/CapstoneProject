@@ -34,37 +34,32 @@ $(document).ready(function(){
 		var chartData = [
 				['Name', 'Points', 'Month']
 		];
-		console.log(annualData.Results);
-		for (var entry in annualData.Results){
 
+		//Process the data in a datatable
+		for (var entry in annualData.Results){
 			for(var point in annualData.Results[entry]){
-	
 				var newEntry = [];
 				if( annualData.Results[entry][point].name != undefined){
-					console.log(entry);
-
 					newEntry.push(annualData.Results[entry][point].name);
 					newEntry.push(annualData.Results[entry][point].points);
+					//check if entry is a year, push 
 					if(entry == 'Year')
-						newEntry.push(0);
+						newEntry.push('All Time');
 					else{
-
 						var month = entry.split('-');
-						console.log(month[0]);							
 						newEntry.push(month[0]);						
 					}
 					chartData.push(newEntry);
 				}
 			}		
 		}
-		console.log(chartData);
+
 		//create data table
 		 var data = new google.visualization.arrayToDataTable(
 			chartData			
 		);
 
 		//create a control  wrapper for data
-		
 		 var controlWrapper = new google.visualization.ControlWrapper({
 			'controlType': 'CategoryFilter',
 			'containerId': 'filter_div',
@@ -73,12 +68,12 @@ $(document).ready(function(){
 				'ui': {
 					'allowMultiple': false,
 					'allowNone': false
-					
 				}
 			},
-			'state' : {'selectedValues': ['0']}
+			'state' : {'selectedValues': ['All Time']}
 
 	  	 });
+
 		//create data table
 		var dataTable = new google.visualization.ChartWrapper({
 			'chartType': 'Table',
@@ -88,10 +83,7 @@ $(document).ready(function(){
 				'width': '100%',
 				'height': '100%'
 			}
-			
 		});
-
-
 	
 		//create bar chart
 		var barChart = new google.visualization.ChartWrapper({
@@ -115,10 +107,5 @@ $(document).ready(function(){
 
 		//bind the dashboard with the controls
 		dashBoard.draw(data);
-
-
-	
-
 	}
-
 });

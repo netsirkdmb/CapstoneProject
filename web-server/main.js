@@ -4,6 +4,7 @@
 // Required Modules (Miscellaneous)
 var fs = require('fs');
 var randomString = require('randomstring');
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 // Loads the express, handlebars engine
 var express = require('express');
