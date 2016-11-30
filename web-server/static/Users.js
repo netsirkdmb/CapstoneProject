@@ -25,11 +25,13 @@ $(document).ready(function(){
 			url: '/admin/API/user/' + modalData[0]
 		}).done(function(result){
 			var jsonResult = JSON.parse(result);
+			console.log(result);
 			var date = new Date(jsonResult.Data[0].startDate);
 			$('#ID').text(jsonResult.Data[0].userID);
 			$('#editname').val(jsonResult.Data[0].name);
                 	$('#editemail').val(jsonResult.Data[0].email);
 			$('#editregion').val(jsonResult.Data[0].region);
+			$('#passwordcode').text(jsonResult.Data[0].passwordCode);
 			$('#editdatepicker').val(date);
 			$('#editusers').modal('show');
 			//get image from server
@@ -136,11 +138,12 @@ $(document).ready(function(){
                 testData.append('name', $('#editname').val());
                 testData.append('region',  $('#editregion').val());
                 testData.append('startDate',  $('#editdatepicker').val());
+		testData.append('passwordCode', $('#passwordcode').val());
 		//Add new Signature Image
 		var files = $('#editimage')[0].files[0];
 
 		 testData.append('avatar', files, files.name);
-
+		console.log(testData);
                 $.ajax({
                         url: '/admin/API/user/' + userID,
                         type:"PUT",
