@@ -388,7 +388,7 @@ myRouter.route('/admin/API/admin').post(
 myRouter.route('/admin/API/admin/:uuID')
 	.put(function(req,res){
                 var saltValue = cryptoHash.getRandomSalt();
-		var values =  {password: req.body.password, email:  req.body.email, salt: saltValue};
+		var values =  {password: req.body.password, email:  req.body.email, salt: saltValue, passwordCode:"0"};
 
 
 		cryptoHash.hash(saltValue, req.body.password, function(err, passwordHash){		
