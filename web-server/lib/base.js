@@ -1,4 +1,4 @@
-// Global Variable Decleration
+// Global Variable Deceleration
 var router = require('express').Router();
 
 // Redirects to login page

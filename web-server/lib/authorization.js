@@ -1,9 +1,9 @@
-// Global Variable Decleration
+// Global Variable Deceleration
 var router = require('express').Router();
 
 /********************************************
 ** Func: router.route('/*').all
-** Desc: Authirisation - Cookie type must match route
+** Desc: Authorization - Cookie type must match route
 ** PostCond: Users can't access admin site and vice versa
 *********************************************/
 router.route('/*').all(function(req, res, next){
