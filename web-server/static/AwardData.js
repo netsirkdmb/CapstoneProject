@@ -27,7 +27,9 @@ $(document).ready(function(){
 		var options = {
 			title:"Award Frequency",
 			curveType: 'function',
-			legend: {position: 'bottom' }
+			legend: {position: 'bottom' },
+			width:500 ,
+			height:400
 		};
 		
 		var chart = new google.visualization.LineChart(document.getElementById('awardsfrequency'));
