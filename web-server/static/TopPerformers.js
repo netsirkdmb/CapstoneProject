@@ -70,7 +70,7 @@ $(document).ready(function(){
 					'allowNone': false
 				}
 			},
-			'state' : {'selectedValues': ['All Time']}
+			'state' : {'selectedValues': ['Past Year']}
 
 	  	 });
 
