@@ -402,8 +402,6 @@ class TopEmployees(Resource):
 
             for i in range(len(monthList)):
                 queryMonth, queryYear = monthList[i]
-                print(queryMonth)
-                print(queryYear)
 
                 query = """SELECT z.userID, z.name, z.rank, z.points FROM 
                         (SELECT x.userID, x.name, x.points, 
@@ -433,11 +431,9 @@ class TopEmployees(Resource):
                     
                     monthYear = "{0}-{1}".format(queryMonth, queryYear)
                     resultsList[monthYear] = rowList
-                    print(resultsList)
                 else:
                     monthYear = "{0}-{1}".format(queryMonth, queryYear)
                     resultsList[monthYear] = [0]
-                    print(resultsList)
             
             query = """SELECT z.userID, z.name, z.rank, z.points FROM 
                     (SELECT x.userID, x.name, x.points, 
