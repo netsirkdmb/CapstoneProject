@@ -27,7 +27,7 @@ $(document).ready(function(){
                                         newEntry.push(genData.Results[entry][point].name);
                                         newEntry.push(genData.Results[entry][point].frequency);
                                         if(entry == 'Year')
-                                                newEntry.push('All Time');
+                                                newEntry.push('Past Year');
                                         else{
                                 		var month = entry.split('-');
                                                 newEntry.push(month[0]);
@@ -55,7 +55,7 @@ $(document).ready(function(){
 					'allowNone': false
 				}
                         },
-			'state': {'selectedValues': ['All Time']}
+			'state': {'selectedValues': ['Past Year']}
 
 	
 		});
@@ -71,7 +71,7 @@ $(document).ready(function(){
                                 'title': "name"
                                  },
                                 'vAxis':{
-                                        'title': 'Points'
+                                        'title': 'Frequency'
                                 },
                                 'legend': {'position': "none" }
                         },

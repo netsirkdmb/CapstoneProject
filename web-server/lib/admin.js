@@ -388,7 +388,7 @@ myRouter.route('/admin/API/admin').post(
 myRouter.route('/admin/API/admin/:uuID')
 	.put(function(req,res){
                 var saltValue = cryptoHash.getRandomSalt();
-		var values =  {password: req.body.password, email:  req.body.email, salt: saltValue};
+		var values =  {password: req.body.password, email:  req.body.email, salt: saltValue, passwordCode:"0"};
 
 
 		cryptoHash.hash(saltValue, req.body.password, function(err, passwordHash){		
@@ -519,8 +519,6 @@ myRouter.route('/admin/API/user/:ID')
 	.put(upload.single('avatar'),function(req,res){
                 //generate salt value here
                 var saltValue = cryptoHash.getRandomSalt();
-                console.log(req.file);
-		console.log(req.body);
 
                 cryptoHash.hash(saltValue, req.body.password, function(err, passwordHash){
                         var filepath = req.file.path;
@@ -528,6 +526,10 @@ myRouter.route('/admin/API/user/:ID')
                         if(req.file.mimetype = 'image/jpeg'){
                                 newFilePath = filepath + '.jpeg';
                         }
+			else if(req.file.mimetype = 'image/jpg'){
+				newFilePath = filepath + '.jpg';
+
+			}
                         else if (req.file.mimetype = 'image/png'){
                                 newFilePath = filepath + '.png';
                         }
@@ -540,7 +542,8 @@ myRouter.route('/admin/API/user/:ID')
                                 console.log(newFilePath);
                                 var values =  {
                                         image: fs.createReadStream(newFilePath),
-                                        password: req.body.password,
+                                        passwordCode: req.body.passwordCode,
+					password: req.body.password,
                                         email:  req.body.email,
                                         salt: saltValue   ,
                                         region: req.body.region,
@@ -561,6 +564,7 @@ myRouter.route('/admin/API/user/:ID')
                                         }
                                         else{
                                                 console.log("User Updated!");
+						console.log(response);
                                                 res.send({result:"User Updated!"});
 						fs.unlinkSync(newFilePath);
                                         }

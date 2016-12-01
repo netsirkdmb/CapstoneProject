@@ -44,7 +44,7 @@ $(document).ready(function(){
 					newEntry.push(annualData.Results[entry][point].points);
 					//check if entry is a year, push 
 					if(entry == 'Year')
-						newEntry.push('All Time');
+						newEntry.push('Past Year');
 					else{
 						var month = entry.split('-');
 						newEntry.push(month[0]);						
@@ -70,7 +70,7 @@ $(document).ready(function(){
 					'allowNone': false
 				}
 			},
-			'state' : {'selectedValues': ['All Time']}
+			'state' : {'selectedValues': ['Past Year']}
 
 	  	 });
 
