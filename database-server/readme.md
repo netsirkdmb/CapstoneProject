@@ -1,9 +1,6 @@
 #API Readme
 
 **API base endpoint:**
-http://ec2-52-42-152-172.us-west-2.compute.amazonaws.com:5600
-
-**API base endpoint for HTTPS:**
 https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com
 
 
@@ -22,14 +19,14 @@ https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com
 
 
 **Users Table:** [/users](https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com/users)
-- get: returns all users in the database (does not include signature image)
+- get: returns all users in the database
 - post: creates a new users in the database
 - put: invalid
 - delete: deletes all users in the database
 
 
 **Users Table by ID:** [/users/1234](https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com/users/1)
-- get: returns user with specified id _(specified id is represented by "1234")_, includes signature image
+- get: returns user with specified id _(specified id is represented by "1234")_
 - post: invalid
 - put: updates user with specified id, signatureImage not required
 - delete: deletes user with specified id
@@ -58,7 +55,7 @@ https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com
 
 **Award Types Table:** [/awardTypes](https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com/awardTypes)
 - get: returns all award types in the database
-- post: creates a new award types in the database
+- post: creates a new award type in the database
 - put: invalid
 - delete: deletes all award types in the database
 
@@ -76,10 +73,12 @@ https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com
 
 **Get User by Email:** [/getUserByEmail](https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com/getUserByEmail)
 - post: returns user with specified email (does not include signature image)
+- put: updates user with specified email's password code
 
 
 **Get Admin by Email:** [/getAdminByEmail](https://ec2-52-42-152-172.us-west-2.compute.amazonaws.com/getAdminByEmail)
 - post: returns admin with specified email
+- put: updates admin with specified email's password code
 
 
 

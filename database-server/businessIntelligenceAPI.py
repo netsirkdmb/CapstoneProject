@@ -14,6 +14,7 @@ from flask import Flask, request, current_app as app
 from flask_restful import Resource
 import traceback
 import datetime
+import arrow
 
 
 def convertMonth(mon):
@@ -389,23 +390,20 @@ class AwardUserGivenTypes(Resource):
 
 class TopEmployees(Resource):
     def get(self):
-        # get current month
-        month = datetime.datetime.now().strftime("%m")
-        year = datetime.datetime.now().strftime("%Y")
-        year = int(year)
         monthList = []
-        for i in range(12):
-            monthNum = (int(month) - i) % 12
-            if monthNum == 0:
-                monthNum = 12
-                year -= 1
-            monthList.append((monthNum, year))
+        # get current date
+        end = arrow.now()
+        start = end.replace(months = -11)
+        for d in arrow.Arrow.range('month', start, end):
+            monthList.append((d.month, d.year))
 
         try:
             resultsList = {}
 
             for i in range(len(monthList)):
                 queryMonth, queryYear = monthList[i]
+                print(queryMonth)
+                print(queryYear)
 
                 query = """SELECT z.userID, z.name, z.rank, z.points FROM 
                         (SELECT x.userID, x.name, x.points, 
@@ -435,9 +433,11 @@ class TopEmployees(Resource):
                     
                     monthYear = "{0}-{1}".format(queryMonth, queryYear)
                     resultsList[monthYear] = rowList
+                    print(resultsList)
                 else:
                     monthYear = "{0}-{1}".format(queryMonth, queryYear)
                     resultsList[monthYear] = [0]
+                    print(resultsList)
             
             query = """SELECT z.userID, z.name, z.rank, z.points FROM 
                     (SELECT x.userID, x.name, x.points, 
@@ -483,17 +483,12 @@ class TopEmployees(Resource):
 
 class MostGenerous(Resource):
     def get(self):
-        # get current month
-        month = datetime.datetime.now().strftime("%m")
-        year = datetime.datetime.now().strftime("%Y")
-        year = int(year)
         monthList = []
-        for i in range(12):
-            monthNum = (int(month) - i) % 12
-            if monthNum == 0:
-                monthNum = 12
-                year -= 1
-            monthList.append((monthNum, year))
+        # get current date
+        end = arrow.now()
+        start = end.replace(months = -11)
+        for d in arrow.Arrow.range('month', start, end):
+            monthList.append((d.month, d.year))
 
         try:
             resultsList = {}
