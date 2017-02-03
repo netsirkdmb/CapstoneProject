@@ -1,3 +1,5 @@
+#Note: I'm not sure how long these links will remain active.
+
 Using the Website:
 Initially, you can log in using the backdoor login. This will log you in as Kristen for both admin and award page.
 Backdoor:
